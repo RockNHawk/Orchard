@@ -14,6 +14,12 @@ namespace Amba.HtmlBlocks
 
         public void GetNavigation(NavigationBuilder builder)
         {
+            builder.Add(T("AppInstanceId:{0}", System.AppDomain.CurrentDomain.Id));
+
+            var appId = T("AppId:{0}", System.AppDomain.CurrentDomain.Id);
+            builder.Add(appId, "4",
+                          menu => menu.Add(appId, "1.0"));
+
             builder.Add(T("Html Blocks"), "4",
                         menu => menu
                                     .Add(T("Html Blocks"), "1.0",
