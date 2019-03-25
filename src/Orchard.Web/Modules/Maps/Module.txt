@@ -1,0 +1,11 @@
+Name: Maps
+AntiForgery: enabled
+Author: The Orchard Team
+Website: http://orchardproject.net
+Version: 1.0.0
+OrchardVersion: 1.0.0
+Description:  Adds a map image to content items, based on longitude and latitude.
+Features:
+    Maps:
+        Description: Adds a map image to content items, based on longitude and latitude.
+        Category: Geolocation

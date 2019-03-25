@@ -1,0 +1,6 @@
+syntax: glob
+*/obj/*
+bin/*
+*/obj/*
+obj/Debug/Amba.HtmlBlocks.csproj.FileListAbsolute.txt
+obj/*
