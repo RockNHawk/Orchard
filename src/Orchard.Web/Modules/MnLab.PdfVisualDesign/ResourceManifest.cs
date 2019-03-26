@@ -1,6 +1,6 @@
 using Orchard.UI.Resources;
 
-namespace MnLab.PdfVisualDesign.HtmlBlocks
+namespace MnLab.PdfVisualDesign.Binding
 {
     public class ResourceManifest : IResourceManifestProvider
     {

@@ -23,7 +23,39 @@
     */
 
 }
-@Html.TextBoxFor(x => x.PropertyExpression)
+
+<fieldset>
+    <legend>Bind</legend>
+
+    ContentPartTypeName
+    @Html.TextBoxFor(x => x.Binding.ContentPartTypeName)
+
+
+    Bind Property
+    @Html.TextBoxFor(x => x.Binding.ContentPartFieldExpression)
+
+    ExampleValue:
+    @Html.TextBoxFor(x => x.Binding.ExampleValue)
+
+    @*Description:*@
+    @*@Html.TextBoxFor(x => x.Bind.Description)*@
+</fieldset>
+
+
+@if (Model.Field != null)
+{
+    <fieldset>
+        <legend>Value</legend>
+
+        @{
+            @*@Model.FieldDisplay*@
+            var contentFieldShape = Model.FieldDisplay.BuildDisplay(Model.Content, Model.Field, "", "Value");
+            @Display(contentFieldShape);
+        }
+        @*@Html.TextBoxFor(x => x.Value.Value)*@
+    </fieldset>
+}
+
 
 @using (Script.Foot())
 {

@@ -1,7 +1,7 @@
 ﻿using Orchard.Localization;
 using Orchard.UI.Navigation;
 
-namespace MnLab.PdfVisualDesign.HtmlBlocks
+namespace MnLab.PdfVisualDesign.Binding
 {
     public class AdminMenu : INavigationProvider
     {

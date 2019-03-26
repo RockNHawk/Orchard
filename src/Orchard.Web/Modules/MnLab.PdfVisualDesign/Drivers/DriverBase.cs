@@ -2,7 +2,7 @@
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
 
-namespace MnLab.PdfVisualDesign.HtmlBlocks.Drivers
+namespace MnLab.PdfVisualDesign.Binding.Drivers
 {
     public abstract class FieldDriverBase<TContentField> : ContentFieldDriver<TContentField>
         where TContentField : ContentField, new()

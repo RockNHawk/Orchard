@@ -3,8 +3,7 @@ using Orchard.Localization;
 using Orchard.Layouts.Framework.Elements;
 using Orchard.Layouts.Helpers;
 
-namespace MnLab.PdfVisualDesign.HtmlBlocks.Elements 
-{
+namespace MnLab.PdfVisualDesign.Binding.Elements {
     /// <summary>
     /// 定义 Model Property Bind Element
     /// 具有三种模式：
@@ -14,24 +13,34 @@ namespace MnLab.PdfVisualDesign.HtmlBlocks.Elements
     ///
     /// 对 Orchard 现有功能架构进行扩展，应该可行
     /// </summary>
-    public class PropertyBindElement : ContentElement 
-    {
-        public override string ToolboxIcon
-        {
+    public class PropertyBindElement : ContentElement {
+        public override string ToolboxIcon {
             get { return "\uf0f6"; }
         }
 
-        public override LocalizedString DisplayText
-        {
+        public override LocalizedString DisplayText {
             get { return T("Property Bind"); }
         }
 
-        public virtual string PropertyExpression {
-            get { return this.Retrieve(x => x.PropertyExpression); }
-            set { this.Store(x => x.PropertyExpression, value); }
+        public virtual string ContentPartFieldExpression {
+            get { return this.Retrieve(x => x.ContentPartFieldExpression); }
+            set { this.Store(x => x.ContentPartFieldExpression, value); }
         }
 
+        public virtual string ContentPartTypeName {
+            get { return this.Retrieve(x => x.ContentPartTypeName); }
+            set { this.Store(x => x.ContentPartTypeName, value); }
+        }
 
+        public virtual string ExampleValue {
+            get { return this.Retrieve(x => x.ExampleValue); }
+            set { this.Store(x => x.ExampleValue, value); }
+        }
+
+        public virtual string Remark {
+            get { return this.Retrieve(x => x.Remark); }
+            set { this.Store(x => x.Remark, value); }
+        }
 
     }
 
