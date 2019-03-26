@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using MnLab.PdfVisualDesign.Binding.Elements;
 using Orchard.ContentManagement;
+using Orchard.ContentManagement.Drivers;
+using Orchard.ContentManagement.Handlers;
 using Orchard.Layouts.Services;
 
 namespace MnLab.PdfVisualDesign.ViewModels {
@@ -27,6 +29,10 @@ namespace MnLab.PdfVisualDesign.ViewModels {
 
         public ContentField Field { get; set; }
 
+        public BuildShapeContext EditorShapeContext { get; set; }
+
+        
+        public IEnumerable<DriverResult> FieldDrivers { get; set; }
         public IContentFieldDisplay FieldDisplay { get; set; }
 
         public FieldBindingInfo Binding { get; set; }

@@ -49,9 +49,23 @@
 
     @{
         @*@Model.FieldDisplay*@
-        var contentFieldShape = Model.FieldDisplay.BuildDisplay(Model.Content, Model.Field, "", "Value");
-       // @New.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
-       @contentFieldShape
+        //   var contentFieldShape = Model.FieldDisplay.BuildEditor(Model.Content, Model.Field);
+        // @New.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
+        // @contentFieldShape
+
+
+        //   @Display(contentFieldShape)
+
+        @*var editors = Model.FieldDrivers;
+            foreach (var item in editors)
+            {
+                @Display(item)
+            }*@
+
+        @Model.EditorShapeContext.Shape
+
+        @Display(Model.EditorShapeContext.Shape)
+
 
         /*
         var editor = context.ShapeFactory.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
@@ -60,7 +74,7 @@
     }
     @*@Html.TextBoxFor(x => x.Value.Value)*@
 </fieldset>
-            }
+        }
 
 
 @using (Script.Foot())

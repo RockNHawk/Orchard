@@ -10,17 +10,124 @@ using Orchard.Layouts.ViewModels;
 using System.Linq;
 using System;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Routing;
+using Orchard.ContentManagement;
+using Orchard.ContentManagement.Drivers;
+using Orchard.DisplayManagement;
+using Orchard.DisplayManagement.Descriptors;
+using Orchard.FileSystems.VirtualPath;
+using Orchard;
+using Orchard.ContentManagement.Handlers;
+
 namespace MnLab.PdfVisualDesign.Binding.Drivers {
+
+
+    public class CustomContentFieldDisplay : ContentDisplayBase, IContentFieldDisplay {
+        private readonly IEnumerable<IContentFieldDriver> _contentFieldDrivers;
+
+        public CustomContentFieldDisplay(
+            IShapeFactory shapeFactory,
+            Lazy<IShapeTableLocator> shapeTableLocator,
+            RequestContext requestContext,
+            IVirtualPathProvider virtualPathProvider,
+            IWorkContextAccessor workContextAccessor,
+            IEnumerable<IContentFieldDriver> contentFieldDrivers)
+            : base(shapeFactory, shapeTableLocator, requestContext, virtualPathProvider, workContextAccessor) {
+
+            _contentFieldDrivers = contentFieldDrivers;
+        }
+
+        public override string DefaultStereotype {
+            get { return "ContentField"; }
+        }
+
+        public dynamic BuildDisplay(IContent content, ContentField field, string displayType, string groupId) {
+            var context = BuildDisplayContext(content, displayType, groupId);
+            var drivers = GetFieldDrivers(field.FieldDefinition.Name);
+
+            drivers.Invoke(driver => {
+                var result = Filter(driver.BuildDisplayShape(context), field);
+                if (result != null)
+                    result.Apply(context);
+            }, Logger);
+
+            return context.Shape;
+        }
+
+        public dynamic BuildEditor(IContent content, ContentField field, string groupId) {
+            var context = BuildEditorContext(content, groupId);
+            var drivers = GetFieldDrivers(field.FieldDefinition.Name);
+
+            drivers.Invoke(driver => {
+                var result = driver.BuildEditorShape(context);
+                if (result != null)
+                    result.Apply(context);
+            }, Logger);
+
+            return context.Shape;
+        }
+
+        public dynamic UpdateEditor(IContent content, ContentField field, IUpdateModel updater, string groupInfoId) {
+            var context = UpdateEditorContext(content, updater, groupInfoId);
+            var drivers = GetFieldDrivers(field.FieldDefinition.Name);
+
+            drivers.Invoke(driver => {
+                var result = driver.UpdateEditorShape(context);
+                if (result != null)
+                    result.Apply(context);
+            }, Logger);
+
+            return context.Shape;
+        }
+
+        private DriverResult Filter(DriverResult driverResult, ContentField field) {
+            DriverResult result = null;
+            var combinedResult = driverResult as CombinedResult;
+            var contentShapeResult = driverResult as ContentShapeResult;
+
+            if (combinedResult != null) {
+                result = combinedResult.GetResults().SingleOrDefault(x => x.ContentField != null && x.ContentField.Name == field.Name);
+            }
+            else if (contentShapeResult != null) {
+                result = contentShapeResult.ContentField != null && contentShapeResult.ContentField.Name == field.Name ? contentShapeResult : driverResult;
+            }
+
+            return result;
+        }
+
+        private IEnumerable<IContentFieldDriver> GetFieldDrivers(string fieldName) {
+            return _contentFieldDrivers.Where(x => x.GetType().BaseType.GenericTypeArguments[0].Name == fieldName);
+        }
+    }
 
 
     public class PropertyBindElementDriver : ElementDriver<PropertyBindElement> {
 
 
+        private readonly IShapeFactory _shapeFactory;
+
+        private readonly IEnumerable<IContentFieldDriver> _contentFieldDrivers;
+
+
         readonly IContentFieldDisplay _fieldDisplay;
         private readonly IElementFilterProcessor _processor;
-        public PropertyBindElementDriver(IElementFilterProcessor processor, IContentFieldDisplay fieldDisplay) {
+        public PropertyBindElementDriver(IElementFilterProcessor processor, IContentFieldDisplay fieldDisplay,
+            IShapeFactory shapeFactory,
+            IEnumerable<IContentFieldDriver> contentFieldDrivers
+
+            ) {
             this._processor = processor;
             this._fieldDisplay = fieldDisplay;
+            this._shapeFactory = shapeFactory;
+            this._contentFieldDrivers = contentFieldDrivers;
+
+        }
+
+        private IEnumerable<IContentFieldDriver> GetFieldDrivers(string fieldName) {
+            return _contentFieldDrivers.Where(x => x.GetType().BaseType.GenericTypeArguments[0].Name == fieldName);
         }
 
         protected override EditorResult OnBuildEditor(PropertyBindElement element, ElementEditorContext context) {
@@ -73,6 +180,26 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             viewModel.Field = field;
 
 
+            if (field != null) {
+
+
+              
+                var drivers = GetFieldDrivers(field.FieldDefinition.Name);
+                var fieldEditorContext = new BuildEditorContext(_shapeFactory.Create("Zone"), content, null, _shapeFactory);
+
+                //foreach (var driver in drivers) {
+                //    driver.BuildEditorShape(fieldContext);
+                //}
+
+                viewModel.FieldDrivers = drivers.Select(driver => driver.BuildEditorShape(fieldEditorContext));
+
+                foreach (var item in viewModel.FieldDrivers) {
+                    item.Apply(fieldEditorContext);
+                }
+                viewModel.EditorShapeContext = fieldEditorContext;
+            }
+
+
             //var viewModel = new PropertyBindViewModel {
             //    ContentPartFieldExpression = element.ContentPartFieldExpression,
             //    ContentPartTypeName = element.ContentPartTypeName,
@@ -102,7 +229,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 }
                 else {
 
-                    Mapper.Map(bindingInfo,element);
+                    Mapper.Map(bindingInfo, element);
 
                     if (updater.TryUpdateModel(field, GetPrefix(context, "Value"), null, null)) {
 
