@@ -45,8 +45,8 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 }
             }
 
-            var partTypeName = element.ContentPartTypeName;
-            var partPropertyName = element.ContentPartFieldExpression;
+            var partTypeName = bindingInfo.ContentPartTypeName;
+            var partPropertyName = bindingInfo.ContentPartFieldExpression;
 
             //context.Content.ContentItem.GetContentField("{}");
 
