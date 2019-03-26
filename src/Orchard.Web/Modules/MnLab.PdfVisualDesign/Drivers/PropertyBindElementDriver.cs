@@ -21,6 +21,7 @@ using Orchard.DisplayManagement.Descriptors;
 using Orchard.FileSystems.VirtualPath;
 using Orchard;
 using Orchard.ContentManagement.Handlers;
+using Orchard.UI.Zones;
 
 namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
@@ -185,7 +186,11 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
               
                 var drivers = GetFieldDrivers(field.FieldDefinition.Name);
-                var fieldEditorContext = new BuildEditorContext(_shapeFactory.Create("Zone"), content, null, _shapeFactory);
+
+                var shape = _shapeFactory.Create("Content_Edit", Arguments.Empty(), () => new ZoneHolding(() => _shapeFactory.Create("ContentZone", Arguments.Empty())));
+                //var fieldEditorContext = new BuildEditorContext(_shapeFactory.Create("Content_Edit"), content, null, _shapeFactory);
+                var fieldEditorContext = new BuildEditorContext(shape, content, "", _shapeFactory);
+                fieldEditorContext.FindPlacement = (partType, differentiator, defaultLocation) => new PlacementInfo { Location = "1", Source = String.Empty };
 
                 //foreach (var driver in drivers) {
                 //    driver.BuildEditorShape(fieldContext);
