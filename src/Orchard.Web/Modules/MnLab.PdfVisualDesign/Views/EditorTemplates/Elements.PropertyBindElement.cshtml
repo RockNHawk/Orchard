@@ -44,17 +44,23 @@
 
 @if (Model.Field != null)
 {
-    <fieldset>
-        <legend>Value</legend>
+<fieldset>
+    <legend>Value</legend>
 
-        @{
-            @*@Model.FieldDisplay*@
-            var contentFieldShape = Model.FieldDisplay.BuildDisplay(Model.Content, Model.Field, "", "Value");
-            @Display(contentFieldShape);
-        }
-        @*@Html.TextBoxFor(x => x.Value.Value)*@
-    </fieldset>
-}
+    @{
+        @*@Model.FieldDisplay*@
+        var contentFieldShape = Model.FieldDisplay.BuildDisplay(Model.Content, Model.Field, "", "Value");
+       // @New.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
+       @contentFieldShape
+
+        /*
+        var editor = context.ShapeFactory.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
+
+         */
+    }
+    @*@Html.TextBoxFor(x => x.Value.Value)*@
+</fieldset>
+            }
 
 
 @using (Script.Foot())
