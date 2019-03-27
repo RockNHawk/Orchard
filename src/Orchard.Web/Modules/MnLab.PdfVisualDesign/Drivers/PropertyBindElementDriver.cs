@@ -189,24 +189,30 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             //Orchard.Core.Common.Fields.TextField
 
-           
+
             var content = context.Content;
             var contentItem = content.ContentItem;
             /*
            context.Content's Version is the publish version, if the content never Published, the field will be null.
            so I get the latest (if have draft) ContentItem from ContentManager
             */
-            contentItem = _contentManager.Get(content.Id,VersionOptions.Latest);
+            contentItem = _contentManager.Get(content.Id, VersionOptions.Latest);
+
+            var contentPart = partName == null ? null : contentItem.Parts.FirstOrDefault(x => x.PartDefinition.Name == partName);
 
             /*
                https://docs.orchardproject.net/en/latest/Documentation/Creating-a-custom-field-type/
+
+            field in Orchard is dynamic added to a ContentPart by user
+            the internal ContentPart own it's "hard code" Property like TitlePart.Title is a hard coded property
+            it also storage the data, but it only can edit by hole part no single Property editor support (see TitlePartDriver), or I can add this feature by self.
             */
-            var contentPart = contentItem.Parts.FirstOrDefault(x => x.PartDefinition.Name == partName);
-            var field = contentPart?.Fields.FirstOrDefault(x => x.Name == partPropertyName);
+            var field = partPropertyName == null ? null : contentPart?.Fields.FirstOrDefault(x => x.Name == partPropertyName);
+            var property = field == null ? contentPart.GetType().GetProperty(partPropertyName) : null;
+            var hasDataMember = field != null || property != null;
 
             viewModel.Content = content;
             viewModel.Field = field;
-
 
             //var viewModel = new PropertyBindViewModel {
             //    ContentPartFieldExpression = element.ContentPartFieldExpression,
@@ -231,8 +237,8 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                   and maybe has multi property
 
                 */
-                if (field == null) {
-                    updater.AddModelError("", T("Field {0} not exists in ContentPart {1} not exists", partPropertyName, partName));
+                if (hasDataMember == false) {
+                    updater.AddModelError("", T("Field {0} not exists in ContentPart {1}", partPropertyName, partName));
                     goto ret;
                 }
                 else {
@@ -274,7 +280,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             // next:
 
             IEnumerable<IContentFieldDriver> drivers;
-            if (field != null) {
+            if (hasDataMember) {
 
                 drivers = GetFieldDrivers(field.FieldDefinition.Name);
 
@@ -291,10 +297,20 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                     var fieldEditorContext = new UpdateEditorContext(rootShape, contentForCurrentFieldEditorBuild, updater, "", _shapeFactory, shapeTable, GetPath());
                     fieldEditorContext.FindPlacement = (partType, differentiator, defaultLocation) => new PlacementInfo { Location = "1", Source = String.Empty };
                     var fieldEditorDriverResults = drivers.Select(driver => driver.UpdateEditorShape(fieldEditorContext));
+
+                    /*
+                    seems direct update the published version if no Draft,
+                    and the date not updated.
+
+                    but the requirement is:
+                    if value not changed ignore (consider if value not changed and currently no draft, do not create a new draft version), if in draft update draft and save, if published, create a draft.
+
+                     */
                     foreach (var item in fieldEditorDriverResults) {
                         item.Apply(fieldEditorContext);
                     }
-                 //   _contentManager.Publish(contentItem);
+
+                    //   _contentManager.Publish(contentItem);
                     //_contentManager.UpdateEditor(content,updater);
 
                     viewModel.EditorShapeContext = fieldEditorContext;
@@ -343,7 +359,9 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             var part = new ContentPart() {
                 TypePartDefinition = contentPart.TypePartDefinition,
             };
-            part.Weld(field);
+            if (field != null) {
+                part.Weld(field);
+            }
 
             var ct = new ContentItem() {
                 ContentType = content.ContentItem.ContentType,
