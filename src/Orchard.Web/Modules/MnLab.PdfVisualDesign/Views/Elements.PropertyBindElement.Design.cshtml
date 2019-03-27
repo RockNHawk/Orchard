@@ -5,7 +5,14 @@
 
 @{
     ContentDataMemberHelper member = Model.Member;
-}
-@*<span title="Expression: @(member.Expression)">@(member.GetAccessor().GetValue())</span>*@
 
-@Model.HTML
+    var value = member.GetAccessor().GetValue();
+}
+@if (value == null || (value is string s && string.IsNullOrEmpty(s)))
+{
+    @(member.Expression)
+}
+else
+{
+    <span title="Expression: @(member.Expression)">@(value)</span>
+}

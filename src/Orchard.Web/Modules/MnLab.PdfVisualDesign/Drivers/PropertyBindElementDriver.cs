@@ -54,11 +54,11 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
         }
 
         public object GetValue() {
-            return _field.Storage.Get<object>(_memberName);
+            return _field.Storage.Get<object>(null);
         }
 
         public void SetValue(object value) {
-            _field.Storage.Set<object>(_memberName, value);
+            _field.Storage.Set<object>(null, value);
         }
     }
 
@@ -123,7 +123,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             */
             var field = part?.Fields.FirstOrDefault(x => x.Name == partPropertyName);
 
-            var helper = new ContentDataMemberHelper(part, partName);
+            var helper = new ContentDataMemberHelper(part, partPropertyName);
             if (field != null) {
                 helper.Field = field;
             }
@@ -263,9 +263,9 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 contentItem = _contentManager.Get(content.Id, VersionOptions.Latest);
             }
 
-            var member = ContentDataMemberHelper.FindFromContentItem(contentItem, partName, partPropertyName);
+            var member = string.IsNullOrEmpty(partName) || string.IsNullOrEmpty(partPropertyName) ? null : ContentDataMemberHelper.FindFromContentItem(contentItem, partName, partPropertyName);
 
-            var part = member.Part;
+            var part = member?.Part;
 
             /*
                https://docs.orchardproject.net/en/latest/Documentation/Creating-a-custom-field-type/
@@ -274,9 +274,9 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             the internal ContentPart own it's "hard code" Property like TitlePart.Title is a hard coded property
             it also storage the data, but it only can edit by hole part no single Property editor support (see TitlePartDriver), or I can add this feature by self.
             */
-            var field = member.Field;
-            var property = member.PropertyInfo;
-            var hasDataMember = member.hasDataMember;
+            var field = member?.Field;
+            var property = member?.PropertyInfo;
+            var hasDataMember = member?.hasDataMember??false;
 
             viewModel.Content = content;
             viewModel.Field = field;
