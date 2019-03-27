@@ -29,7 +29,7 @@ namespace MnLab.PdfVisualDesign.ViewModels {
 
         public ContentField Field { get; set; }
 
-        public BuildShapeContext EditorShapeContext { get; set; }
+        public dynamic EditorShape { get; set; }
 
         //public IEnumerable<DriverResult> FieldDrivers { get; set; }
         public IContentFieldDisplay FieldDisplay { get; set; }

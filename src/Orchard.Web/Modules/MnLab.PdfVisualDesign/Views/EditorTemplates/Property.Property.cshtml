@@ -1,0 +1,11 @@
+﻿@using MnLab.PdfVisualDesign.ViewModels
+@using MnLab.PdfVisualDesign.Binding.Drivers
+@model ContentPartPropertyEditViewModel
+
+@{
+    var model = Model;
+
+
+}
+
+<input type="text" name="@(model.Prefix)@(model.PropertyInfo.Name)" value="@(model.Value)" />

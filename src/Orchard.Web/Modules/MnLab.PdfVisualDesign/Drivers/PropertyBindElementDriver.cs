@@ -23,86 +23,18 @@ using Orchard;
 using Orchard.ContentManagement.Handlers;
 using Orchard.UI.Zones;
 using System.Web;
+using System.Reflection;
+using System.Web.Mvc;
+using Orchard.Core.Title.Models;
 
 namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
 
-    public class CustomContentFieldDisplay : ContentDisplayBase, IContentFieldDisplay {
-        private readonly IEnumerable<IContentFieldDriver> _contentFieldDrivers;
-
-        public CustomContentFieldDisplay(
-            IShapeFactory shapeFactory,
-            Lazy<IShapeTableLocator> shapeTableLocator,
-            RequestContext requestContext,
-            IVirtualPathProvider virtualPathProvider,
-            IWorkContextAccessor workContextAccessor,
-            IEnumerable<IContentFieldDriver> contentFieldDrivers)
-            : base(shapeFactory, shapeTableLocator, requestContext, virtualPathProvider, workContextAccessor) {
-
-            _contentFieldDrivers = contentFieldDrivers;
-        }
-
-        public override string DefaultStereotype {
-            get { return "ContentField"; }
-        }
-
-        public dynamic BuildDisplay(IContent content, ContentField field, string displayType, string groupId) {
-            var context = BuildDisplayContext(content, displayType, groupId);
-            var drivers = GetFieldDrivers(field.FieldDefinition.Name);
-
-            drivers.Invoke(driver => {
-                var result = Filter(driver.BuildDisplayShape(context), field);
-                if (result != null)
-                    result.Apply(context);
-            }, Logger);
-
-            return context.Shape;
-        }
-
-        public dynamic BuildEditor(IContent content, ContentField field, string groupId) {
-            var context = BuildEditorContext(content, groupId);
-            var drivers = GetFieldDrivers(field.FieldDefinition.Name);
-
-            drivers.Invoke(driver => {
-                var result = driver.BuildEditorShape(context);
-                if (result != null)
-                    result.Apply(context);
-            }, Logger);
-
-            return context.Shape;
-        }
-
-        public dynamic UpdateEditor(IContent content, ContentField field, IUpdateModel updater, string groupInfoId) {
-            var context = UpdateEditorContext(content, updater, groupInfoId);
-            var drivers = GetFieldDrivers(field.FieldDefinition.Name);
-
-            drivers.Invoke(driver => {
-                var result = driver.UpdateEditorShape(context);
-                if (result != null)
-                    result.Apply(context);
-            }, Logger);
-
-            return context.Shape;
-        }
-
-        private DriverResult Filter(DriverResult driverResult, ContentField field) {
-            DriverResult result = null;
-            var combinedResult = driverResult as CombinedResult;
-            var contentShapeResult = driverResult as ContentShapeResult;
-
-            if (combinedResult != null) {
-                result = combinedResult.GetResults().SingleOrDefault(x => x.ContentField != null && x.ContentField.Name == field.Name);
-            }
-            else if (contentShapeResult != null) {
-                result = contentShapeResult.ContentField != null && contentShapeResult.ContentField.Name == field.Name ? contentShapeResult : driverResult;
-            }
-
-            return result;
-        }
-
-        private IEnumerable<IContentFieldDriver> GetFieldDrivers(string fieldName) {
-            return _contentFieldDrivers.Where(x => x.GetType().BaseType.GenericTypeArguments[0].Name == fieldName);
-        }
+    public class ContentPartPropertyEditViewModel {
+        public PropertyInfo PropertyInfo { get; set; }
+        public ContentPart ContentPart { get; set; }
+        public object Value { get; set; }
+        public string Prefix { get; set; }
     }
 
 
@@ -152,6 +84,52 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             return _contentFieldDrivers.Where(x => x.GetType().BaseType.GenericTypeArguments[0].Name == fieldName);
         }
 
+        dynamic BuildContentPropertyEditor(ContentPartPropertyEditViewModel viewModel, IUpdateModel updater, IValueProvider valueProvicer) {
+
+            if (updater != null) {
+
+                /*
+                I can't recall the exact details, but there was a reason the ValueProvider was being modified with existing values from the element, and it had something to do with a certain scenario where the element's editor UI would not be rendered, yet its Update method was called, or something along those lines. However, your proposal does make things more "natural", so what I propose we do is merge in your PR and see how it works. I'm currently doing some Layouts development anyway, so if there are any issues I'll most likely spot them soon enough (and ask you to fix them ;))
+                Thanks for spotting this.
+                 */
+
+                //var part = (TitlePart)model.ContentPart;
+                var part = viewModel.ContentPart;
+
+                if (!TryUpdateModel(updater, part, viewModel.Prefix, new string[] { viewModel.PropertyInfo.Name }, null)) {
+                    //if (!updater.TryUpdateModel(model.ContentPart, model.Prefix, null, null)) {
+                    updater.AddModelError("", T("Error update ContentPart Property '{0}.{1}'", viewModel.ContentPart.TypePartDefinition.PartDefinition.Name, viewModel.PropertyInfo.Name));
+                }
+            }
+
+            dynamic sp = _shapeFactory;
+            var editor = sp.EditorTemplate(TemplateName: $"Property.Property", Model: viewModel);
+            return editor;
+        }
+
+        bool TryUpdateModel(IUpdateModel updater, object model, string prefix, string[] includeProperties, string[] excludeProperties){
+            Predicate<string> propertyFilter = (string propertyName) => IsPropertyAllowed(propertyName, includeProperties, excludeProperties);
+            var type = model.GetType();
+            var binder = System.Web.Mvc.ModelBinders.Binders.GetBinder(type);
+            var controller = (Controller)updater;
+            var bc = new ModelBindingContext {
+                // Model = model,
+                ModelMetadata = ModelMetadataProviders.Current.GetMetadataForType(() => model, type),
+                ModelState = controller.ModelState,
+                ModelName = prefix,
+                PropertyFilter = propertyFilter,
+                ValueProvider = controller.ValueProvider,
+            };
+            binder.BindModel(controller.ControllerContext,bc);
+            return controller.ModelState.IsValid;
+        }
+
+        internal static bool IsPropertyAllowed(string propertyName, ICollection<string> includeProperties, ICollection<string> excludeProperties) {
+            bool flag = includeProperties == null || includeProperties.Count == 0 || includeProperties.Contains(propertyName, StringComparer.OrdinalIgnoreCase);
+            bool flag2 = excludeProperties != null && excludeProperties.Contains(propertyName, StringComparer.OrdinalIgnoreCase);
+            return flag && !flag2;
+        }
+
         protected override EditorResult OnBuildEditor(PropertyBindElement element, ElementEditorContext context) {
 
             var updater = context.Updater;
@@ -192,13 +170,15 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             var content = context.Content;
             var contentItem = content.ContentItem;
-            /*
-           context.Content's Version is the publish version, if the content never Published, the field will be null.
-           so I get the latest (if have draft) ContentItem from ContentManager
-            */
-            contentItem = _contentManager.Get(content.Id, VersionOptions.Latest);
+            if (content.Id > 0) {
+                /*
+               context.Content's Version is the publish version, if the content never Published, the field will be null.
+               so I get the latest (if have draft) ContentItem from ContentManager
+                */
+                contentItem = _contentManager.Get(content.Id, VersionOptions.Latest);
+            }
 
-            var contentPart = partName == null ? null : contentItem.Parts.FirstOrDefault(x => x.PartDefinition.Name == partName);
+            var part = partName == null ? null : contentItem.Parts.FirstOrDefault(x => x.PartDefinition.Name == partName);
 
             /*
                https://docs.orchardproject.net/en/latest/Documentation/Creating-a-custom-field-type/
@@ -207,8 +187,8 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             the internal ContentPart own it's "hard code" Property like TitlePart.Title is a hard coded property
             it also storage the data, but it only can edit by hole part no single Property editor support (see TitlePartDriver), or I can add this feature by self.
             */
-            var field = partPropertyName == null ? null : contentPart?.Fields.FirstOrDefault(x => x.Name == partPropertyName);
-            var property = field == null ? contentPart.GetType().GetProperty(partPropertyName) : null;
+            var field = partPropertyName == null ? null : part?.Fields.FirstOrDefault(x => x.Name == partPropertyName);
+            var property = partPropertyName == null ? null : (field == null ? part.GetType().GetProperty(partPropertyName) : null);
             var hasDataMember = field != null || property != null;
 
             viewModel.Content = content;
@@ -227,7 +207,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                     goto ret;
                 }
 
-                if (contentPart == null) {
+                if (part == null) {
                     updater.AddModelError("", T("ContentPart {0} not exists", partName));
                     goto ret;
                 }
@@ -245,94 +225,87 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
                     Mapper.Map(bindingInfo, element);
 
-                    if (updater.TryUpdateModel(field, GetPrefix(context, "Value"), null, null)) {
-
-                    }
-                    else {
-
-                    }
-
-                    if (field is Orchard.Core.Common.Fields.TextField f) {
-                        //f.Value = 
-                    }
-                    //if (field is Orchard.Core.Common.Fields.TextField || field is Orchard.Fields.Fields.InputField) {
-
+                    //if (updater.TryUpdateModel(field, GetPrefix(context, "Value"), null, null)) {
+                    //}
+                    //else {
                     //}
 
-                    //Orchard.ContentManagement.ContentField
-
-
-                    //contentPart.
+                    //if (field is Orchard.Core.Common.Fields.TextField || field is Orchard.Fields.Fields.InputField) {
+                    //}
                 }
-
-
-                //if (context.Updater.TryUpdateModel(element, GetPrefix(context, nameof(PropertyBindViewModel.Value)), null, null)) {
-
-                //}
-                //else {
-
-                //}
-
-                //Mapper.Map(viewModel,element);
-                //element.ContentPartFieldExpression = viewModel.ContentPartFieldExpression;
             }
 
             // next:
 
-            IEnumerable<IContentFieldDriver> drivers;
+            //IEnumerable<IContentFieldDriver> drivers;
             if (hasDataMember) {
 
-                drivers = GetFieldDrivers(field.FieldDefinition.Name);
+                // IContentFieldDriver
 
                 var rootShape = _shapeFactory.Create("Content_Edit", Arguments.Empty(), () => new ZoneHolding(() => _shapeFactory.Create("ContentZone", Arguments.Empty())));
 
-                var contentForCurrentFieldEditorBuild = ContentForFieldEditorBuild(field, contentPart, content);
+                var contentForCurrentFieldEditorBuild = ContentForFieldEditorBuild(field, part, content);
                 //var contentForCurrentFieldEditorBuild = content;// ContentForFieldEditorBuild(field, contentPart, content);
+                if (field != null) {
+                    var drivers = GetFieldDrivers(field.FieldDefinition.Name);
+                    if (updater != null) {
 
-                if (updater != null) {
-                    var workContext = _workContextAccessor.GetContext();
-                    var theme = workContext.CurrentTheme;
-                    var shapeTable = _shapeTableLocator.Value.Lookup(theme.Id);
+                        var workContext = _workContextAccessor.GetContext();
+                        var theme = workContext.CurrentTheme;
+                        var shapeTable = _shapeTableLocator.Value.Lookup(theme.Id);
 
-                    var fieldEditorContext = new UpdateEditorContext(rootShape, contentForCurrentFieldEditorBuild, updater, "", _shapeFactory, shapeTable, GetPath());
-                    fieldEditorContext.FindPlacement = (partType, differentiator, defaultLocation) => new PlacementInfo { Location = "1", Source = String.Empty };
-                    var fieldEditorDriverResults = drivers.Select(driver => driver.UpdateEditorShape(fieldEditorContext));
+                        var fieldEditorContext = new UpdateEditorContext(rootShape, contentForCurrentFieldEditorBuild, updater, "", _shapeFactory, shapeTable, GetPath());
+                        fieldEditorContext.FindPlacement = (partType, differentiator, defaultLocation) => new PlacementInfo { Location = "1", Source = String.Empty };
+                        var fieldEditorDriverResults = drivers.Select(driver => driver.UpdateEditorShape(fieldEditorContext));
 
-                    /*
-                    seems direct update the published version if no Draft,
-                    and the date not updated.
+                        /*
+                        seems direct update the published version if no Draft,
+                        and the date not updated.
 
-                    but the requirement is:
-                    if value not changed ignore (consider if value not changed and currently no draft, do not create a new draft version), if in draft update draft and save, if published, create a draft.
+                        but the requirement is:
+                        if value not changed ignore (consider if value not changed and currently no draft, do not create a new draft version), if in draft update draft and save, if published, create a draft.
 
-                     */
-                    foreach (var item in fieldEditorDriverResults) {
-                        item.Apply(fieldEditorContext);
+                         */
+                        foreach (var item in fieldEditorDriverResults) {
+                            item.Apply(fieldEditorContext);
+                        }
+
+                        //   _contentManager.Publish(contentItem);
+                        //_contentManager.UpdateEditor(content,updater);
+
+                        viewModel.EditorShape = fieldEditorContext.Shape.Zones["1"];
                     }
+                    else {
+                        //foreach (var driver in drivers) {
+                        //    driver.BuildEditorShape(fieldContext);
+                        //}
+                        //var fieldEditorContext = new BuildEditorContext(_shapeFactory.Create("Content_Edit"), content, null, _shapeFactory);
+                        var fieldEditorContext = new BuildEditorContext(rootShape, contentForCurrentFieldEditorBuild, "", _shapeFactory);
+                        fieldEditorContext.FindPlacement = (partType, differentiator, defaultLocation) => new PlacementInfo { Location = "1", Source = String.Empty };
 
-                    //   _contentManager.Publish(contentItem);
-                    //_contentManager.UpdateEditor(content,updater);
-
-                    viewModel.EditorShapeContext = fieldEditorContext;
-                }
-                else {
-                    //foreach (var driver in drivers) {
-                    //    driver.BuildEditorShape(fieldContext);
-                    //}
-                    //var fieldEditorContext = new BuildEditorContext(_shapeFactory.Create("Content_Edit"), content, null, _shapeFactory);
-                    var fieldEditorContext = new BuildEditorContext(rootShape, contentForCurrentFieldEditorBuild, "", _shapeFactory);
-                    fieldEditorContext.FindPlacement = (partType, differentiator, defaultLocation) => new PlacementInfo { Location = "1", Source = String.Empty };
-
-                    var fieldEditorDriverResults = drivers.Select(driver => driver.BuildEditorShape(fieldEditorContext));
-                    foreach (var item in fieldEditorDriverResults) {
-                        item.Apply(fieldEditorContext);
+                        var fieldEditorDriverResults = drivers.Select(driver => driver.BuildEditorShape(fieldEditorContext));
+                        foreach (var item in fieldEditorDriverResults) {
+                            item.Apply(fieldEditorContext);
+                        }
+                        viewModel.EditorShape = fieldEditorContext.Shape.Zones["1"];
                     }
-
-                    viewModel.EditorShapeContext = fieldEditorContext;
                 }
+                else if (property != null) {
+                    var vm = new ContentPartPropertyEditViewModel {
+                        ContentPart = part,
+                        PropertyInfo = property,
+                        Value = property.GetValue(part),
+                        Prefix = $"{partName}.",
+                    };
+
+                    var propertyEditor = BuildContentPropertyEditor(vm, updater, context.ValueProvider);
+                    //var propertyEditor = context.ShapeFactory.EditorTemplate(TemplateName: $"Property.Property", Model: vm);
+                    viewModel.EditorShape = propertyEditor;
+                }
+
             }
 
-        ret:
+            ret:
 
             var editor = context.ShapeFactory.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
             return Editor(context, editor);

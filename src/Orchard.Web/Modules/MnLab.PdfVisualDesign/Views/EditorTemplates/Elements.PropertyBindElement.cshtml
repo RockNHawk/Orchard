@@ -22,6 +22,8 @@
     Style.Include("EditorStyle.css");
     */
 
+    var field = Model.Field;
+
 }
 
 <fieldset>
@@ -42,53 +44,47 @@
 </fieldset>
 
 
-@if (Model.Field != null)
+@if (Model.EditorShape != null)
 {
-<fieldset>
-    <legend>Value</legend>
+    <fieldset>
+        <legend>Value</legend>
 
-    @{
-        @*@Model.FieldDisplay*@
-        //   var contentFieldShape = Model.FieldDisplay.BuildEditor(Model.Content, Model.Field);
-        // @New.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
-        // @contentFieldShape
-
-
-        //   @Display(contentFieldShape)
-
-        @*var editors = Model.FieldDrivers;
-            foreach (var item in editors)
-            {
-                @Display(item)
-            }*@
-
-        @Model.EditorShapeContext.Shape
-
-        @*@Display(Model.EditorShapeContext.Shape)*@
-        @Display(Model.EditorShapeContext.Shape.Zones["1"])
+        @{
+            @*@Model.FieldDisplay*@
+            //   var contentFieldShape = Model.FieldDisplay.BuildEditor(Model.Content, Model.Field);
+            // @New.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
+            // @contentFieldShape
 
 
+            //   @Display(contentFieldShape)
 
-        // @Model.Field.Storage.get
+            @*var editors = Model.FieldDrivers;
+                foreach (var item in editors)
+                {
+                    @Display(item)
+                }*@
+
+           // @Model.EditorShape
+
+            @*@Display(Model.EditorShapeContext.Shape)*@
+            // @Display(Model.EditorShape.Zones["1"])
+            @Display(Model.EditorShape)
 
 
 
-        /*
-        var editor = context.ShapeFactory.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
+            // @Model.Field.Storage.get
 
-         */
-    }
 
-    fv:
-    @{
 
-        var field = Model.Field as Orchard.Core.Common.Fields.TextField;
-        @(field.Name)
-        @(field.Value)
-    }
-    @*@Html.TextBoxFor(x => x.Value.Value)*@
-</fieldset>
+            /*
+            var editor = context.ShapeFactory.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
+
+             */
         }
+
+        @*@Html.TextBoxFor(x => x.Value.Value)*@
+    </fieldset>
+}
 
 
 @using (Script.Foot())
