@@ -27,9 +27,9 @@ namespace MnLab.PdfVisualDesign.Binding.Elements {
             set { this.Store(x => x.ContentPartFieldExpression, value); }
         }
 
-        public virtual string ContentPartTypeName {
-            get { return this.Retrieve(x => x.ContentPartTypeName); }
-            set { this.Store(x => x.ContentPartTypeName, value); }
+        public virtual string ContentPartName {
+            get { return this.Retrieve(x => x.ContentPartName); }
+            set { this.Store(x => x.ContentPartName, value); }
         }
 
         public virtual string ExampleValue {

@@ -27,8 +27,8 @@
 <fieldset>
     <legend>Bind</legend>
 
-    ContentPartTypeName
-    @Html.TextBoxFor(x => x.Binding.ContentPartTypeName)
+    ContentPartName
+    @Html.TextBoxFor(x => x.Binding.ContentPartName)
 
 
     Bind Property
@@ -68,10 +68,23 @@
         @Display(Model.EditorShapeContext.Shape.Zones["1"])
 
 
+
+        // @Model.Field.Storage.get
+
+
+
         /*
         var editor = context.ShapeFactory.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
 
          */
+    }
+
+    fv:
+    @{
+
+        var field = Model.Field as Orchard.Core.Common.Fields.TextField;
+        @(field.Name)
+        @(field.Value)
     }
     @*@Html.TextBoxFor(x => x.Value.Value)*@
 </fieldset>

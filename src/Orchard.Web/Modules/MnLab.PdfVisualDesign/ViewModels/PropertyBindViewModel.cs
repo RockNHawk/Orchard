@@ -16,7 +16,7 @@ namespace MnLab.PdfVisualDesign.ViewModels {
 
 
     public class FieldBindingInfo {
-        public string ContentPartTypeName { get; set; }
+        public string ContentPartName { get; set; }
         public string ContentPartFieldExpression { get; set; }
         public string ExampleValue { get; set; }
         public string Description { get; set; }
@@ -31,8 +31,7 @@ namespace MnLab.PdfVisualDesign.ViewModels {
 
         public BuildShapeContext EditorShapeContext { get; set; }
 
-        
-        public IEnumerable<DriverResult> FieldDrivers { get; set; }
+        //public IEnumerable<DriverResult> FieldDrivers { get; set; }
         public IContentFieldDisplay FieldDisplay { get; set; }
 
         public FieldBindingInfo Binding { get; set; }

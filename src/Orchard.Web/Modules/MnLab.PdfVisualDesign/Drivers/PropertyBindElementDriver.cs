@@ -22,6 +22,7 @@ using Orchard.FileSystems.VirtualPath;
 using Orchard;
 using Orchard.ContentManagement.Handlers;
 using Orchard.UI.Zones;
+using System.Web;
 
 namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
@@ -108,23 +109,43 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
     public class PropertyBindElementDriver : ElementDriver<PropertyBindElement> {
 
 
+        private readonly IElementFilterProcessor _processor;
+
         private readonly IShapeFactory _shapeFactory;
 
         private readonly IEnumerable<IContentFieldDriver> _contentFieldDrivers;
 
-
         readonly IContentFieldDisplay _fieldDisplay;
-        private readonly IElementFilterProcessor _processor;
+
+
+
+        private readonly Lazy<IShapeTableLocator> _shapeTableLocator;
+
+        private readonly IVirtualPathProvider _virtualPathProvider;
+
+        IContentManager _contentManager;
+
+        readonly IWorkContextAccessor _workContextAccessor;
+
+
         public PropertyBindElementDriver(IElementFilterProcessor processor, IContentFieldDisplay fieldDisplay,
             IShapeFactory shapeFactory,
-            IEnumerable<IContentFieldDriver> contentFieldDrivers
+             Lazy<IShapeTableLocator> shapeTableLocator,
+             IVirtualPathProvider virtualPathProvider,
+            IEnumerable<IContentFieldDriver> contentFieldDrivers,
+
+            IContentManager contentManager,
+            IWorkContextAccessor workContextAccessor
 
             ) {
             this._processor = processor;
             this._fieldDisplay = fieldDisplay;
             this._shapeFactory = shapeFactory;
+            this._shapeTableLocator = shapeTableLocator;
+            this._virtualPathProvider = virtualPathProvider;
             this._contentFieldDrivers = contentFieldDrivers;
-
+            this._contentManager = contentManager;
+            this._workContextAccessor = workContextAccessor;
         }
 
         private IEnumerable<IContentFieldDriver> GetFieldDrivers(string fieldName) {
@@ -153,7 +174,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 }
             }
 
-            var partTypeName = bindingInfo.ContentPartTypeName;
+            var partName = bindingInfo.ContentPartName;
             var partPropertyName = bindingInfo.ContentPartFieldExpression;
 
             //context.Content.ContentItem.GetContentField("{}");
@@ -168,46 +189,28 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             //Orchard.Core.Common.Fields.TextField
 
+           
             var content = context.Content;
             var contentItem = content.ContentItem;
+            /*
+           context.Content's Version is the publish version, if the content never Published, the field will be null.
+           so I get the latest (if have draft) ContentItem from ContentManager
+            */
+            contentItem = _contentManager.Get(content.Id,VersionOptions.Latest);
 
             /*
                https://docs.orchardproject.net/en/latest/Documentation/Creating-a-custom-field-type/
             */
-            var contentPart = contentItem.Parts.FirstOrDefault(x => x.PartDefinition.Name == partTypeName);
+            var contentPart = contentItem.Parts.FirstOrDefault(x => x.PartDefinition.Name == partName);
             var field = contentPart?.Fields.FirstOrDefault(x => x.Name == partPropertyName);
 
             viewModel.Content = content;
             viewModel.Field = field;
 
 
-            if (field != null) {
-
-
-              
-                var drivers = GetFieldDrivers(field.FieldDefinition.Name);
-
-                var shape = _shapeFactory.Create("Content_Edit", Arguments.Empty(), () => new ZoneHolding(() => _shapeFactory.Create("ContentZone", Arguments.Empty())));
-                //var fieldEditorContext = new BuildEditorContext(_shapeFactory.Create("Content_Edit"), content, null, _shapeFactory);
-                var fieldEditorContext = new BuildEditorContext(shape, content, "", _shapeFactory);
-                fieldEditorContext.FindPlacement = (partType, differentiator, defaultLocation) => new PlacementInfo { Location = "1", Source = String.Empty };
-
-                //foreach (var driver in drivers) {
-                //    driver.BuildEditorShape(fieldContext);
-                //}
-
-                viewModel.FieldDrivers = drivers.Select(driver => driver.BuildEditorShape(fieldEditorContext));
-
-                foreach (var item in viewModel.FieldDrivers) {
-                    item.Apply(fieldEditorContext);
-                }
-                viewModel.EditorShapeContext = fieldEditorContext;
-            }
-
-
             //var viewModel = new PropertyBindViewModel {
             //    ContentPartFieldExpression = element.ContentPartFieldExpression,
-            //    ContentPartTypeName = element.ContentPartTypeName,
+            //    ContentPartName = element.ContentPartName,
             //    ExampleValue = element.ExampleValue,
             //    Remark = element.Remark,
             //};
@@ -219,7 +222,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 }
 
                 if (contentPart == null) {
-                    updater.AddModelError("", T("ContentPart {0} not exists", partTypeName));
+                    updater.AddModelError("", T("ContentPart {0} not exists", partName));
                     goto ret;
                 }
                 /*
@@ -229,7 +232,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
                 */
                 if (field == null) {
-                    updater.AddModelError("", T("Field {0} not exists in ContentPart {1} not exists", partPropertyName, partTypeName));
+                    updater.AddModelError("", T("Field {0} not exists in ContentPart {1} not exists", partPropertyName, partName));
                     goto ret;
                 }
                 else {
@@ -268,9 +271,90 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 //element.ContentPartFieldExpression = viewModel.ContentPartFieldExpression;
             }
 
+            // next:
+
+            IEnumerable<IContentFieldDriver> drivers;
+            if (field != null) {
+
+                drivers = GetFieldDrivers(field.FieldDefinition.Name);
+
+                var rootShape = _shapeFactory.Create("Content_Edit", Arguments.Empty(), () => new ZoneHolding(() => _shapeFactory.Create("ContentZone", Arguments.Empty())));
+
+                var contentForCurrentFieldEditorBuild = ContentForFieldEditorBuild(field, contentPart, content);
+                //var contentForCurrentFieldEditorBuild = content;// ContentForFieldEditorBuild(field, contentPart, content);
+
+                if (updater != null) {
+                    var workContext = _workContextAccessor.GetContext();
+                    var theme = workContext.CurrentTheme;
+                    var shapeTable = _shapeTableLocator.Value.Lookup(theme.Id);
+
+                    var fieldEditorContext = new UpdateEditorContext(rootShape, contentForCurrentFieldEditorBuild, updater, "", _shapeFactory, shapeTable, GetPath());
+                    fieldEditorContext.FindPlacement = (partType, differentiator, defaultLocation) => new PlacementInfo { Location = "1", Source = String.Empty };
+                    var fieldEditorDriverResults = drivers.Select(driver => driver.UpdateEditorShape(fieldEditorContext));
+                    foreach (var item in fieldEditorDriverResults) {
+                        item.Apply(fieldEditorContext);
+                    }
+                 //   _contentManager.Publish(contentItem);
+                    //_contentManager.UpdateEditor(content,updater);
+
+                    viewModel.EditorShapeContext = fieldEditorContext;
+                }
+                else {
+                    //foreach (var driver in drivers) {
+                    //    driver.BuildEditorShape(fieldContext);
+                    //}
+                    //var fieldEditorContext = new BuildEditorContext(_shapeFactory.Create("Content_Edit"), content, null, _shapeFactory);
+                    var fieldEditorContext = new BuildEditorContext(rootShape, contentForCurrentFieldEditorBuild, "", _shapeFactory);
+                    fieldEditorContext.FindPlacement = (partType, differentiator, defaultLocation) => new PlacementInfo { Location = "1", Source = String.Empty };
+
+                    var fieldEditorDriverResults = drivers.Select(driver => driver.BuildEditorShape(fieldEditorContext));
+                    foreach (var item in fieldEditorDriverResults) {
+                        item.Apply(fieldEditorContext);
+                    }
+
+                    viewModel.EditorShapeContext = fieldEditorContext;
+                }
+            }
+
         ret:
+
             var editor = context.ShapeFactory.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
             return Editor(context, editor);
+        }
+
+
+        private string GetPath() {
+            return "";
+            //return VirtualPathUtility.AppendTrailingSlash(_virtualPathProvider.ToAppRelative(_requestContext.HttpContext.Request.Path));
+        }
+
+
+
+        /// <summary>
+        ///   IContentFieldDriver.BuildEditorShape method will build all shape of field from contentItem,
+        /// </summary>
+        /// <param name="field"></param>
+        /// <param name="contentPart"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        private static ContentPart ContentForFieldEditorBuild(ContentField field, ContentPart contentPart, IContent content) {
+            /*
+             */
+            var part = new ContentPart() {
+                TypePartDefinition = contentPart.TypePartDefinition,
+            };
+            part.Weld(field);
+
+            var ct = new ContentItem() {
+                ContentType = content.ContentItem.ContentType,
+                TypeDefinition = content.ContentItem.TypeDefinition,
+            };
+            ct.Weld(part);
+
+            var ct2 = new ContentPart() {
+            };
+            ct2.ContentItem = ct;
+            return ct2;
         }
 
         private static string GetPrefix(ElementEditorContext context, string name) {
