@@ -1,5 +1,11 @@
-﻿@{
+﻿@using MnLab.PdfVisualDesign.ViewModels
+@using MnLab.PdfVisualDesign.Binding
+@using MnLab.PdfVisualDesign.Binding.Drivers
+@*@model ContentDataMemberHelper*@
 
-   var pe = Model.Element.ContentPartFieldExpression;
+@{
+    ContentDataMemberHelper member = Model.Member;
 }
-Expr: @pe
+@*<span title="Expression: @(member.Expression)">@(member.GetAccessor().GetValue())</span>*@
+
+@Model.HTML

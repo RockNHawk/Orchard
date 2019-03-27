@@ -38,6 +38,104 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
     }
 
 
+    public interface IContentMemberAccessor {
+        object GetValue();
+        void SetValue(object value);
+    }
+
+    public class ContentFieldMemberAccessor : IContentMemberAccessor {
+        string _memberName;
+        ContentField _field;
+        ContentPart _contentItem;
+        public ContentFieldMemberAccessor(ContentPart contentItem, ContentField field, string memberName) {
+            this._contentItem = contentItem;
+            this._field = field;
+            this._memberName = memberName;
+        }
+
+        public object GetValue() {
+            return _field.Storage.Get<object>(_memberName);
+        }
+
+        public void SetValue(object value) {
+            _field.Storage.Set<object>(_memberName, value);
+        }
+    }
+
+    public class ContentPropertyMemberAccessor : IContentMemberAccessor {
+        string _memberName;
+        PropertyInfo _field;
+        ContentPart _contentItem;
+        public ContentPropertyMemberAccessor(ContentPart contentItem, PropertyInfo field, string memberName) {
+            this._contentItem = contentItem;
+            this._field = field;
+            this._memberName = memberName;
+        }
+
+        public object GetValue() {
+            return _field.GetValue(_contentItem);
+        }
+
+        public void SetValue(object value) {
+            _field.SetValue(_contentItem, value);
+        }
+    }
+
+    public class ContentDataMemberHelper {
+
+        public ContentField Field;
+        public PropertyInfo PropertyInfo;
+
+        public ContentPart Part;
+        public string Expression;
+
+        public bool hasDataMember { get => Field != null || PropertyInfo != null; }
+
+        public ContentDataMemberHelper(ContentPart contentItem, string expr) {
+            this.Part = contentItem;
+            this.Expression = expr;
+        }
+
+
+        public IContentMemberAccessor GetAccessor() {
+            if (Field != null) {
+                return new ContentFieldMemberAccessor(Part, Field, Expression);
+            }
+            else if (PropertyInfo != null) {
+                return new ContentPropertyMemberAccessor(Part, PropertyInfo, Expression);
+            }
+            else {
+                throw new InvalidOperationException("No data member");
+            }
+        }
+
+        public static ContentDataMemberHelper FindFromContentItem(ContentItem contentItem, string partName, string partPropertyName) {
+            if (partName == null) throw new ArgumentNullException(nameof(partName));
+            if (partPropertyName == null) throw new ArgumentNullException(nameof(partPropertyName));
+            var part = contentItem.Parts.FirstOrDefault(x => x.PartDefinition.Name == partName);
+            if (part == null) return null;
+            /*
+               https://docs.orchardproject.net/en/latest/Documentation/Creating-a-custom-field-type/
+
+            field in Orchard is dynamic added to a ContentPart by user
+            the internal ContentPart own it's "hard code" Property like TitlePart.Title is a hard coded property
+            it also storage the data, but it only can edit by hole part no single Property editor support (see TitlePartDriver), or I can add this feature by self.
+            */
+            var field = part?.Fields.FirstOrDefault(x => x.Name == partPropertyName);
+
+            var helper = new ContentDataMemberHelper(part, partName);
+            if (field != null) {
+                helper.Field = field;
+            }
+            else {
+                var property = part.GetType().GetProperty(partPropertyName);
+                helper.PropertyInfo = property;
+            }
+            return helper;
+        }
+    }
+
+
     public class PropertyBindElementDriver : ElementDriver<PropertyBindElement> {
 
 
@@ -107,7 +205,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             return editor;
         }
 
-        bool TryUpdateModel(IUpdateModel updater, object model, string prefix, string[] includeProperties, string[] excludeProperties){
+        bool TryUpdateModel(IUpdateModel updater, object model, string prefix, string[] includeProperties, string[] excludeProperties) {
             Predicate<string> propertyFilter = (string propertyName) => IsPropertyAllowed(propertyName, includeProperties, excludeProperties);
             var type = model.GetType();
             var binder = System.Web.Mvc.ModelBinders.Binders.GetBinder(type);
@@ -120,7 +218,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 PropertyFilter = propertyFilter,
                 ValueProvider = controller.ValueProvider,
             };
-            binder.BindModel(controller.ControllerContext,bc);
+            binder.BindModel(controller.ControllerContext, bc);
             return controller.ModelState.IsValid;
         }
 
@@ -153,20 +251,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             }
 
             var partName = bindingInfo.ContentPartName;
-            var partPropertyName = bindingInfo.ContentPartFieldExpression;
-
-            //context.Content.ContentItem.GetContentField("{}");
-
-            // context.Content.ContentItem.TypeDefinition.Parts.First().PartDefinition.Fields.First()
-            //  .FieldDefinition
-
-            //context.Content.ContentItem.ContentManager.GetContentTypeDefinitions()
-            //     .First().Parts
-
-            //Orchard.Fields.Fields.
-
-            //Orchard.Core.Common.Fields.TextField
-
+            var partPropertyName = bindingInfo.ContentPartMemberExpression;
 
             var content = context.Content;
             var contentItem = content.ContentItem;
@@ -178,7 +263,9 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 contentItem = _contentManager.Get(content.Id, VersionOptions.Latest);
             }
 
-            var part = partName == null ? null : contentItem.Parts.FirstOrDefault(x => x.PartDefinition.Name == partName);
+            var member = ContentDataMemberHelper.FindFromContentItem(contentItem, partName, partPropertyName);
+
+            var part = member.Part;
 
             /*
                https://docs.orchardproject.net/en/latest/Documentation/Creating-a-custom-field-type/
@@ -187,9 +274,9 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             the internal ContentPart own it's "hard code" Property like TitlePart.Title is a hard coded property
             it also storage the data, but it only can edit by hole part no single Property editor support (see TitlePartDriver), or I can add this feature by self.
             */
-            var field = partPropertyName == null ? null : part?.Fields.FirstOrDefault(x => x.Name == partPropertyName);
-            var property = partPropertyName == null ? null : (field == null ? part.GetType().GetProperty(partPropertyName) : null);
-            var hasDataMember = field != null || property != null;
+            var field = member.Field;
+            var property = member.PropertyInfo;
+            var hasDataMember = member.hasDataMember;
 
             viewModel.Content = content;
             viewModel.Field = field;
@@ -352,9 +439,41 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             return $"{(string.IsNullOrEmpty(context.Prefix) ? null : ".")}{name}";
         }
 
+
         protected override void OnDisplaying(PropertyBindElement element, ElementDisplayingContext context) {
-            context.ElementShape.HTML = element.Content;
+
+
+            var bindingInfo = element;
+            var partName = bindingInfo.ContentPartName;
+            var partPropertyName = bindingInfo.ContentPartMemberExpression;
+
+            var content = context.Content;
+            var contentItem = content.ContentItem;
+            //if (content.Id > 0) {
+            //    /*
+            //   context.Content's Version is the publish version, if the content never Published, the field will be null.
+            //   so I get the latest (if have draft) ContentItem from ContentManager
+            //    */
+            //    contentItem = _contentManager.Get(content.Id, VersionOptions.Latest);
+            //}
+
+
+            var member = ContentDataMemberHelper.FindFromContentItem(contentItem, partName, partPropertyName);
+
+            if (context.DisplayType == "Design") {
+                context.ElementShape.Member = member;
+                context.ElementShape.Context = context;
+                context.ElementShape.Content = context.Content;
+            }
         }
+
+        //protected override void OnDisplaying(PropertyBindElement element, ElementDisplayingContext context) {
+        //    context.ElementShape.HTML = element.Content;
+        //}
+
+        //protected override void OnCreatingDisplay(PropertyBindElement element, ElementCreatingDisplayShapeContext context) {
+        //    base.OnCreatingDisplay(element, context);
+        //}
 
     }
 }

@@ -22,9 +22,9 @@ namespace MnLab.PdfVisualDesign.Binding.Elements {
             get { return T("Property Bind"); }
         }
 
-        public virtual string ContentPartFieldExpression {
-            get { return this.Retrieve(x => x.ContentPartFieldExpression); }
-            set { this.Store(x => x.ContentPartFieldExpression, value); }
+        public virtual string ContentPartMemberExpression {
+            get { return this.Retrieve(x => x.ContentPartMemberExpression); }
+            set { this.Store(x => x.ContentPartMemberExpression, value); }
         }
 
         public virtual string ContentPartName {

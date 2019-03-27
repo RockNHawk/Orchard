@@ -17,7 +17,7 @@ namespace MnLab.PdfVisualDesign.ViewModels {
 
     public class FieldBindingInfo {
         public string ContentPartName { get; set; }
-        public string ContentPartFieldExpression { get; set; }
+        public string ContentPartMemberExpression { get; set; }
         public string ExampleValue { get; set; }
         public string Description { get; set; }
         public string Remark { get; set; }
