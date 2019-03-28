@@ -1,0 +1,12 @@
+﻿
+@using Orchard.Utility.Extensions;
+@{
+    string name = Model.Name;
+    string value = Model.Value;
+}
+@if (HasText(name) && HasText(value))
+{
+     @Html.Hidden(name,value)
+     
+
+}

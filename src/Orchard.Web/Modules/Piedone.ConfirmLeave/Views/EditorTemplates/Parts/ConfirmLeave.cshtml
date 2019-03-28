@@ -1,0 +1,21 @@
+﻿@model Piedone.Models.ConfirmLeave.ConfirmLeavePart
+           
+@{
+    Script.Require("jQuery");
+    Script.Include("piedone-confirm-leave.js").AtFoot();
+    var fieldId = "ConfirmLeave" + Model.ContentItem.Id;
+}
+
+@*This is to handle the situation when multiple editor are on the same window (and maybe not all have this part)*@
+<input type="hidden" name="@fieldId" id="@fieldId" value="" />
+
+@using (Script.Foot())
+{
+    <script type="text/javascript">
+        $(window).load(function(){
+            $.getJSON("@Url.Action("Index", new { Controller = "JSLocalization", Area = "Piedone.ConfirmLeave" } )", function (data) {
+                $.confirmLeave(data).makeConfirm("@fieldId");
+            });
+        });
+    </script>
+}
