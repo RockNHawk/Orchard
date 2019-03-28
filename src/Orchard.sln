@@ -299,6 +299,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchard.AngularJS", "Orchar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "I9AOrchard.MediaPickerField", "Orchard.Web\Modules\I9AOrchard.MediaPickerField\I9AOrchard.MediaPickerField.csproj", "{15C4F6B4-E383-4187-8529-737BE67DBFF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadioSystems.BootstrapElements", "Orchard.Web\Modules\RadioSystems.BootstrapElements\RadioSystems.BootstrapElements.csproj", "{298F8B28-B344-4B5C-9951-50B5C2824E1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchard.InlineEditing", "Orchard.Web\Modules\Orchard.InlineEditing\Orchard.InlineEditing.csproj", "{05EFF462-4258-4850-8583-E60F8F3063F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeCoverage|Any CPU = CodeCoverage|Any CPU
@@ -1404,6 +1408,30 @@ Global
 		{15C4F6B4-E383-4187-8529-737BE67DBFF2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{15C4F6B4-E383-4187-8529-737BE67DBFF2}.Stage|Any CPU.ActiveCfg = Release|Any CPU
 		{15C4F6B4-E383-4187-8529-737BE67DBFF2}.Stage|Any CPU.Build.0 = Release|Any CPU
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B}.CodeCoverage|Any CPU.ActiveCfg = Release|Any CPU
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B}.CodeCoverage|Any CPU.Build.0 = Release|Any CPU
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B}.Coverage|Any CPU.ActiveCfg = Release|Any CPU
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B}.Coverage|Any CPU.Build.0 = Release|Any CPU
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B}.FxCop|Any CPU.ActiveCfg = Release|Any CPU
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B}.FxCop|Any CPU.Build.0 = Release|Any CPU
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B}.Stage|Any CPU.ActiveCfg = Release|Any CPU
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B}.Stage|Any CPU.Build.0 = Release|Any CPU
+		{05EFF462-4258-4850-8583-E60F8F3063F4}.CodeCoverage|Any CPU.ActiveCfg = Release|Any CPU
+		{05EFF462-4258-4850-8583-E60F8F3063F4}.CodeCoverage|Any CPU.Build.0 = Release|Any CPU
+		{05EFF462-4258-4850-8583-E60F8F3063F4}.Coverage|Any CPU.ActiveCfg = Release|Any CPU
+		{05EFF462-4258-4850-8583-E60F8F3063F4}.Coverage|Any CPU.Build.0 = Release|Any CPU
+		{05EFF462-4258-4850-8583-E60F8F3063F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05EFF462-4258-4850-8583-E60F8F3063F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05EFF462-4258-4850-8583-E60F8F3063F4}.FxCop|Any CPU.ActiveCfg = Release|Any CPU
+		{05EFF462-4258-4850-8583-E60F8F3063F4}.FxCop|Any CPU.Build.0 = Release|Any CPU
+		{05EFF462-4258-4850-8583-E60F8F3063F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05EFF462-4258-4850-8583-E60F8F3063F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05EFF462-4258-4850-8583-E60F8F3063F4}.Stage|Any CPU.ActiveCfg = Release|Any CPU
+		{05EFF462-4258-4850-8583-E60F8F3063F4}.Stage|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1500,9 +1528,11 @@ Global
 		{71F43CDA-1540-4767-B1BF-AE8944C2CB11} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
 		{3064E35C-597C-4A6B-9890-8E1030076CB6} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
 		{15C4F6B4-E383-4187-8529-737BE67DBFF2} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
+		{298F8B28-B344-4B5C-9951-50B5C2824E1B} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
+		{05EFF462-4258-4850-8583-E60F8F3063F4} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {3585D970-275B-4363-9F61-CD37CFC9DCD3}
 		EnterpriseLibraryConfigurationToolBinariesPath = packages\TransientFaultHandling.Core.5.1.1209.1\lib\NET4
+		SolutionGuid = {3585D970-275B-4363-9F61-CD37CFC9DCD3}
 	EndGlobalSection
 EndGlobal

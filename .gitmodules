@@ -1,0 +1,12 @@
+[submodule "src/Orchard.Web/Modules/Moov2.Orchard.FindReplace"]
+	path = src/Orchard.Web/Modules/Moov2.Orchard.FindReplace
+	url = https://github.com/moov2/Moov2.Orchard.FindReplace.git
+[submodule "src/Orchard.Web/Themes/BootstrapAdminTheme"]
+	path = src/Orchard.Web/Themes/BootstrapAdminTheme
+	url = https://github.com/yhnavein/orchard-bootstrap-admin-theme.git
+[submodule "src/Orchard.Web/Modules/Orchard.InlineEditing"]
+	path = src/Orchard.Web/Modules/Orchard.InlineEditing
+	url = https://github.com/Jetski5822/Orchard.InlineEditing.git
+[submodule "src/Orchard.Web/Modules/RadioSystems.BootstrapElements"]
+	path = src/Orchard.Web/Modules/RadioSystems.BootstrapElements
+	url = https://github.com/RadioSystems/RadioSystems.BootstrapElements.git
