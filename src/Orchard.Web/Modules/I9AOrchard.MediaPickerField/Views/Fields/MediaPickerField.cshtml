@@ -1,0 +1,8 @@
+﻿@{
+    string name = Model.Model.Name;
+    string value = Model.Model.PickerPath;
+}
+
+@if (HasText(name) && HasText(value)) {
+    <div class="Image"><img src='@value' alt='@name' /></div>
+}

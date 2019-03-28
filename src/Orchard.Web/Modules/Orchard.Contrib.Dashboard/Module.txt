@@ -1,0 +1,18 @@
+﻿Name: Orchard.Contrib.Dashboard
+AntiForgery: enabled
+Author: Ikutsin
+Website: http://usanov.net
+Version: 0.9
+OrchardVersion: 1.6
+Description: Dashboard replacement
+Dependencies: Orchard.Forms
+Features:
+    Orchard.Contrib.Dashboard:
+		Name: Contrib.Dashboard
+        Description: Dashboard replacement.
+		Category: Dashboard
+	Orchard.Contrib.Dashboard.CommonItems
+		Dependencies: Orchard.Contrib.Dashboard
+		Name: Contrib.Dashboard: Common items
+		Category: Dashboard
+		Description: Dashboard replacement common items.

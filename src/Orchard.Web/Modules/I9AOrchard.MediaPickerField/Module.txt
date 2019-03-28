@@ -1,0 +1,12 @@
+Name: I9AOrchard.MediaPickerField
+AntiForgery: enabled
+Author: Innovagency
+Website: http://www.innovagency.com
+Version: 1.0
+OrchardVersion: 1.1.30
+Description: The MediaPickerField module introduces a new field with MediaPicker functionalities to store the path of selected file, or upload one.
+Features:
+    I9AOrchard.MediaPickerField:
+        Description: MediaPicker Field.
+		Category: Fields
+        Dependencies: Orchard.jQuery, Orchard.MediaPicker, Settings

@@ -1,0 +1,26 @@
+﻿@model Orchard.Contrib.Dashboard.ViewModels.DashboardItemAddViewModel
+@if (!Model.Items.Any())
+{
+    <h3>@T("There are no currently available items")</h3>
+}
+
+@foreach (var item in Model.Items.OrderBy(x => x.Name.Text))
+{
+    <h2>@item.Name</h2>
+    
+    <table class="items">
+        <thead>
+            <tr>
+                <th scope="col" style="width:300px">@T("Name")</th>
+                <th scope="col">@T("Description")</th>
+            </tr>
+        </thead>
+        @foreach (var descriptor in item.Descriptors)
+        {
+        <tr>
+            <td>@Html.ActionLink(descriptor.Name.Text, "Create", new { category = descriptor.Category, type = descriptor.Type })</td>
+            <td>@descriptor.Description</td>    
+        </tr>
+        }
+    </table>
+}

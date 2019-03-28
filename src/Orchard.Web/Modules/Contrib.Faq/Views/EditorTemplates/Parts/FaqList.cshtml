@@ -1,0 +1,19 @@
+@model Contrib.Faq.Models.FaqList
+@{
+	Script.Require("CKEditor");
+}
+@using(Script.Foot()) {
+<script type="text/javascript">
+//<![CDATA[
+	CKEDITOR.replace('Intro',@Display.CKEditor_Config());
+//]]>
+</script>
+}
+
+<fieldset>
+    <label class="sub" for="Intro">@T("Intro text")</label><br />
+	@Html.TextArea("Intro", (string)Model.Intro, 25, 80, new { @class = "html" })
+	<br />
+    <label class="sub" for="Category">@T("Category")</label><br />
+    @Html.TextBoxFor(m => m.Category, new { @class = "text" })<br />
+</fieldset>

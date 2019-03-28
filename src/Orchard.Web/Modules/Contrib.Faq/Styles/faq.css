@@ -1,0 +1,18 @@
+.faq-items-question {
+	margin-left: 40px;
+}
+
+.faq-question {
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.faq-answer {
+	display: none;
+	background-color: #FFFFAA;
+	border: 1px solid #EDEDED;
+	padding: 5px;
+}
+
+.faq-selected {	
+}

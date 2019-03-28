@@ -1,0 +1,24 @@
+﻿@model I9AOrchard.MediaPickerField.ViewModels.MediaPickerFieldViewModel
+
+<fieldset>
+    <label for="@Html.FieldIdFor(m => Model.PickerPath)">@Model.Name</label>
+    @Html.EditorFor(m => Model.PickerPath)@Html.ValidationMessageFor(m => Model.PickerPath)
+    <span id='btn-@Html.FieldIdFor(m => Model.PickerPath)' style="cursor:pointer; padding: 3px 14px; color:#ffffff; border: 1px solid #487328; background: #9BB36C;">Open</span>
+</fieldset>
+
+
+@using(Script.Foot()) {
+
+<script type="text/javascript">
+    jQuery("#btn-@Html.FieldIdFor(m => Model.PickerPath)").click(function () {
+        jQuery("#btn-@Html.FieldIdFor(m => Model.PickerPath)").trigger("orchard-admin-pickimage-open", {
+            img: null,
+            uploadMediaPath: '@Model.EditorMediaPath',
+            callback: function (data) {
+                jQuery("#@Html.FieldIdFor(m => Model.PickerPath)").val(data.img.src);
+            }
+        });
+    });
+</script>
+
+}

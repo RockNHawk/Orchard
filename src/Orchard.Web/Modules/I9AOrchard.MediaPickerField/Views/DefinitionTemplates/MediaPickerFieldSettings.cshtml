@@ -1,0 +1,6 @@
+﻿@model I9AOrchard.MediaPickerField.Settings.MediaPickerFieldSettings
+<fieldset>
+    <label for="@Html.FieldIdFor(m => m.MediaPathDefault)">@T("Upload Folder")</label>
+    @Html.EditorFor(m => m.MediaPathDefault)
+    @Html.ValidationMessageFor(m => m.MediaPathDefault)
+</fieldset>

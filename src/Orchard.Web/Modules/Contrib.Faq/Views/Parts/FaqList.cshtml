@@ -1,0 +1,59 @@
+@using Orchard.ContentManagement;
+@{
+	IEnumerable<object> faqs = Model.Faqs;
+}
+
+@(new MvcHtmlString(Model.Intro))<br/>
+
+@if (faqs == null || faqs.Count() < 1) {
+<p>@T("Er zijn geen vragen gevonden voor categorie " + @Model.Category + ".")</p>
+}
+else 
+{
+	Script.Require("jQuery");
+	Style.Include("~/Modules/Contrib.Faq/Styles/faq.css");
+	<ol class="faq-items">
+	@{string currentsub = "";}
+    @foreach (dynamic item in faqs) 
+    {
+		string quest = item.Question;
+		string anws = item.Answer;
+		string subc = item.SubCategory;
+		int id = item.Id;
+		ContentItem contentItem = item.ContentItem;
+		
+		if (currentsub != subc) {			
+			<h1>@subc</h1>
+			currentsub = subc;
+		}
+		<li class="faq-items-question">
+			<div class="faq-question" id="@id">@(new MvcHtmlString(quest))</div>
+			<div class="faq-answer" id="faq-answer-@id">@(new MvcHtmlString(anws))</div>
+        </li>
+    }
+	</ol>
+
+	using(Script.Foot()) {
+		<script type ="text/javascript">
+		//<![CDATA[
+		$(document).ready(function () { 
+			//alert('page loaded');			
+			$('.faq-question').click(function() {				
+				if(!$(this).hasClass('faq-selected'))
+				{
+					var id = $(this).attr("id");
+					//alert('#faq-answer-' + id);
+					$('.faq-answer').hide();
+					$('.faq-question').removeClass('faq-selected');
+					
+					$(this).addClass('faq-selected');
+					$('#faq-answer-' + id).fadeIn('slow', function() {
+						// animation completed						
+					});
+				}
+			});
+		});
+		//]]>
+		</script>
+	}
+}

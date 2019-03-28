@@ -1,0 +1,18 @@
+Name: Contrib.Faq
+AntiForgery: enabled
+Author: Bolus de Beer
+Website: http://www.bolusdebeer.nl
+Version: 1.0
+OrchardVersion: 1.2.41.0
+Description: A simple FAQ module
+Dependencies: CKEditor
+Features:
+    Contrib.Faq:
+		Name: FAQ
+        Description: Description for feature Contrib.Faq.
+		Category: FAQ
+	Contrib.Faq.list:
+		Name: FAQ List
+        Description: A simple module to list FAQ's based on the category
+		Dependencies: Contrib.Faq, Orchard.jQuery
+		Category: FAQ

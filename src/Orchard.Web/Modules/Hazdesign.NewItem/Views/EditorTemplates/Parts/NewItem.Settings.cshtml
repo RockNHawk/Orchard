@@ -1,0 +1,9 @@
+﻿@model Hazdesign.NewItem.Models.NewItemSettingsPart
+<fieldset>
+    <legend>@T("New Item settings")</legend>
+    <div>
+        @Html.LabelFor(m => m.Days, @T("Days to consider a New Item"))
+        @Html.EditorFor(m => m.Days)
+        @Html.ValidationMessageFor(m => m.Days, "*")
+    </div>
+</fieldset>

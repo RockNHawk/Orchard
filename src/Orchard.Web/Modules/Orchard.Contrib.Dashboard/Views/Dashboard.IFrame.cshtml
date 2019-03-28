@@ -1,0 +1,12 @@
+﻿@using Orchard.Contrib.Dashboard.Models
+@{
+    DashboardItemContext context = Model.Context;
+    string technicalName = context.Properties.ContainsKey("technicalName")?context.Properties["technicalName"]:"";
+    string displayName = context.Properties.ContainsKey("displayName")?T(context.Properties["displayName"]).Text:"";
+    string url = context.Properties.ContainsKey("url")?context.Properties["url"]:"";
+    
+}        
+<h2 class="@technicalName">@displayName</h2>
+<iframe id="@technicalName" src="@url" frameborder="0" height="100%" width="100%" scrolling="no">
+ <p>@T("Your browser does not support iframes. You can't see '{0}' messages.", @displayName)</p>
+</iframe>

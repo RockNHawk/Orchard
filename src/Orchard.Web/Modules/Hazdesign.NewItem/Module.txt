@@ -1,0 +1,10 @@
+Name: Hazdesign.NewItem
+AntiForgery: enabled
+Author: Carlos Eduardo Miranda
+Website: http://twitter.com/hazdesign
+Version: 1.3
+OrchardVersion: 1.3
+Description: Orchard module that created a NewItemPart that can be added to ContentTypes that shows automatically on recent items a New image.
+Features:
+    Hazdesign.NewItem:
+        Description: Orchard module that created a NewItemPart that can be added to ContentTypes that shows automatically on recent items a New image.

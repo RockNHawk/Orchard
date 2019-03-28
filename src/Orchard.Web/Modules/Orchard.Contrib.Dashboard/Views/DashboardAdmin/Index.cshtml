@@ -1,0 +1,92 @@
+@using Orchard.Contrib.Dashboard.ViewModels
+@using Orchard.Contrib.Dashboard.Models
+@model DashboardItemIndexViewModel
+@{
+    Style.Include("admin-dashboard.css");
+    
+    var entryIndex = 0;
+
+	var pageSizes = new List<int?>() { 10, 50, 100 };
+	var defaultPageSize = WorkContext.CurrentSite.PageSize;
+	if(!pageSizes.Contains(defaultPageSize)) { 
+		pageSizes.Add(defaultPageSize);
+	}
+}
+
+<h1>@Html.TitleForPage(T("Manage Dashboard").ToString()) </h1>
+@using (Html.BeginFormAntiForgeryPost()) { 
+    @Html.ValidationSummary()
+    <div class="manage">@Html.ActionLink(T("Add a new Item").ToString(), "Add", new { }, new { @class = "button primaryAction" })</div>
+
+    <fieldset class="bulk-actions">
+        <label for="publishActions">@T("Actions:")</label>
+        <select id="publishActions" name="@Html.NameOf(m => m.Options.BulkAction)">
+            @Html.SelectOption(Model.Options.BulkAction, DashboardItemBulkAction.None, T("Choose action...").ToString())
+            @Html.SelectOption(Model.Options.BulkAction, DashboardItemBulkAction.Enable, T("Enable").ToString()) 
+            @Html.SelectOption(Model.Options.BulkAction, DashboardItemBulkAction.Disable, T("Disable").ToString())
+            @Html.SelectOption(Model.Options.BulkAction, DashboardItemBulkAction.Delete, T("Delete").ToString())
+        </select>
+        <button type="submit" name="submit.BulkEdit" value="@T("Apply")">@T("Apply")</button>
+    </fieldset>
+    <fieldset class="bulk-actions">
+		<label for="filterResults">@T("Sort by:")</label>
+        <select id="filterResults" name="@Html.NameOf(m => m.Options.Order)">
+            @Html.SelectOption(Model.Options.Order, DashboardItemOrder.Position, T("Position").ToString())
+            @Html.SelectOption(Model.Options.Order, DashboardItemOrder.Category, T("Category").ToString())
+            @Html.SelectOption(Model.Options.Order, DashboardItemOrder.Type, T("Type").ToString())
+        </select>
+		<input type="hidden" name="Page" value="1" />
+		<label for="pageSize">@T("Show:")</label>
+		<select id="pageSize" name="PageSize">
+			@Html.SelectOption((int)Model.Pager.PageSize, 0, T("All").ToString())
+			@foreach(int size in pageSizes.OrderBy(p => p)) {
+				@Html.SelectOption((int)Model.Pager.PageSize, size, size.ToString())
+			}
+		</select>
+        <button type="submit" name="submit.Filter" value="@T("Filter")">@T("Filter")</button>
+    </fieldset>
+    <fieldset>		
+        <table class="items">
+            <thead>
+                <tr>
+                    <th scope="col">&nbsp;&darr;</th>
+                    <th scope="col">@T("Name")</th>
+                    <th scope="col">@T("Position")</th>
+                    <th scope="col">@T("Category/Type")</th>
+                    <th scope="col">&nbsp;</th>
+                </tr>
+            </thead>
+            @foreach (var entry in Model.Items) { 
+			<tr>
+                <td class="status-@(entry.Record.Enabled ? "enabled" : "disabled")">
+                    <input type="hidden" value="@Model.Items[entryIndex].Id" 
+                                        name="@Html.NameOf(m => m.Items[entryIndex].Id)"/>
+                    <input type="checkbox" value="true" name="@Html.NameOf(m => m.Items[entryIndex].IsChecked)"/>
+                </td>
+                <td>
+                    @Html.ActionLink(entry.Record.Name, "Edit", new { entry.Record.Id }) 
+                </td>
+                <td>
+                    @entry.Record.Position 
+                </td>
+                <td>
+					@entry.Record.Category / @entry.Record.Type
+                </td>
+                <td>
+                    @Html.ActionLink(T("Edit").ToString(), "Edit", new { entry.Record.Id }) |
+                    @Html.ActionLink(T("Delete").ToString(), "Delete", new { entry.Record.Id }, new { itemprop = "RemoveUrl UnsafeUrl" }) |
+                    @if(entry.Record.Enabled == false) {
+                        @Html.ActionLink(T("Enable").ToString(), "Enable", new { entry.Record.Id })
+                    } else {
+                        @Html.ActionLink(T("Disable").ToString(), "Disable", new { entry.Record.Id })
+                    }
+                    | @Html.ActionLink(T("Move Up").ToString(), "MoveUp", new { entry.Record.Id })
+                    | @Html.ActionLink(T("Move Down").ToString(), "MoveDown", new { entry.Record.Id })
+                </td>
+            </tr>
+            entryIndex++;
+			}
+        </table>
+	@Display(Model.Pager)
+    </fieldset>
+} 

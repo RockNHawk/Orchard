@@ -1,0 +1,16 @@
+﻿@model dynamic
+@using Orchard.Contrib.Dashboard.Models
+
+@{ 
+    Layout.Title = T("Welcome to Orchard").ToString();
+    Style.Include("dashboard.css");
+}
+
+<section class="dashboard group">
+@foreach (var item in Model.Items) { 
+    <div class="help-item">
+        @Display(item.Shape)
+    </div>
+}
+</section>
+@*<div style="float:right">@Html.ActionLink("Manage", "Index", "DashboardAdmin")</div>*@

@@ -1,0 +1,9 @@
+﻿<Placement>
+  <Match DisplayType="Summary">
+    <Place Parts_NewItem="Header:10"/>
+  </Match>
+  <Match DisplayType="Detail">
+    <Place Parts_NewItem="Header:10"/>
+  </Match>
+  <Place Parts_NewItem_Settings="Content:60"/>
+</Placement>

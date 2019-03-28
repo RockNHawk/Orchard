@@ -1,0 +1,11 @@
+﻿@model Orchard.Contrib.Dashboard.ViewModels.DashboardItemEditViewModel
+           
+@{
+    Layout.Title = T("Edit Item - {0}", Model.Item.Name);
+}
+
+@Html.ValidationSummary()
+<h2>@Model.Item.Description</h2>
+@Display(Model.Form)
+
+@Display.TokenHint()

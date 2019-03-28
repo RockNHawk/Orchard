@@ -1,0 +1,10 @@
+﻿@using Orchard.Contrib.Dashboard.Models
+@{
+    DashboardItemContext context = Model.Context;
+    string technicalName = context.Properties.ContainsKey("technicalName")?context.Properties["technicalName"]:"";
+    string displayName = context.Properties.ContainsKey("displayName")?T(context.Properties["displayName"]).Text:"";
+    string content = context.Properties.ContainsKey("Body") ? context.Properties["Body"] : "";
+    
+}        
+<h2 class="@technicalName">@displayName</h2>
+<p>@Html.Raw(content)</p>

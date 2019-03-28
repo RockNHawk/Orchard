@@ -1,0 +1,11 @@
+<Placement>
+    <Place Parts_Faq_Edit="Content:3"/>
+	<Match DisplayType="Detail">
+        <Place Parts_Faq="Content:3"/>
+    </Match>
+	
+	<Place Faq_List_Edit="Content:3"/>
+	<Match DisplayType="Detail">
+        <Place Faq_List="Content:3"/>
+    </Match>
+</Placement>
