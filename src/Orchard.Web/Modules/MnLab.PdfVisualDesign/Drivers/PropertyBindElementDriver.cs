@@ -251,7 +251,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             }
 
             var partName = bindingInfo.ContentPartName;
-            var partPropertyName = bindingInfo.ContentPartMemberExpression;
+            var partPropertyName = bindingInfo.MemberExpression;
 
             var content = context.Content;
             var contentItem = content.ContentItem;
@@ -445,7 +445,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             var bindingInfo = element;
             var partName = bindingInfo.ContentPartName;
-            var partPropertyName = bindingInfo.ContentPartMemberExpression;
+            var partPropertyName = bindingInfo.MemberExpression;
 
             var content = context.Content;
             var contentItem = content.ContentItem;

@@ -1,0 +1,59 @@
+// Forms and form inputs styling
+
+// Error Handling
+span.field-validation-error {
+    @include font-style(12px, $formValidationError);
+}
+div.validation-summary-errors {
+    @extend .alert;
+    @extend .alert-danger;
+}
+
+// Make the dynamic form looks like a Bootstrap form
+.form-field-element-text-field {
+    @extend .form-group;
+    input {
+        @extend .form-control;
+    }
+}
+.form-field-element-email-field {
+    @extend .form-group;
+    input {
+        @extend .form-control;
+    }
+}
+.form-field-element-url-field {
+    @extend .form-group;
+    input {
+        @extend .form-control;
+    }
+}
+.form-field-element-text-area {
+    @extend .form-group;
+    textarea {
+        @extend .form-control;
+        height: auto !important;
+    }
+}
+.form-field-element-button {
+    @extend .form-group;
+    button {
+        @extend .btn;
+        @extend .btn-default;
+    }
+}
+.form-field-element-enumeration {
+    @extend .form-group;
+    select {
+        @extend .form-control;
+    }
+    ol {
+        list-style: none;
+        margin: 0px;
+        padding: 0px;
+        li{
+            display: inline-block;
+            margin-right: 10px;
+        }
+    }
+}

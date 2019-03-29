@@ -1,0 +1,27 @@
+﻿@using Orchard.ContentManagement
+@using Orchard.Layouts.Helpers
+@using Orchard.MediaLibrary.Models
+@{
+    var tagBuilder = TagBuilderExtensions.CreateElementTagBuilder(Model, "img");
+    var imagePart = (ImagePart)Model.ImagePart;
+    var mediaPart = imagePart != null ? imagePart.As<MediaPart>() : default(MediaPart);
+    var imageCaption = mediaPart.Caption;
+
+    if (mediaPart != null)
+    {
+        tagBuilder.Attributes["src"] = Url.Content(mediaPart.MediaUrl);
+        tagBuilder.Attributes["alt"] = mediaPart.AlternateText;
+    }
+    else
+    {
+        tagBuilder.Attributes["alt"] = T("Image not found").Text;
+    }
+    tagBuilder.AddCssClass("img-responsive center-image");
+}
+@if (String.IsNullOrEmpty(imageCaption)) {
+    @tagBuilder.ToHtmlString(TagRenderMode.SelfClosing)
+} else {
+    <a href="@imageCaption" target="@( imageCaption.StartsWith("http") ? "_blank" : "_self" )">
+        @tagBuilder.ToHtmlString(TagRenderMode.SelfClosing)
+    </a>
+}

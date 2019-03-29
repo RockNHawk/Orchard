@@ -1,0 +1,63 @@
+﻿// Blog post list 
+ul.blog-posts {
+    list-style: none;
+    padding-left: 0px;
+}
+
+// Blog Post 
+.blog-post {
+    h2 {
+        a {
+            @extend .main-subtitle;
+        }
+    }
+}
+
+// Comments
+#commenter,
+.comment-count {
+    @extend .main-subtitle;
+}
+.comment h4 {
+    font-size: 16px;
+}
+
+.comment-form {
+    .who {
+        ol {
+            list-style: none;
+            padding-left: 0px;
+            li {
+                @extend .form-group;
+                input {
+                    @extend .form-control;
+                }
+            }
+        }
+    }
+    .what {
+        ol {
+            list-style: none;
+            padding-left: 0px;
+            textarea {
+                @extend .form-control;
+                height: auto !important;
+            }
+        }
+    }
+    button {
+        @extend .btn;
+        @extend .btn-default;
+    }
+}
+
+// Blog
+.blog {
+    h1 {
+        @extend .main-title;
+    }
+}
+.blog-description {
+    @extend .alert;
+    @extend .alert-info;
+}

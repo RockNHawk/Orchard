@@ -1,0 +1,25 @@
+﻿.pager li {
+    display: inline-block;
+    a,
+    span {
+        border-radius: 5px !important;
+        padding: 10px 14px;
+        @include font-style(12px, $pagerColor, 700);
+        &:hover {
+            background: $pagerBackground;
+        }
+        &.current-pager {
+            cursor: default;
+            color: $pagerActiveColor;
+            background-color: $pagerActiveBackground;
+            border-color: $pagerActiveBackground;
+            &:hover {
+                background: $pagerActiveBackground;
+            }
+        }
+        &.gap-pager {
+            cursor: default;
+            pointer-events: none;
+        }
+    }
+}

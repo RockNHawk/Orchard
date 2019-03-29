@@ -1,0 +1,40 @@
+﻿// Author: George Roubie - george.roubie@gmail.com
+// CSS Style Guide: https://github.com/georgeroubie/CSS-Style-Guide
+
+// Bootstrap
+$font-family-sans-serif: 'Open Sans', sans-serif;
+$icon-font-path: '../fonts/';
+@import '../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap';
+
+// FontAwesome
+@import '../node_modules/font-awesome/scss/font-awesome';
+
+// Toastr
+@import '../node_modules/toastr/toastr';
+
+// Reusable
+@import 'reusable/_variables';
+@import 'reusable/_mixins';
+@import 'reusable/_classes';
+@import 'reusable/_colors';
+@import 'reusable/_fonts';
+@import 'reusable/_buttons';
+@import 'reusable/_forms'; 
+@import 'reusable/_animations'; 
+
+// General
+@import 'layout/_basic';
+@import 'layout/_grid';
+@import 'layout/_footer';
+
+// Components
+@import 'components/_cookie-bar'; 
+@import 'components/_loader';
+@import 'components/_menu';
+@import 'components/_pager';
+@import 'components/_blog';
+@import 'components/_search';
+@import 'components/_tags';
+
+// Snippets
+@import 'snippets/_share-btn';
