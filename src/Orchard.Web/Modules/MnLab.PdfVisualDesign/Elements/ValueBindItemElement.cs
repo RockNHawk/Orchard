@@ -19,7 +19,7 @@ namespace MnLab.PdfVisualDesign.Binding.Elements {
         }
 
         public override LocalizedString DisplayText {
-            get { return T("Property Bind"); }
+            get { return T("Value Bind Item"); }
         }
 
         public virtual string MemberExpression {

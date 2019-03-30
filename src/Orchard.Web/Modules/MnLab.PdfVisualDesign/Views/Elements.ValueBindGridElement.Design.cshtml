@@ -1,0 +1,16 @@
+﻿@using MnLab.PdfVisualDesign
+@using MnLab.PdfVisualDesign.ViewModels
+@using MnLab.PdfVisualDesign.Binding
+@using MnLab.PdfVisualDesign.Binding.Elements
+
+@model ValueBindGridViewModel
+@{
+    /**/
+
+    Script.Require("handsontable").AtHead();
+    Style.Require("handsontable").AtHead();
+
+    var design = Model.Design;
+
+}
+Grid

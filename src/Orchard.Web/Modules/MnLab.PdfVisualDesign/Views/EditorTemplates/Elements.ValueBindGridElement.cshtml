@@ -1,11 +1,146 @@
-﻿@using MnLab.PdfVisualDesign.ViewModels
-@model ValueBindGridElement
-@{
-    Script.Require("handsometable").AtHead();
-    Style.Require("handsometable").AtHead();
+﻿@using MnLab.PdfVisualDesign
+@using MnLab.PdfVisualDesign.ViewModels
+@using MnLab.PdfVisualDesign.Binding
+@using MnLab.PdfVisualDesign.Binding.Elements
 
-    var field = Model.Field;
+@model ValueBindGridViewModel
+@{
+    /**/
+
+    Script.Require("handsontable").AtHead();
+    Style.Require("handsontable").AtHead();
+
+
+    Script.Require("AngularJs_Full").AtHead();
+
+    //manifest.DefineScript("Layouts.Lib").SetDependencies("jQuery", "AngularJs_Full", "Underscore");
+
+
+    var design = Model.Design;
+
 }
+
+@*<script src="https://cdn.jsdelivr.net/npm/handsontable@7.0.0/dist/handsontable.full.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@7.0.0/dist/handsontable.full.min.css">*@
+
+
+@{
+    var AllCellValues = design?.AllCellValues;
+    var mergedCells = design?.MergedCells;
+    var uniqueId = Guid.NewGuid().ToString("N");
+
+    <div id="handsontable-@(uniqueId)" class="hot handsontable htRowHeaders htColumnHeaders"></div>
+
+    <script>
+    (function () {
+
+        var uniqueId = ['@(uniqueId)'][0];
+
+
+          //var data = Handsontable.helper.createSpreadsheetData(10, 10);
+
+        var AllCellValues = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(AllCellValues, Newtonsoft.Json.Formatting.Indented)))][0];
+    var mergedCells = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(mergedCells, Newtonsoft.Json.Formatting.Indented)))][0];
+
+
+        var gridApp = angular.module('ValueBindGrid_' + uniqueId, []);
+
+        var scope;
+        var ngController = gridApp.controller('ValueBindGridController_' + uniqueId, function PhoneListController($scope) {
+            scope = $scope;
+
+            $scope.AllCellValues_JSON = AllCellValues && JSON.stringify(AllCellValues);
+            $scope.mergedCells_JSON = mergedCells && JSON.stringify(mergedCells);
+
+            $scope.appplyTableChange = function (table) {
+                var mc = table.getPlugin('mergeCells');
+                var mergedCellsCollection = mc.mergedCellsCollection;
+                var mergedCellsNew = mergedCellsCollection && mergedCellsCollection.mergedCells;
+                console.log("mergedCellsCollection", mc);
+                debugger
+                scope.$apply(function () {
+                    //scope.mergedCells = mergedCellsNew;
+                    scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
+
+                      //// 源数据？
+    // hot.getSourceData();
+
+                    // 用户编辑修改后的数据？
+                    var newData = table.getData();
+                    scope.AllCellValues_JSON = newData && JSON.stringify(newData);
+                });
+
+            }
+            //$scope.AllCellValues = AllCellValues;
+            //$scope.mergedCells = mergedCells;
+        });
+
+
+
+        var container = document.getElementById('handsontable-@(uniqueId)');
+
+
+
+        var tableCfg = {
+            data: AllCellValues,
+            //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
+            rowHeaders: true,
+            colHeaders: true,
+            contextMenu: true,
+            mergeCells: mergedCells || [],
+            //mergeCells: [
+            //    { row: 1, col: 1, rowspan: 3, colspan: 3 },
+            //    { row: 3, col: 4, rowspan: 2, colspan: 2 },
+            //    { row: 5, col: 6, rowspan: 3, colspan: 3 }
+            //],
+            //afterMergeCells: function (range, parent, auto) {
+            //    //    debugger
+            //    console.log("afterMergeCells", range, parent, auto);
+
+            //    scope.appplyTableChange(girdTable);
+            //}
+        };
+
+        //v https://handsontable.com/docs/7.0.0/tutorial-using-callbacks.html
+        //var hooks = ['afterChange', 'afterRemoveRow', 'afterRemoveCol', 'afterMergeCells',' afterUnmergeCells'];
+
+        //['']
+        var hooks = Handsontable.hooks.getRegistered().filter(x => x.indexOf('Mouse') != -1 || x.indexOf('Scroll') != -1);
+
+        var girdTable;
+        hooks.forEach(function (hook) {
+            console.log("hook", arguments);
+            tableCfg[hook] = function () {
+                if (scope) {
+                    scope.appplyTableChange(girdTable);
+                }
+            }
+        });
+
+        girdTable = new Handsontable(container, tableCfg);
+        girdTable.hot = girdTable;
+
+    })();
+    </script>
+
+
+    <div ng-app="ValueBindGrid_@(uniqueId)">
+
+        <div ng-controller="ValueBindGridController_@(uniqueId)">
+            <input name="Design.AllCellValues" ng-model="AllCellValues_JSON" />
+            <input name="Design.mergedCells" ng-model="mergedCells_JSON" />
+        </div>
+    </div>
+
+
+
+}
+
+  EditorFor:
+@Html.EditorFor(x => x.Design.AllCellValues);
+
+
+
 @using (Script.Foot())
 {
     <script type="text/javascript">

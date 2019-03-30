@@ -5,7 +5,25 @@ using Orchard.Layouts.Helpers;
 
 namespace MnLab.PdfVisualDesign.Binding.Elements {
 
-  
+    public class ValueBindGridViewModel {
+        public ValueBindGridData Design { get; set; }
+        public ValueBindGridData Data { get; set; }
+    }
+
+    public class ValueBindGridData {
+        public virtual FieldBindingInfo[][] AllCellValues { get; set; }
+        public virtual MergedCell[] MergedCells { get; set; }
+    }
+
+    public class MergedCell {
+        public int row { get; set; }
+        public int col { get; set; }
+        //[Newtonsoft.Json.JsonProperty()]
+        public int rowspan { get; set; }
+        public int colspan { get; set; }
+        public bool removed { get; set; }
+    }
+
     /// <summary>
     /// 定义 Model Property Bind Element
     /// 具有三种模式：
@@ -21,15 +39,15 @@ namespace MnLab.PdfVisualDesign.Binding.Elements {
         }
 
         public override LocalizedString DisplayText {
-            get { return T("Property Bind"); }
+            get { return T("Value Bind Grid"); }
         }
 
         /// <summary>
         /// Binding jagged array data used for handsometable
         /// </summary>
-        public virtual FieldBindingInfo[][] BindingJaggeds {
-            get { return this.Retrieve(x => x.BindingJaggeds); }
-            set { this.Store(x => x.BindingJaggeds, value); }
+        public virtual ValueBindGridData Design {
+            get { return this.Retrieve(x => x.Design); }
+            set { this.Store(x => x.Design, value); }
         }
 
         public virtual string Remark {

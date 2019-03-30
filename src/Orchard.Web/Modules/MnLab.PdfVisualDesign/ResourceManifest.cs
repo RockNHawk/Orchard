@@ -7,8 +7,11 @@ namespace MnLab.PdfVisualDesign.Binding
         public void BuildManifests(ResourceManifestBuilder builder)
         {
             var manifest = builder.Add();
-            manifest.DefineScript("handsontable").SetUrl("handsontable/handsontable.full.js");
-            manifest.DefineStyle("handsontable").SetUrl("handsontable/handsontable.css");
+
+
+            var url = "~/Modules/MnLab.PdfVisualDesign/Scripts/";
+            manifest.DefineScript("handsontable").SetUrl(url+"handsontable/handsontable.full.js");
+            manifest.DefineStyle("handsontable").SetUrl(url+"handsontable/handsontable.css");
         }
     }
 }
