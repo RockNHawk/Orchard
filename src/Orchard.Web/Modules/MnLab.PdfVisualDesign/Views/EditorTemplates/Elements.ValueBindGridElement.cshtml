@@ -68,6 +68,27 @@
 
                     // 用户编辑修改后的数据？
                     var newData = table.getData();
+        if (newData){
+        debugger
+        for(var i =0;i<newData.length;i++){
+        var array=newData[i];
+
+        if(array){
+        for(var j =0;j<array.length;j++){
+        var d=array[j];
+        debugger
+         if(d &&  typeof(d) == 'string'){
+        array[j] = JSON.parse(array[j]);
+        }else{
+           array[j] =d;
+        }
+        }
+
+        }
+        }
+
+       
+        }
                     scope.AllCellValues_JSON = newData && JSON.stringify(newData);
                 });
 
@@ -230,17 +251,14 @@ string MemberExpression { get; set; }
     <div ng-app="ValueBindGrid_@(uniqueId)">
 
         <div ng-controller="ValueBindGridController_@(uniqueId)">
-            <input name="Design.AllCellValues" ng-model="AllCellValues_JSON" />
-            <input name="Design.mergedCells" ng-model="mergedCells_JSON" />
+            <input name="@Html.NameFor(x => x.DesignData.AllCellValues)" ng-model="AllCellValues_JSON" />
+            <input name="@Html.NameFor(x => x.DesignData.MergedCells)" ng-model="mergedCells_JSON" />
         </div>
     </div>
 
 
 
 }
-
-  EditorFor:
-@Html.EditorFor(x => x.DesignData.AllCellValues);
 
 
 

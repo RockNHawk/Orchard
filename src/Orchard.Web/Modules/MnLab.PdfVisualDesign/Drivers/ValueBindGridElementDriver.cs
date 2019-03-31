@@ -165,14 +165,28 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             if (context.Updater != null) {
 
+                var strAllCellValues = ((string[])context.ValueProvider.GetValue($"{nameof(viewModel.DesignData)}.{nameof(viewModel.DesignData.AllCellValues)}")?.RawValue)?[0];
+                var strMergedCells = ((string[])context.ValueProvider.GetValue($"{nameof(viewModel.DesignData)}.{nameof(viewModel.DesignData.MergedCells)}")?.RawValue)?[0];
+
                 var design = new ValueBindGridData();
-                if (!context.Updater.TryUpdateModel(design, context.Prefix, null, null)) {
-                    updater.AddModelError("", T("Could not update {0}", nameof(ValueBindGridData)));
-                    goto ret;
+
+                if (!string.IsNullOrEmpty(strAllCellValues)) {
+                    design.AllCellValues = Newtonsoft.Json.JsonConvert.DeserializeObject<ValueBindingDef[][]>(strAllCellValues);
                 }
-                else {
-                    element.DesignData = design;
+
+                if (!string.IsNullOrEmpty(strMergedCells)) {
+                    design.MergedCells = Newtonsoft.Json.JsonConvert.DeserializeObject<MergedCell[]>(strMergedCells);
                 }
+
+                element.DesignData = viewModel.DesignData = design;
+
+                //if (!context.Updater.TryUpdateModel(viewModel, context.Prefix, null, null)) {
+                //    updater.AddModelError("", T("Could not update {0}", nameof(ValueBindGridData)));
+                //    goto ret;
+                //}
+                //else {
+                //    element.DesignData = viewModel.DesignData;
+                //}
 
             }
 

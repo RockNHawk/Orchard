@@ -6,7 +6,7 @@
 @{
     ContentDataMemberHelper member = Model.Member;
 
-    var value = member.GetAccessor().GetValue();
+    var value = member?.GetAccessor().GetValue();
 }
 @if (value == null || (value is string s && string.IsNullOrEmpty(s)))
 {
