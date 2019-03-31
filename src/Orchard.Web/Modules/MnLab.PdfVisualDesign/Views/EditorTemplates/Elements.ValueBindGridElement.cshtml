@@ -17,9 +17,27 @@
 
 
     var design = Model.DesignData;
-    var BindingDefSources = Model.BindingDefSources?.Where(x => x.Count() > 0).SelectMany(x => x);
+    var BindingDefSources = Model.BindingDefSources?.SelectMany(x => x);
 
     var ValueMaps = Model.ValueMaps;
+
+
+    var bs1 = BindingDefSources?.Select(x => new
+    {
+        x.ContentPartName,
+        x.MemberExpression,
+        x.Key,
+        BindType = "DisplayName",
+    });
+    var bs2 = BindingDefSources?.Select(x => new
+    {
+        x.ContentPartName,
+        x.MemberExpression,
+        x.Key,
+        BindType = "Value",
+    });
+
+    var bs = bs1.Concat(bs2);
 }
 
 @*<script src="https://cdn.jsdelivr.net/npm/handsontable@7.0.0/dist/handsontable.full.min.js"></script>
@@ -32,11 +50,11 @@
     var uniqueId = Guid.NewGuid().ToString("N");
 
     var gridTypes = new[] {
-        new SelectListItem() { Text = T("Please choose").Text } }
+new SelectListItem() { Text = T("Please choose").Text } }
     .Concat(new[] { "Table", "ULList", "OLList" }
     .Select(x => new SelectListItem() { Value = x, Text = x, Selected = x == design?.GridType }));
 
-     <fieldset>
+    <fieldset>
         <legend>Grid Type Setting</legend>
         @*<input name="" />*@
         @Html.DropDownListFor(x => x.DesignData.GridType, gridTypes)
@@ -136,7 +154,8 @@ catch(e){
 
           //var data = Handsontable.helper.createSpreadsheetData(10, 10);
 
-        var manufacturerData = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(BindingDefSources)))][0];
+        var manufacturerData = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(bs)))][0];
+
 
         var columnDef={
        // renderer: Handsontable.renderers.AutocompleteRenderer,
@@ -190,10 +209,11 @@ catch(e){
         //columns: ['ContentPartName','MemberExpression'],
           //indicators: true,
         columns:[
+        {data: 'BindType'},
         {data: 'ContentPartName'},
         {data: 'MemberExpression'}
         ],
-                        colHeaders: ['Part Type', 'Member Name'],
+                        colHeaders: ['Bind Type','Part Type', 'Member Name'],
                         autoColumnSize: true,
                         data: manufacturerData,
         /*
@@ -235,8 +255,8 @@ string MemberExpression { get; set; }
             contextMenu: true,
         allowInsertColumn:true,
         allowInsertRow:true,
-            colHeaders: ['Data Member (First Column)', 'Data Member (Second Column)'],
-            columns: [columnDef,columnDef],
+            colHeaders: ['Data Member (First Column)','', 'Data Member (Second Column)',''],
+            columns: [columnDef,columnDef,columnDef,columnDef],
             mergeCells: mergedCells || [],
             //mergeCells: [
             //    { row: 1, col: 1, rowspan: 3, colspan: 3 },
@@ -290,11 +310,11 @@ string MemberExpression { get; set; }
 
 @using (Script.Foot())
 {
-    <script type="text/javascript">
+<script type="text/javascript">
         $(function () {
 
 
 
         });
-    </script>
+</script>
 }
