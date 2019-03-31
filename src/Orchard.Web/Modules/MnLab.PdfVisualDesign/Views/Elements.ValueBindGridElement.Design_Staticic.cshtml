@@ -1,0 +1,130 @@
+﻿@using MnLab.PdfVisualDesign
+@using MnLab.PdfVisualDesign.ViewModels
+@using MnLab.PdfVisualDesign.Binding
+@using MnLab.PdfVisualDesign.Binding.Elements
+Des
+
+@{
+
+
+    /**/
+
+    //Script.Require("handsontable").AtHead();
+    //Style.Require("handsontable").AtHead();
+
+    //Script.Require("AngularJs_Full").AtHead();
+
+    //manifest.DefineScript("Layouts.Lib").SetDependencies("jQuery", "AngularJs_Full", "Underscore");
+
+    ValueBindGridViewModel ViewModel = Model.ViewModel;
+    ValueBindGridData design = ViewModel?.DesignData;
+    var ValueMaps = ViewModel?.ValueMaps;
+    var DesignCellValues = design?.AllCellValues;
+    var mergedCells = design?.MergedCells;
+    var uniqueId = Guid.NewGuid().ToString("N");
+}
+
+<script>
+    (function () {
+
+        var uniqueId = ['@(uniqueId)'][0];
+
+
+        var DesignCellValues = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(DesignCellValues, Newtonsoft.Json.Formatting.Indented)))][0];
+        var mergedCells = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(mergedCells, Newtonsoft.Json.Formatting.Indented)))][0];
+
+
+        var gridApp = angular.module('ValueBindGrid_' + uniqueId, []);
+
+        var scope;
+        var ngController = gridApp.controller('ValueBindGridController_' + uniqueId, function PhoneListController($scope) {
+            scope = $scope;
+
+        var cellValues = DesignCellValues;
+
+          /*
+
+        mergedCells:
+
+        [{"row":1,"col":0,"rowspan":1,"colspan":2,"removed":false},{"row":3,"col":0,"rowspan":2,"colspan":1,"removed":false}]
+        */
+
+        var rowSpanMap={};
+        var colSpanMap={};
+        var removedRowCount=0;
+        if (mergedCells){
+            for (var i =0;i<mergedCells.length;i++){
+                var merge = mergedCells[i];
+
+                 for (var r = merge.row; r < merge.row + merge.rowspan ; r++){
+                    var row = cellValues[r];
+                if(r!=merge.row && merge.rowspan>1){
+
+        if(merge.colspan>=row.length){
+        // do not render this <tr>
+        cellValues[r]=null;
+        removedRowCount++;
+        }else{
+
+        }
+
+                }
+
+        // keep the fitst column
+                     for (var col = 1; col < merge.rowspan; col++){
+        row[col] = '!IGNORED';
+                     }
+                }
+
+            }
+        }
+
+        var trs=cellValues;
+        if(removedRowCount>0){
+        trs=trs.filter(x=>x!=null);
+        }
+            $scope.trs = trs;
+
+        $scope.getColSpan(rowIndex,colIndex){
+
+        }
+
+            $scope.mergedCells = mergedCells;
+            $scope.mergedCellsMap = mergedCells;
+        });
+
+    })();
+
+</script>
+
+
+<div ng-app="ValueBindGrid_@(uniqueId)">
+
+    <div ng-controller="ValueBindGridController_@(uniqueId)">
+
+        <table>
+            <tr ng-repeat="tr in trs track by $index">
+                <td ng-repeat="td in tr track by $index" ng-if="tr!='!IGNORED'" colspan="{{td.colspan}}" rowspan="{{td.rowspan}}">
+                    {{td.value}}
+                </td>
+            </tr>
+        </table>
+
+    </div>
+</div>
+
+
+
+
+
+
+@using (Script.Foot())
+{
+    <script type="text/javascript">
+        $(function () {
+
+
+
+        });
+    </script>
+}

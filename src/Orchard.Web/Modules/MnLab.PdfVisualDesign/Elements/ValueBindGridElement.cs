@@ -37,9 +37,14 @@ namespace MnLab.PdfVisualDesign.Binding.Elements {
         public Dictionary<string, object> ValueMaps { get; set; }
     }
 
-    public class ValueBindGridData {
+    public class ValueBindGridData : IValueBindGridData {
         public virtual ValueBindingDef[][] AllCellValues { get; set; }
         public virtual MergedCell[] MergedCells { get; set; }
+        /// <summary>
+        /// Table / UI/LI List
+        /// </summary>
+        public virtual string GridType { get; set; }
+        public virtual string DisplayType { get; set; }
     }
 
     public class MergedCell {
@@ -60,7 +65,8 @@ namespace MnLab.PdfVisualDesign.Binding.Elements {
     ///
     /// 对 Orchard 现有功能架构进行扩展，应该可行
     /// </summary>
-    public class ValueBindGridElement : ContentElement {
+    public class ValueBindGridElement : ContentElement //,IValueBindGridData
+        {
         public override string ToolboxIcon {
             get { return "\uf0f6"; }
         }
@@ -69,15 +75,25 @@ namespace MnLab.PdfVisualDesign.Binding.Elements {
             get { return T("Value Bind Grid"); }
         }
 
-
-
-
         /// <summary>
         /// Binding jagged array data used for handsometable
         /// </summary>
         public virtual ValueBindGridData DesignData {
             get { return this.RetrieveObject<ValueBindGridData>(nameof(DesignData)); }
             set { this.StoreObject(nameof(DesignData), value); }
+        }
+
+        /// <summary>
+        /// Table / UI/LI List
+        /// </summary>
+        public virtual string GridType {
+            get { return this.Retrieve(x=>x.GridType); }
+            set { this.Store(x=>x.GridType, value); }
+        }
+
+        public virtual string DisplayType {
+            get { return this.Retrieve(x => x.DisplayType); }
+            set { this.Store(x => x.DisplayType, value); }
         }
 
         public virtual string Remark {

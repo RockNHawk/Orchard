@@ -374,6 +374,7 @@
     <Compile Include="Drivers\DriverBase.cs" />
     <Compile Include="Drivers\ValueBindGridElementDriver.cs" />
     <Compile Include="Drivers\PropertyBindElementDriver.cs" />
+    <Compile Include="Elements\IValueBindGridData.cs" />
     <Compile Include="Elements\ValueBindGridElement.cs" />
     <Compile Include="Elements\ValueBindItemElement.cs" />
     <Compile Include="Extensions\HtmlHelper.cs" />
@@ -410,6 +411,7 @@
     <Content Include="Scripts\handsontable\README.md" />
     <Content Include="Views\EditorTemplates\Elements.ValueBindGridElement.cshtml" />
     <Content Include="Views\Elements.ValueBindGridElement.Design.cshtml" />
+    <Content Include="Views\Elements.ValueBindGridElement.Design_Staticic.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

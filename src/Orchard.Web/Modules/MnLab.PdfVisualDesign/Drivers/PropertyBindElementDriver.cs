@@ -30,6 +30,21 @@ using Orchard.Core.Title.Models;
 namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
 
+    public static class GetLastContentItem {
+
+        public static ContentItem GetLatestVersion(this IContent content, IContentManager _contentManager) {
+            var contentItem = content.ContentItem;
+            if (content.Id > 0) {
+                /*
+               context.Content's Version is the publish version, if the content never Published, the field will be null.
+               so I get the latest (if have draft) ContentItem from ContentManager
+                */
+                contentItem = _contentManager.Get(content.Id, VersionOptions.Latest);
+            }
+            return contentItem;
+        }
+    }
+
     public class ContentPartPropertyEditViewModel {
         public PropertyInfo PropertyInfo { get; set; }
         public ContentPart ContentPart { get; set; }
@@ -133,8 +148,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             return FindFromContentPart(part, bindingDef);
         }
 
-        public static ContentDataMemberHelper FindFromContentPart(ContentPart part, IValueBindingDef bindingDef)
-        {
+        public static ContentDataMemberHelper FindFromContentPart(ContentPart part, IValueBindingDef bindingDef) {
             var me = bindingDef.MemberExpression;
             /*
                https://docs.orchardproject.net/en/latest/Documentation/Creating-a-custom-field-type/
@@ -277,14 +291,9 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             var partPropertyName = bindingInfo.MemberExpression;
 
             var content = context.Content;
-            var contentItem = content.ContentItem;
-            if (content.Id > 0) {
-                /*
-               context.Content's Version is the publish version, if the content never Published, the field will be null.
-               so I get the latest (if have draft) ContentItem from ContentManager
-                */
-                contentItem = _contentManager.Get(content.Id, VersionOptions.Latest);
-            }
+            // var contentItem = content.ContentItem;
+            var contentItem = content.GetLatestVersion(_contentManager);//  _contentManager.Get(content.Id, VersionOptions.Latest);
+
 
             var member = string.IsNullOrEmpty(partName) || string.IsNullOrEmpty(partPropertyName) ? null : ContentDataMemberHelper.FindFromContentItem(contentItem, element);
 

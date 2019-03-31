@@ -123,36 +123,13 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
         protected override EditorResult OnBuildEditor(ValueBindGridElement element, ElementEditorContext context) {
             var updater = context.Updater;
 
-
-            var contentItem = context.Content.ContentItem;
-            // in 'Create' page, the content is empty
-            var bindingDefGroups = contentItem.TypeDefinition.Parts?
-                .Select(x => x.PartDefinition)
-                .GroupBy(x => x)
-                .Select(x => new Grouping<ContentPartDefinition, IValueBindingDef>(x.Key, GetBindingItems(x.Key)))
-                //.GroupBy(x => x, v => GetBindingItems(v))
-                ;
-
-            //var bindingDefs = bindingDefGroups.ToArray();
+            var content = context.Content;
+          //  var contentItem = context.Content.ContentItem;
+            var contentItem = content.GetLatestVersion(_contentManager);
 
 
-            var valueMaps = new Dictionary<string, object>();
-            foreach (var group in bindingDefGroups) {
-                var partDef = group.Key;
-                var part = contentItem.Parts.First(x => x.PartDefinition == partDef);
-                foreach (var item in group) {
-                    var helper = ContentDataMemberHelper.FindFromContentPart(part, item);
-                    //var helper = new ContentDataMemberHelper(part, item);
-                    try {
-                        var value = helper.GetAccessor().GetValue();
-                        valueMaps[item.Key] = value;
-                    }
-                    catch (Exception ex) {
-                        valueMaps[item.Key] = ex;
-                        //throw;
-                    }
-                }
-            }
+            var bindingDefGroups = GetBindingDefGroups(contentItem);
+            Dictionary<string, object> valueMaps = GetValueMaps(contentItem, bindingDefGroups);
 
             var viewModel = Mapper.Map(element, new ValueBindGridViewModel() {
                 BindingDefSources = bindingDefGroups,
@@ -196,8 +173,54 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             return Editor(context, editor);
         }
 
+        private static IEnumerable<Grouping<ContentPartDefinition, IValueBindingDef>> GetBindingDefGroups(ContentItem contentItem) {
+            // in 'Create' page, the content is empty
+            return contentItem.TypeDefinition.Parts?
+                .Select(x => x.PartDefinition)
+                .GroupBy(x => x)
+                .Select(x => new Grouping<ContentPartDefinition, IValueBindingDef>(x.Key, GetBindingItems(x.Key)))
+                .Where(x => x.Count() > 0);
+                ;
+        }
+
+        private static Dictionary<string, object> GetValueMaps(ContentItem contentItem, IEnumerable<Grouping<ContentPartDefinition, IValueBindingDef>> bindingDefGroups) {
+            var valueMaps = new Dictionary<string, object>();
+            foreach (var group in bindingDefGroups) {
+                var partDef = group.Key;
+                var part = contentItem.Parts.First(x => x.PartDefinition == partDef);
+                foreach (var item in group) {
+                    var helper = ContentDataMemberHelper.FindFromContentPart(part, item);
+                    //var helper = new ContentDataMemberHelper(part, item);
+                    try {
+                        var value = helper.GetAccessor().GetValue();
+                        valueMaps[item.Key] = value;
+                    }
+                    catch (Exception ex) {
+                        valueMaps[item.Key] = ex;
+                        //throw;
+                    }
+                }
+            }
+
+            return valueMaps;
+        }
+
         protected override void OnDisplaying(ValueBindGridElement element, ElementDisplayingContext context) {
 
+            var content = context.Content;
+            //  var contentItem = context.Content.ContentItem;
+            var contentItem = content.GetLatestVersion(_contentManager);
+
+            var bindingDefGroups = GetBindingDefGroups(contentItem);
+            Dictionary<string, object> valueMaps = GetValueMaps(contentItem, bindingDefGroups);
+
+            var viewModel = Mapper.Map(element, new ValueBindGridViewModel() {
+                BindingDefSources = bindingDefGroups,
+                DesignData = element.DesignData,
+                ValueMaps = valueMaps,
+            });
+
+            context.ElementShape.ViewModel = viewModel;
         }
 
         //protected override void OnDisplaying(PropertyBindElement element, ElementDisplayingContext context) {

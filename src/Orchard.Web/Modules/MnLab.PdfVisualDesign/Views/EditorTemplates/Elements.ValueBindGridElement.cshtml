@@ -31,6 +31,18 @@
     var mergedCells = design?.MergedCells;
     var uniqueId = Guid.NewGuid().ToString("N");
 
+    var gridTypes = new[] {
+        new SelectListItem() { Text = T("Please choose").Text } }
+    .Concat(new[] { "Table", "ULList", "OLList" }
+    .Select(x => new SelectListItem() { Value = x, Text = x, Selected = x == design?.GridType }));
+
+     <fieldset>
+        <legend>Grid Type Setting</legend>
+        @*<input name="" />*@
+        @Html.DropDownListFor(x => x.DesignData.GridType, gridTypes)
+        @Html.TextBoxFor(x => x.DesignData.DisplayType)
+    </fieldset>
+
     <div id="handsontable-@(uniqueId)" class="hot handsontable htRowHeaders htColumnHeaders"></div>
 
     <script>
@@ -213,6 +225,8 @@ string MemberExpression { get; set; }
                 };
 
         var tableCfg = {
+        licenseKey: 'non-commercial-and-evaluation',
+
             //data: AllCellValues || Handsontable.helper.createSpreadsheetData(5, 2),
             data: AllCellValues,
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
