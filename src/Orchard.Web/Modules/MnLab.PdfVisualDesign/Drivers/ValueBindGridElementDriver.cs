@@ -128,7 +128,8 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             // in 'Create' page, the content is empty
             var bindingDefGroups = contentItem.TypeDefinition.Parts?
                 .Select(x => x.PartDefinition)
-                .Select(x => new Grouping<ContentPartDefinition, IValueBindingDef>(x, GetBindingItems(x)))
+                .GroupBy(x => x)
+                .Select(x => new Grouping<ContentPartDefinition, IValueBindingDef>(x.Key, GetBindingItems(x.Key)))
                 //.GroupBy(x => x, v => GetBindingItems(v))
                 ;
 
@@ -140,15 +141,22 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 var partDef = group.Key;
                 var part = contentItem.Parts.First(x => x.PartDefinition == partDef);
                 foreach (var item in group) {
-                    var helper = new ContentDataMemberHelper(part, item);
-                    var value = helper.GetAccessor().GetValue();
-                    valueMaps[item.Key] = value;
+                    var helper = ContentDataMemberHelper.FindFromContentPart(part, item);
+                    //var helper = new ContentDataMemberHelper(part, item);
+                    try {
+                        var value = helper.GetAccessor().GetValue();
+                        valueMaps[item.Key] = value;
+                    }
+                    catch (Exception ex) {
+                        valueMaps[item.Key] = ex;
+                        //throw;
+                    }
                 }
             }
 
             var viewModel = Mapper.Map(element, new ValueBindGridViewModel() {
                 BindingDefSources = bindingDefGroups,
-                DesignData = element.Design,
+                DesignData = element.DesignData,
                 ValueMaps = valueMaps,
             });
             //var viewModel = element;
@@ -163,7 +171,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                     goto ret;
                 }
                 else {
-                    element.Design = design;
+                    element.DesignData = design;
                 }
 
             }

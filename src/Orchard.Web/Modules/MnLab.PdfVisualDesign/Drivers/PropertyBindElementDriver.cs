@@ -81,9 +81,11 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
         }
     }
 
+    [System.Diagnostics.DebuggerDisplay("Name={Part.Name},BindingDef={BindingDef.Key},Field={Field},Property={PropertyInfo}")]
     public class ContentDataMemberHelper {
 
         public ContentField Field;
+
         public PropertyInfo PropertyInfo;
 
         public ContentPart Part;
@@ -93,6 +95,13 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
         public IValueBindingDef BindingDef;
 
         public bool hasDataMember { get => Field != null || PropertyInfo != null; }
+
+        public ContentDataMemberHelper(ContentPart contentItem, IValueBindingDef bindingDef, ContentField field) : this(contentItem, bindingDef) {
+            this.Field = field;
+        }
+        public ContentDataMemberHelper(ContentPart contentItem, IValueBindingDef bindingDef, PropertyInfo field) : this(contentItem, bindingDef) {
+            this.PropertyInfo = field;
+        }
 
         public ContentDataMemberHelper(ContentPart contentItem, IValueBindingDef bindingDef) {
             this.Part = contentItem;
@@ -109,7 +118,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 return new ContentPropertyMemberAccessor(Part, PropertyInfo, Expression);
             }
             else {
-                throw new InvalidOperationException("No data member");
+                throw new InvalidOperationException(string.Format("Data member '{0}' not setted", BindingDef.Key));
             }
         }
 
@@ -121,6 +130,12 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             if (MemberExpression == null) throw new ArgumentNullException(nameof(MemberExpression));
             var part = contentItem.Parts.FirstOrDefault(x => x.PartDefinition.Name == partName);
             if (part == null) return null;
+            return FindFromContentPart(part, bindingDef);
+        }
+
+        public static ContentDataMemberHelper FindFromContentPart(ContentPart part, IValueBindingDef bindingDef)
+        {
+            var me = bindingDef.MemberExpression;
             /*
                https://docs.orchardproject.net/en/latest/Documentation/Creating-a-custom-field-type/
 
@@ -128,18 +143,19 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             the internal ContentPart own it's "hard code" Property like TitlePart.Title is a hard coded property
             it also storage the data, but it only can edit by hole part no single Property editor support (see TitlePartDriver), or I can add this feature by self.
             */
-            var field = part?.Fields.FirstOrDefault(x => x.Name == MemberExpression);
+            var field = part?.Fields.FirstOrDefault(x => x.Name == me);
 
             var helper = new ContentDataMemberHelper(part, bindingDef);
             if (field != null) {
                 helper.Field = field;
             }
             else {
-                var property = part.GetType().GetProperty(MemberExpression);
+                var property = part.GetType().GetProperty(me);
                 helper.PropertyInfo = property;
             }
             return helper;
         }
+
     }
 
 
@@ -270,7 +286,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 contentItem = _contentManager.Get(content.Id, VersionOptions.Latest);
             }
 
-            var member = string.IsNullOrEmpty(partName) || string.IsNullOrEmpty(partPropertyName) ? null : ContentDataMemberHelper.FindFromContentItem(contentItem,element);
+            var member = string.IsNullOrEmpty(partName) || string.IsNullOrEmpty(partPropertyName) ? null : ContentDataMemberHelper.FindFromContentItem(contentItem, element);
 
             var part = member?.Part;
 

@@ -17,7 +17,7 @@
 
 
     var design = Model.DesignData;
-    var BindingDefSources = Model.BindingDefSources;
+    var BindingDefSources = Model.BindingDefSources?.Where(x => x.Count() > 0).SelectMany(x => x);
 
     var ValueMaps = Model.ValueMaps;
 }
@@ -59,7 +59,7 @@
                 var mergedCellsCollection = mc.mergedCellsCollection;
                 var mergedCellsNew = mergedCellsCollection && mergedCellsCollection.mergedCells;
                 console.log("mergedCellsCollection", mc);
-                debugger
+                //debugger
                 scope.$apply(function () {
                     //scope.mergedCells = mergedCellsNew;
                     scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
@@ -89,6 +89,11 @@
         //        { name: 'Volvo', country: 'Sweden', owner: 'Zhejiang Geely Holding Group' }
         //];
 
+        /*
+        [
+        {"ContentPartName":"Page","MemberExpression":"Choice1","DefaultValue":null,"Description":null,"Remark":null,"Key":"Page.Choice1"}
+        ],
+        */
         var manufacturerData = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(BindingDefSources)))][0];
         var tableCfg = {
             data: AllCellValues,
@@ -99,23 +104,81 @@
             colHeaders: ['Data Member (First Column)', 'Data Member (Second Column)'],
             columns: [
                 {
+       // renderer: Handsontable.renderers.AutocompleteRenderer, 
+                renderer:function (instance, td, row, col, prop, value, cellProperties) {
+
+
+        /*
+        https://github.com/valor-software/ng2-handsontable/issues/373
+        not work well
+
+
+        Native cell renderers
+        https://handsontable.com/docs/7.0.0/tutorial-cell-function.html
+
+
+        */
+
+        try     {
+
+        var obj = value && JSON.parse(value);
+        // 5 is value 
+        arguments[5] =obj && obj['Key'];
+        }catch(e){
+        }
+
+         Handsontable.renderers.AutocompleteRenderer.apply(instance, arguments);
+
+       // $td= $(td);//.empty();//.addClass('htAutocomplete');
+    //if(value != null){
+    //var escaped = Handsontable.helper.stringify(value);
+        // value must be a string type
+       // var obj = JSON.parse(value);
+       // debugger
+       // $td.html(obj['Key']); //empty is needed because you are rendering to an existing cell
+   // }
+      //  $td.append('<div class="htAutocompleteArrow">▼</div>'); //empty is needed because you are rendering to an existing cell
+      //  $td.append('▼'); //empty is needed because you are rendering to an existing cell
+
+    return td;
+},
                     type: 'handsontable',
                     handsontable: {
-                        colHeaders: ['Content Type', 'Member Name'],
+        search: true,
+
+        // https://handsontable.com/docs/7.0.0/demo-hiding-columns.html
+        //columns: [0, 1],
+        //columns: ['ContentPartName','MemberExpression'],
+          //indicators: true,
+        columns:[
+        {data: 'ContentPartName'},
+        {data: 'MemberExpression'}
+        ],
+                        colHeaders: ['Part Type', 'Member Name'],
                         autoColumnSize: true,
                         data: manufacturerData,
+        /*
+        // https://github.com/handsontable/handsontable/issues/865
+        renderer:function (instance, td, row, col, prop, value, cellProperties) {
+    if(value != null){
+    var escaped = Handsontable.helper.stringify(value);
+        $(td).empty().append(value['ContentPartName']); //empty is needed because you are rendering to an existing cell
+    }
+    return td;
+},
+        */
                         getValue: function () {
                             var selection = this.getSelectedLast();
                             // Get the row's data object, object is from BindingDefSources
                             var obj = this.getSourceDataAtRow(selection[0]);
-
                             /*
  string ContentPartName { get; set; }
-        string MemberExpression { get; set; }
-
+string MemberExpression { get; set; }
 */
                             return JSON.stringify(obj);
                             //return obj.ContentPartName + '.' + obj.MemberExpression;
+                           // return obj.Key;
+                            //return obj;
                         }
                     }
                 }

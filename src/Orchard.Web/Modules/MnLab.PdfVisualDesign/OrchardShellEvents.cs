@@ -19,6 +19,9 @@ namespace MnLab.PdfVisualDesign {
                 //cfg.AddProfile<AppProfile>();
                 cfg.CreateMap<ValueBindingDef, PropertyBindElement>();
                 cfg.CreateMap<PropertyBindElement, ValueBindingDef>();
+
+                cfg.CreateMap<ValueBindGridElement, ValueBindGridViewModel>();
+
             });
         }
 

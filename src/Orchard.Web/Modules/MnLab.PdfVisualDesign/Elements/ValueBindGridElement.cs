@@ -50,9 +50,9 @@ namespace MnLab.PdfVisualDesign.Binding.Elements {
         /// <summary>
         /// Binding jagged array data used for handsometable
         /// </summary>
-        public virtual ValueBindGridData Design {
-            get { return this.Retrieve(x => x.Design); }
-            set { this.Store(x => x.Design, value); }
+        public virtual ValueBindGridData DesignData {
+            get { return this.Retrieve(x => x.DesignData); }
+            set { this.Store(x => x.DesignData, value); }
         }
 
         public virtual string Remark {
