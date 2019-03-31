@@ -39,7 +39,6 @@
         var uniqueId = ['@(uniqueId)'][0];
 
 
-          //var data = Handsontable.helper.createSpreadsheetData(10, 10);
 
         var AllCellValues = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(AllCellValues, Newtonsoft.Json.Formatting.Indented)))][0];
     var mergedCells = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(mergedCells, Newtonsoft.Json.Formatting.Indented)))][0];
@@ -94,19 +93,14 @@
         {"ContentPartName":"Page","MemberExpression":"Choice1","DefaultValue":null,"Description":null,"Remark":null,"Key":"Page.Choice1"}
         ],
         */
-        var manufacturerData = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(BindingDefSources)))][0];
-        var tableCfg = {
-            data: AllCellValues,
-            //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
-            rowHeaders: true,
-            colHeaders: true,
-            contextMenu: true,
-            colHeaders: ['Data Member (First Column)', 'Data Member (Second Column)'],
-            columns: [
-                {
-       // renderer: Handsontable.renderers.AutocompleteRenderer, 
-                renderer:function (instance, td, row, col, prop, value, cellProperties) {
 
+          //var data = Handsontable.helper.createSpreadsheetData(10, 10);
+
+        var manufacturerData = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(BindingDefSources)))][0];
+
+        var columnDef={
+       // renderer: Handsontable.renderers.AutocompleteRenderer,
+                renderer:function (instance, td, row, col, prop, value, cellProperties) {
 
         /*
         https://github.com/valor-software/ng2-handsontable/issues/373
@@ -122,8 +116,10 @@
         try     {
 
         var obj = value && JSON.parse(value);
-        // 5 is value 
+        // 5 is value
+        if   (obj && obj['Key']){
         arguments[5] =obj && obj['Key'];
+        }
         }catch(e){
         }
 
@@ -181,8 +177,19 @@ string MemberExpression { get; set; }
                             //return obj;
                         }
                     }
-                }
-            ],
+                };
+
+        var tableCfg = {
+            //data: AllCellValues || Handsontable.helper.createSpreadsheetData(5, 2),
+            data: AllCellValues,
+            //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
+            rowHeaders: true,
+            colHeaders: true,
+            contextMenu: true,
+        allowInsertColumn:true,
+        allowInsertRow:true,
+            colHeaders: ['Data Member (First Column)', 'Data Member (Second Column)'],
+            columns: [columnDef,columnDef],
             mergeCells: mergedCells || [],
             //mergeCells: [
             //    { row: 1, col: 1, rowspan: 3, colspan: 3 },
@@ -195,8 +202,6 @@ string MemberExpression { get; set; }
 
             //    scope.appplyTableChange(girdTable);
             //}
-
-
         };
 
         //v https://handsontable.com/docs/7.0.0/tutorial-using-callbacks.html
