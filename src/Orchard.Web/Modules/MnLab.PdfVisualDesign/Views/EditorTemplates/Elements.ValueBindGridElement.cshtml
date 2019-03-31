@@ -57,10 +57,11 @@
                 var mc = table.getPlugin('mergeCells');
                 var mergedCellsCollection = mc.mergedCellsCollection;
                 var mergedCellsNew = mergedCellsCollection && mergedCellsCollection.mergedCells;
-                console.log("mergedCellsCollection", mc);
+               // console.log("mergedCellsCollection", mc);
                 //debugger
                 scope.$apply(function () {
                     //scope.mergedCells = mergedCellsNew;
+
                     scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
 
                       //// 源数据？
@@ -69,16 +70,20 @@
                     // 用户编辑修改后的数据？
                     var newData = table.getData();
         if (newData){
-        debugger
+       // debugger
         for(var i =0;i<newData.length;i++){
         var array=newData[i];
 
         if(array){
         for(var j =0;j<array.length;j++){
         var d=array[j];
-        debugger
          if(d &&  typeof(d) == 'string'){
+        try {
         array[j] = JSON.parse(array[j]);
+        }
+catch(e){
+        debugger
+        }
         }else{
            array[j] =d;
         }
@@ -87,8 +92,10 @@
         }
         }
 
-       
+
         }
+
+        console.info('newData',newData);
                     scope.AllCellValues_JSON = newData && JSON.stringify(newData);
                 });
 
@@ -135,8 +142,11 @@
         */
 
         try     {
-
-        var obj = value && JSON.parse(value);
+        /*
+        if the data is from server (server JSON SerializeObject , value type is Object)
+        if the data is from local user inputed, calue type is string
+        */
+        var obj = value && ( typeof value=='string'?  JSON.parse(value) : value);
         // 5 is value
         if   (obj && obj['Key']){
         arguments[5] =obj && obj['Key'];
@@ -194,7 +204,9 @@ string MemberExpression { get; set; }
 */
                             return JSON.stringify(obj);
                             //return obj.ContentPartName + '.' + obj.MemberExpression;
-                           // return obj.Key;
+
+        // the value only accept plain type
+                           //return obj.Key;
                             //return obj;
                         }
                     }
