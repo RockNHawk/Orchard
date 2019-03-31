@@ -26,8 +26,31 @@ using System.Web;
 using System.Reflection;
 using System.Web.Mvc;
 using Orchard.Core.Title.Models;
+using Orchard.ContentManagement.MetaData.Models;
+using System.Collections;
 
 namespace MnLab.PdfVisualDesign.Binding.Drivers {
+
+
+
+    public class Grouping<TKey, TElement> : IGrouping<TKey, TElement> {
+
+        IEnumerable<TElement> elements;
+        public Grouping(TKey key, IEnumerable<TElement> elements) {
+            this.Key = key;
+            this.elements = elements;
+        }
+        public TKey Key { get; set; }
+
+        public IEnumerator<TElement> GetEnumerator() {
+            return elements.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return this.GetEnumerator();
+        }
+    }
+
 
     public class ValueBindGridElementDriver : ElementDriver<ValueBindGridElement> {
 
@@ -71,11 +94,66 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             this._workContextAccessor = workContextAccessor;
         }
 
+
+        static IList<IValueBindingDef> GetBindingItems(ContentPartDefinition def) {
+            var fields = def.Fields;
+            var properties = def.GetType().GetProperties(BindingFlags.Public);
+
+            var items = new List<IValueBindingDef>((fields?.Count() ?? 0) + properties.Count());
+            if (fields != null) {
+                foreach (var item in fields) {
+                    items.Add(new ValueBindingDef() {
+                        ContentPartName = def.Name,
+                        MemberExpression = item.Name,
+                    });
+                }
+            }
+            if (properties != null) {
+                foreach (var item in properties) {
+                    items.Add(new ValueBindingDef() {
+                        ContentPartName = def.Name,
+                        MemberExpression = item.Name,
+                    });
+                }
+            }
+
+            return items;
+        }
+
         protected override EditorResult OnBuildEditor(ValueBindGridElement element, ElementEditorContext context) {
             var updater = context.Updater;
 
-            var viewModel = Mapper.Map(element, new ValueBindGridViewModel());
+
+            var contentItem = context.Content.ContentItem;
+            // in 'Create' page, the content is empty
+            var bindingDefGroups = contentItem.TypeDefinition.Parts?
+                .Select(x => x.PartDefinition)
+                .Select(x => new Grouping<ContentPartDefinition, IValueBindingDef>(x, GetBindingItems(x)))
+                //.GroupBy(x => x, v => GetBindingItems(v))
+                ;
+
+            //var bindingDefs = bindingDefGroups.ToArray();
+
+
+            var valueMaps = new Dictionary<string, object>();
+            foreach (var group in bindingDefGroups) {
+                var partDef = group.Key;
+                var part = contentItem.Parts.First(x => x.PartDefinition == partDef);
+                foreach (var item in group) {
+                    var helper = new ContentDataMemberHelper(part, item);
+                    var value = helper.GetAccessor().GetValue();
+                    valueMaps[item.Key] = value;
+                }
+            }
+
+            var viewModel = Mapper.Map(element, new ValueBindGridViewModel() {
+                BindingDefSources = bindingDefGroups,
+                DesignData = element.Design,
+                ValueMaps = valueMaps,
+            });
             //var viewModel = element;
+
+            //var helper = new ContentDataMemberHelper(part, bindingDef);
 
             if (context.Updater != null) {
 

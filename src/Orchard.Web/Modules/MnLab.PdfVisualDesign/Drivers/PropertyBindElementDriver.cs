@@ -87,13 +87,17 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
         public PropertyInfo PropertyInfo;
 
         public ContentPart Part;
+
         public string Expression;
+
+        public IValueBindingDef BindingDef;
 
         public bool hasDataMember { get => Field != null || PropertyInfo != null; }
 
-        public ContentDataMemberHelper(ContentPart contentItem, string expr) {
+        public ContentDataMemberHelper(ContentPart contentItem, IValueBindingDef bindingDef) {
             this.Part = contentItem;
-            this.Expression = expr;
+            this.BindingDef = bindingDef;
+            this.Expression = bindingDef.MemberExpression;
         }
 
 
@@ -109,9 +113,12 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             }
         }
 
-        public static ContentDataMemberHelper FindFromContentItem(ContentItem contentItem, string partName, string partPropertyName) {
+        public static ContentDataMemberHelper FindFromContentItem(ContentItem contentItem, IValueBindingDef bindingDef) {
+
+            var partName = bindingDef.ContentPartName;
+            string MemberExpression = bindingDef.MemberExpression;
             if (partName == null) throw new ArgumentNullException(nameof(partName));
-            if (partPropertyName == null) throw new ArgumentNullException(nameof(partPropertyName));
+            if (MemberExpression == null) throw new ArgumentNullException(nameof(MemberExpression));
             var part = contentItem.Parts.FirstOrDefault(x => x.PartDefinition.Name == partName);
             if (part == null) return null;
             /*
@@ -121,14 +128,14 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             the internal ContentPart own it's "hard code" Property like TitlePart.Title is a hard coded property
             it also storage the data, but it only can edit by hole part no single Property editor support (see TitlePartDriver), or I can add this feature by self.
             */
-            var field = part?.Fields.FirstOrDefault(x => x.Name == partPropertyName);
+            var field = part?.Fields.FirstOrDefault(x => x.Name == MemberExpression);
 
-            var helper = new ContentDataMemberHelper(part, partPropertyName);
+            var helper = new ContentDataMemberHelper(part, bindingDef);
             if (field != null) {
                 helper.Field = field;
             }
             else {
-                var property = part.GetType().GetProperty(partPropertyName);
+                var property = part.GetType().GetProperty(MemberExpression);
                 helper.PropertyInfo = property;
             }
             return helper;
@@ -232,7 +239,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             var updater = context.Updater;
 
-            var bindingInfo = Mapper.Map(element, new FieldBindingInfo());
+            var bindingInfo = Mapper.Map(element, new ValueBindingDef());
 
             var viewModel = new PropertyBindViewModel {
                 Binding = bindingInfo,
@@ -263,7 +270,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 contentItem = _contentManager.Get(content.Id, VersionOptions.Latest);
             }
 
-            var member = string.IsNullOrEmpty(partName) || string.IsNullOrEmpty(partPropertyName) ? null : ContentDataMemberHelper.FindFromContentItem(contentItem, partName, partPropertyName);
+            var member = string.IsNullOrEmpty(partName) || string.IsNullOrEmpty(partPropertyName) ? null : ContentDataMemberHelper.FindFromContentItem(contentItem,element);
 
             var part = member?.Part;
 
@@ -276,7 +283,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             */
             var field = member?.Field;
             var property = member?.PropertyInfo;
-            var hasDataMember = member?.hasDataMember??false;
+            var hasDataMember = member?.hasDataMember ?? false;
 
             viewModel.Content = content;
             viewModel.Field = field;
@@ -458,7 +465,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             //}
 
 
-            var member = ContentDataMemberHelper.FindFromContentItem(contentItem, partName, partPropertyName);
+            var member = ContentDataMemberHelper.FindFromContentItem(contentItem, element);
 
             if (context.DisplayType == "Design") {
                 context.ElementShape.Member = member;

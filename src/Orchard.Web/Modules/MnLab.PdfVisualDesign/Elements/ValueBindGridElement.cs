@@ -2,16 +2,21 @@ using Orchard.Layouts.Elements;
 using Orchard.Localization;
 using Orchard.Layouts.Framework.Elements;
 using Orchard.Layouts.Helpers;
+using System.Collections.Generic;
+using System.Linq;
+using Orchard.ContentManagement.MetaData.Models;
 
 namespace MnLab.PdfVisualDesign.Binding.Elements {
 
     public class ValueBindGridViewModel {
-        public ValueBindGridData Design { get; set; }
-        public ValueBindGridData Data { get; set; }
+
+        public IEnumerable<IGrouping<ContentPartDefinition, IValueBindingDef>> BindingDefSources { get; set; }
+        public ValueBindGridData DesignData { get; set; }
+        public Dictionary<string, object> ValueMaps { get; set; }
     }
 
     public class ValueBindGridData {
-        public virtual FieldBindingInfo[][] AllCellValues { get; set; }
+        public virtual ValueBindingDef[][] AllCellValues { get; set; }
         public virtual MergedCell[] MergedCells { get; set; }
     }
 

@@ -13,7 +13,7 @@ namespace MnLab.PdfVisualDesign.Binding.Elements {
     ///
     /// 对 Orchard 现有功能架构进行扩展，应该可行
     /// </summary>
-    public class PropertyBindElement : ContentElement, IValueBindingInfo {
+    public class PropertyBindElement : ContentElement, IValueBindingDef {
         public override string ToolboxIcon {
             get { return "\uf0f6"; }
         }
@@ -46,6 +46,8 @@ namespace MnLab.PdfVisualDesign.Binding.Elements {
             get { return this.Retrieve(x => x.Remark); }
             set { this.Store(x => x.Remark, value); }
         }
+
+        public string Key => ContentPartName + "." + MemberExpression;
 
         //LocalizedString IValueBindingInfo.Description { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
     }

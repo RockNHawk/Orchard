@@ -336,7 +336,6 @@
     <Content Include="Scripts\handsontable\numbro\numbro.js" />
     <Content Include="Scripts\handsontable\pikaday\pikaday.css" />
     <Content Include="Scripts\handsontable\pikaday\pikaday.js" />
-    <Content Include="Styles\EditorStyle.css" />
     <Content Include="Styles\Web.config" />
     <Content Include="Web.config" />
     <Content Include="Views\Web.config" />

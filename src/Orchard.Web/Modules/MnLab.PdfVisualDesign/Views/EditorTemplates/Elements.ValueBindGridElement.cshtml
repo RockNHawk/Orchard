@@ -16,8 +16,10 @@
     //manifest.DefineScript("Layouts.Lib").SetDependencies("jQuery", "AngularJs_Full", "Underscore");
 
 
-    var design = Model.Design;
+    var design = Model.DesignData;
+    var BindingDefSources = Model.BindingDefSources;
 
+    var ValueMaps = Model.ValueMaps;
 }
 
 @*<script src="https://cdn.jsdelivr.net/npm/handsontable@7.0.0/dist/handsontable.full.min.js"></script>
@@ -75,18 +77,49 @@
             //$scope.mergedCells = mergedCells;
         });
 
-
-
         var container = document.getElementById('handsontable-@(uniqueId)');
 
 
+        //var manufacturerData = [
+        //        { name: 'BMW', country: 'Germany', owner: 'Bayerische Motoren Werke AG' },
+        //        { name: 'Chrysler', country: 'USA', owner: 'Chrysler Group LLC' },
+        //        { name: 'Nissan', country: 'Japan', owner: 'Nissan Motor Company Ltd' },
+        //        { name: 'Suzuki', country: 'Japan', owner: 'Suzuki Motor Corporation' },
+        //        { name: 'Toyota', country: 'Japan', owner: 'Toyota Motor Corporation' },
+        //        { name: 'Volvo', country: 'Sweden', owner: 'Zhejiang Geely Holding Group' }
+        //];
 
+        var manufacturerData = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(BindingDefSources)))][0];
         var tableCfg = {
             data: AllCellValues,
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
             rowHeaders: true,
             colHeaders: true,
             contextMenu: true,
+            colHeaders: ['Data Member (First Column)', 'Data Member (Second Column)'],
+            columns: [
+                {
+                    type: 'handsontable',
+                    handsontable: {
+                        colHeaders: ['Content Type', 'Member Name'],
+                        autoColumnSize: true,
+                        data: manufacturerData,
+                        getValue: function () {
+                            var selection = this.getSelectedLast();
+                            // Get the row's data object, object is from BindingDefSources
+                            var obj = this.getSourceDataAtRow(selection[0]);
+
+                            /*
+ string ContentPartName { get; set; }
+        string MemberExpression { get; set; }
+
+*/
+                            return JSON.stringify(obj);
+                            //return obj.ContentPartName + '.' + obj.MemberExpression;
+                        }
+                    }
+                }
+            ],
             mergeCells: mergedCells || [],
             //mergeCells: [
             //    { row: 1, col: 1, rowspan: 3, colspan: 3 },
@@ -99,6 +132,8 @@
 
             //    scope.appplyTableChange(girdTable);
             //}
+
+
         };
 
         //v https://handsontable.com/docs/7.0.0/tutorial-using-callbacks.html
@@ -137,7 +172,7 @@
 }
 
   EditorFor:
-@Html.EditorFor(x => x.Design.AllCellValues);
+@Html.EditorFor(x => x.DesignData.AllCellValues);
 
 
 
