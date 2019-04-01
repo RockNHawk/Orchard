@@ -25,15 +25,13 @@
     var ValueMaps = Model.ValueMaps;
 
 
-    var bs1 = BindingDefSources?.Select(x => new
-    {
+    var bs1 = BindingDefSources?.Select(x => new {
         x.ContentPartName,
         x.MemberExpression,
         x.Key,
         BindType = "DisplayName",
     });
-    var bs2 = BindingDefSources?.Select(x => new
-    {
+    var bs2 = BindingDefSources?.Select(x => new {
         x.ContentPartName,
         x.MemberExpression,
         x.Key,
@@ -53,9 +51,10 @@
     var uniqueId = Guid.NewGuid().ToString("N");
 
     var gridTypes = new[] {
-new SelectListItem() { Text = T("Please choose").Text } }
-    .Concat(new[] { "Table", "ULList", "OLList" }
-    .Select(x => new SelectListItem() { Value = x, Text = x, Selected = x == design?.GridType }));
+        new SelectListItem() {Text = T("Please choose").Text}
+    }
+        .Concat(new[] {"Table", "ULList", "OLList"}
+            .Select(x => new SelectListItem() {Value = x, Text = x, Selected = x == design?.GridType}));
 }
 
 <fieldset>
@@ -69,73 +68,77 @@ new SelectListItem() { Text = T("Please choose").Text } }
 
 
 <script>
-    (function () {
+    (function() {
 
         var uniqueId = ['@(uniqueId)'][0];
 
-        var AllCellValues = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(AllCellValues, Newtonsoft.Json.Formatting.Indented)))][0];
-    var mergedCells = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(mergedCells, Newtonsoft.Json.Formatting.Indented)))][0];
+        var AllCellValues = [
+            @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(AllCellValues, Newtonsoft.Json.Formatting.Indented)))
+        ][0];
+        var mergedCells = [
+            @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(mergedCells, Newtonsoft.Json.Formatting.Indented)))
+        ][0];
 
 
         var gridApp = angular.module('ValueBindGrid_' + uniqueId, []);
 
         var scope;
-        var ngController = gridApp.controller('ValueBindGridController_' + uniqueId, function PhoneListController($scope) {
-            scope = $scope;
+        var ngController = gridApp.controller('ValueBindGridController_' + uniqueId,
+            function PhoneListController($scope) {
+                scope = $scope;
 
-            $scope.AllCellValues_JSON = AllCellValues && JSON.stringify(AllCellValues);
-            $scope.mergedCells_JSON = mergedCells && JSON.stringify(mergedCells);
+                $scope.AllCellValues_JSON = AllCellValues && JSON.stringify(AllCellValues);
+                $scope.mergedCells_JSON = mergedCells && JSON.stringify(mergedCells);
 
-            $scope.appplyTableChange = function (table) {
-                var mc = table.getPlugin('mergeCells');
-                var mergedCellsCollection = mc.mergedCellsCollection;
-                var mergedCellsNew = mergedCellsCollection && mergedCellsCollection.mergedCells;
-               // console.log("mergedCellsCollection", mc);
-                //debugger
-                scope.$apply(function () {
-                    //scope.mergedCells = mergedCellsNew;
+                $scope.appplyTableChange = function(table) {
+                    var mc = table.getPlugin('mergeCells');
+                    var mergedCellsCollection = mc.mergedCellsCollection;
+                    var mergedCellsNew = mergedCellsCollection && mergedCellsCollection.mergedCells;
+                    // console.log("mergedCellsCollection", mc);
+                    //debugger
+                    scope.$apply(function() {
+                        //scope.mergedCells = mergedCellsNew;
 
-                    scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
+                        scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
 
-                      //// 源数据？
-    // hot.getSourceData();
+                        //// 源数据？
+                        // hot.getSourceData();
 
-                    // 用户编辑修改后的数据？
-                    var newData = table.getData();
-        if (newData){
-       // debugger
-        for(var i =0;i<newData.length;i++){
-        var array=newData[i];
+                        // 用户编辑修改后的数据？
+                        var newData = table.getData();
+                        if (newData) {
+                            // debugger
+                            for (var i = 0; i < newData.length; i++) {
+                                var array = newData[i];
 
-        if(array){
-        for(var j =0;j<array.length;j++){
-        var d=array[j];
-         if(d &&  typeof(d) == 'string'){
-        try {
-        array[j] = JSON.parse(array[j]);
-        }
-catch(e){
-        debugger
-        }
-        }else{
-           array[j] =d;
-        }
-        }
+                                if (array) {
+                                    for (var j = 0; j < array.length; j++) {
+                                        var d = array[j];
+                                        if (d && typeof(d) == 'string') {
+                                            try {
+                                                array[j] = JSON.parse(array[j]);
+                                            } catch (e) {
+                                                debugger
+                                            }
+                                        } else {
+                                            array[j] = d;
+                                        }
+                                    }
 
-        }
-        }
+                                }
+                            }
 
 
-        }
+                        }
 
-        console.info('newData',newData);
-                    scope.AllCellValues_JSON = newData && JSON.stringify(newData);
-                });
+                        console.info('newData', newData);
+                        scope.AllCellValues_JSON = newData && JSON.stringify(newData);
+                    });
 
-            }
-            //$scope.AllCellValues = AllCellValues;
-            //$scope.mergedCells = mergedCells;
-        });
+                }
+                //$scope.AllCellValues = AllCellValues;
+                //$scope.mergedCells = mergedCells;
+            });
 
         var container = document.getElementById('handsontable-@(uniqueId)');
 
@@ -155,61 +158,60 @@ catch(e){
         ],
         */
 
-          //var data = Handsontable.helper.createSpreadsheetData(10, 10);
+        //var data = Handsontable.helper.createSpreadsheetData(10, 10);
 
         var manufacturerData = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(bs)))][0];
 
 
-
-        var columnDef={
-       // renderer: Handsontable.renderers.AutocompleteRenderer,
+        var columnDef = {
+            // renderer: Handsontable.renderers.AutocompleteRenderer,
             renderer: handsontableHelper.createRender(null, null, Handsontable.renderers.AutocompleteRenderer),
-                    type: 'handsontable',
-                    handsontable: {
-        search: true,
+            type: 'handsontable',
+            handsontable: {
+                search: true,
 
-        // https://handsontable.com/docs/7.0.0/demo-hiding-columns.html
-        //columns: [0, 1],
-        //columns: ['ContentPartName','MemberExpression'],
-          //indicators: true,
-        columns:[
-        {data: 'BindType'},
-        {data: 'ContentPartName'},
-        {data: 'MemberExpression'}
-        ],
-                        colHeaders: ['Bind Type','Part Type', 'Member Name'],
-                        autoColumnSize: true,
-                        data: manufacturerData,
-        /*
-        // https://github.com/handsontable/handsontable/issues/865
-        renderer:function (instance, td, row, col, prop, value, cellProperties) {
-    if(value != null){
-    var escaped = Handsontable.helper.stringify(value);
-        $(td).empty().append(value['ContentPartName']); //empty is needed because you are rendering to an existing cell
-    }
-    return td;
-},
-        */
-                        getValue: function () {
-                            var selection = this.getSelectedLast();
-                            // Get the row's data object, object is from BindingDefSources
-                            var obj = this.getSourceDataAtRow(selection[0]);
-                            /*
- string ContentPartName { get; set; }
+                // https://handsontable.com/docs/7.0.0/demo-hiding-columns.html
+                //columns: [0, 1],
+                //columns: ['ContentPartName','MemberExpression'],
+                //indicators: true,
+                columns: [
+                    { data: 'BindType' },
+                    { data: 'ContentPartName' },
+                    { data: 'MemberExpression' }
+                ],
+                colHeaders: ['Bind Type', 'Part Type', 'Member Name'],
+                autoColumnSize: true,
+                data: manufacturerData,
+                /*
+                // https://github.com/handsontable/handsontable/issues/865
+                renderer:function (instance, td, row, col, prop, value, cellProperties) {
+            if(value != null){
+            var escaped = Handsontable.helper.stringify(value);
+                $(td).empty().append(value['ContentPartName']); //empty is needed because you are rendering to an existing cell
+            }
+            return td;
+        },
+                */
+                getValue: function() {
+                    var selection = this.getSelectedLast();
+                    // Get the row's data object, object is from BindingDefSources
+                    var obj = this.getSourceDataAtRow(selection[0]);
+                    /*
+string ContentPartName { get; set; }
 string MemberExpression { get; set; }
 */
-                            return JSON.stringify(obj);
-                            //return obj.ContentPartName + '.' + obj.MemberExpression;
+                    return JSON.stringify(obj);
+                    //return obj.ContentPartName + '.' + obj.MemberExpression;
 
-        // the value only accept plain type
-                           //return obj.Key;
-                            //return obj;
-                        }
-                    }
-                };
+                    // the value only accept plain type
+                    //return obj.Key;
+                    //return obj;
+                }
+            }
+        };
 
         var tableCfg = {
-        licenseKey: 'non-commercial-and-evaluation',
+            licenseKey: 'non-commercial-and-evaluation',
 
             //data: AllCellValues || Handsontable.helper.createSpreadsheetData(5, 2),
             data: AllCellValues,
@@ -217,10 +219,10 @@ string MemberExpression { get; set; }
             rowHeaders: true,
             colHeaders: true,
             contextMenu: true,
-        allowInsertColumn:true,
-        allowInsertRow:true,
-            colHeaders: ['Data Member (First Column)','', 'Data Member (Second Column)',''],
-            columns: [columnDef,columnDef,columnDef,columnDef],
+            allowInsertColumn: true,
+            allowInsertRow: true,
+            colHeaders: ['Data Member (First Column)', '', 'Data Member (Second Column)', ''],
+            columns: [columnDef, columnDef, columnDef, columnDef],
             mergeCells: mergedCells || [],
             //mergeCells: [
             //    { row: 1, col: 1, rowspan: 3, colspan: 3 },
@@ -239,12 +241,13 @@ string MemberExpression { get; set; }
         //var hooks = ['afterChange', 'afterRemoveRow', 'afterRemoveCol', 'afterMergeCells',' afterUnmergeCells'];
 
         //['']
-        var hooks = Handsontable.hooks.getRegistered().filter(x => x.indexOf('Mouse') != -1 || x.indexOf('Scroll') != -1);
+        var hooks = Handsontable.hooks.getRegistered()
+            .filter(x => x.indexOf('Mouse') != -1 || x.indexOf('Scroll') != -1);
 
         var girdTable;
-        hooks.forEach(function (hook) {
+        hooks.forEach(function(hook) {
             console.log("hook", arguments);
-            tableCfg[hook] = function () {
+            tableCfg[hook] = function() {
                 if (scope) {
                     scope.appplyTableChange(girdTable);
                 }
@@ -261,21 +264,15 @@ string MemberExpression { get; set; }
 <div ng-app="ValueBindGrid_@(uniqueId)">
 
     <div ng-controller="ValueBindGridController_@(uniqueId)">
-        <input name="@Html.NameFor(x => x.DesignData.AllCellValues)" ng-model="AllCellValues_JSON" />
-        <input name="@Html.NameFor(x => x.DesignData.MergedCells)" ng-model="mergedCells_JSON" />
+        <input name="@Html.NameFor(x => x.DesignData.AllCellValues)" ng-model="AllCellValues_JSON"/>
+        <input name="@Html.NameFor(x => x.DesignData.MergedCells)" ng-model="mergedCells_JSON"/>
     </div>
 </div>
 
 
-
-
-
-
-@using (Script.Foot())
-{
+@using (Script.Foot()) {
     <script type="text/javascript">
-        $(function () {
-
+        $(function() {
 
 
         });

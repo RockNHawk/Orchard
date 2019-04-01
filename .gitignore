@@ -192,3 +192,8 @@ src/Orchard.Azure/Orchard.Azure.CloudService/Staging/
 !lib/**/*.*
 */.vs/*
 src/Rebracer.xml
+src/.idea/.idea.Orchard/.idea/contentModel.xml
+src/.idea/.idea.Orchard/.idea/encodings.xml
+src/.idea/.idea.Orchard/.idea/indexLayout.xml
+src/.idea/.idea.Orchard/.idea/misc.xml
+src/.idea/.idea.Orchard/.idea/workspace.xml

@@ -21,67 +21,77 @@
     var DesignCellValues = design?.AllCellValues;
     var mergedCells = design?.MergedCells;
     var uniqueId = Guid.NewGuid().ToString("N");
-
 }
 
 <div id="handsontable-@(uniqueId)" class="hot handsontable htRowHeaders htColumnHeaders"></div>
-@{ 
-//@using (Script.Foot()){
+@{
+    //@using (Script.Foot()){
     <script>
 
 
-    (function () {
+        (function() {
 
-        // the design page first load data is correct ,but after the element edit form save, the element view design refresh (the data re retrive then get null data of each valueMaps item)
-    var ValueMaps = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ValueMaps, Newtonsoft.Json.Formatting.Indented)))][0];
-    var DesignCellValues = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(DesignCellValues, Newtonsoft.Json.Formatting.Indented)))][0];
-    var mergedCells = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(mergedCells, Newtonsoft.Json.Formatting.Indented)))][0];
-    var uniqueId = ['@(uniqueId)'][0];
+            // the design page first load data is correct ,but after the element edit form save, the element view design refresh (the data re retrive then get null data of each valueMaps item)
+            var ValueMaps = [
+                @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ValueMaps, Newtonsoft.Json.Formatting.Indented)))
+            ][0];
+            var DesignCellValues = [
+                @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(DesignCellValues, Newtonsoft.Json.Formatting.Indented)))
+            ][0];
+            var mergedCells = [
+                @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(mergedCells, Newtonsoft.Json.Formatting.Indented)))
+            ][0];
+            var uniqueId = ['@(uniqueId)'][0];
 
-    var gridType = ['@(design?.GridType)'][0];
-    var DisplayType = ['@(design?.DisplayType)'][0];
+            var gridType = ['@(design?.GridType)'][0];
+            var DisplayType = ['@(design?.DisplayType)'][0];
 
-    if(gridType=='table'){
-    }
+            if (gridType == 'table') {
+            }
 
 
-        var columnNameDef = { renderer: handsontableHelper.createRender(null, null, Handsontable.renderers.AutocompleteRenderer),};
-        var columnValueDef = { renderer: handsontableHelper.createRender(null, null, Handsontable.renderers.AutocompleteRenderer),};
+            var columnNameDef = {
+                renderer: handsontableHelper.createRender(null, null, Handsontable.renderers.AutocompleteRenderer),
+            };
+            var columnValueDef = {
+                renderer: handsontableHelper.createRender(null, null, Handsontable.renderers.AutocompleteRenderer),
+            };
 
-    /*
-    hot.updateSettings({
-  colHeaders: ['A','B','C']
-});
-    */
-
-        var tableCfg = {
-        licenseKey: 'non-commercial-and-evaluation',
-            data: DesignCellValues,
-            mergeCells: mergedCells || [],
-            //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
-            rowHeaders: true,
-            colHeaders: true,
-            contextMenu: false,
-    // header 分为：属性名字列 和 属性值列，列头在设计页面要可以自定义
-            //colHeaders: ['Data Member (First Column)', 'Data Member (Second Column)'],
-            colHeaders: ['Data Member (Name)','', 'Data Member (Second Column)',''],
-            columns: [columnNameDef,columnValueDef,columnNameDef,columnValueDef]
-        };
-
-    $(function(){
-       var interval =  setInterval(function(){
-            var container = document.getElementById('handsontable-@(uniqueId)');
-        if(container){
-   // debugger
-        clearInterval(interval);
-        girdTable = new Handsontable(container, tableCfg);
-        girdTable.hot = girdTable;
-        }
-
-        },500);
-
+            /*
+            hot.updateSettings({
+          colHeaders: ['A','B','C']
         });
-})();
+            */
+
+            var tableCfg = {
+                licenseKey: 'non-commercial-and-evaluation',
+                data: DesignCellValues,
+                mergeCells: mergedCells || [],
+                //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
+                rowHeaders: true,
+                colHeaders: true,
+                contextMenu: false,
+                // header 分为：属性名字列 和 属性值列，列头在设计页面要可以自定义
+                //colHeaders: ['Data Member (First Column)', 'Data Member (Second Column)'],
+                colHeaders: ['Data Member (Name)', '', 'Data Member (Second Column)', ''],
+                columns: [columnNameDef, columnValueDef, columnNameDef, columnValueDef]
+            };
+
+            $(function() {
+                var interval = setInterval(function() {
+                        var container = document.getElementById('handsontable-@(uniqueId)');
+                        if (container) {
+                            // debugger
+                            clearInterval(interval);
+                            girdTable = new Handsontable(container, tableCfg);
+                            girdTable.hot = girdTable;
+                        }
+
+                    },
+                    500);
+
+            });
+        })();
 
     </script>
 }
