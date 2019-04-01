@@ -12,8 +12,7 @@ namespace MnLab.PdfVisualDesign {
         public string DefaultValue { get; set; }
         public LocalizedString Description { get; set; }
         public string Remark { get; set; }
-
+        public string BindType { get; set; }
         public string Key => ContentPartName + "." + MemberExpression;
-
     }
 }

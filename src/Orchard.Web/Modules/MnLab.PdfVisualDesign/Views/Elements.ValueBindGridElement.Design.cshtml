@@ -11,6 +11,10 @@
     Script.Require("handsontable").AtHead();
     Style.Require("handsontable").AtHead();
 
+
+    Script.Require("common").AtHead();
+    Script.Require("handsontable_custom").AtHead();
+
     ValueBindGridViewModel ViewModel = Model?.ViewModel;
     ValueBindGridData design = ViewModel?.DesignData;
     var ValueMaps = ViewModel?.ValueMaps;
@@ -24,16 +28,6 @@
 @{ 
 //@using (Script.Foot()){
     <script>
-
-        function isNullOrUndefined(x){
-      if (x === undefined) {
-            return true;
-        }
-        if (x === null) {
-            return true;
-        }
-        return false;
-}
 
 
     (function () {
@@ -50,23 +44,9 @@
     if(gridType=='table'){
     }
 
-        var createRender = function(type){
-        return  function (instance, td, row, col, prop, value, cellProperties) {
-        if   (!isNullOrUndefined(value) && ValueMaps){
-        var val = ValueMaps[value.Key];
-        arguments[5] = type+':'+val;
-         Handsontable.renderers.AutocompleteRenderer.apply(instance, arguments);
-      //  debugger
-   // $(td).html(val);
-       //return $("<th>"+value.Key+"</th>");
-        }
-    //return td;
-    return td;
-};
-        }
 
-    var columnNameDef={renderer:createRender('Name'),};
-    var columnValueDef={renderer:createRender('Value'),};
+        var columnNameDef = { renderer: handsontableHelper.createRender(null, null, Handsontable.renderers.AutocompleteRenderer),};
+        var columnValueDef = { renderer: handsontableHelper.createRender(null, null, Handsontable.renderers.AutocompleteRenderer),};
 
     /*
     hot.updateSettings({
@@ -105,13 +85,6 @@
 
     </script>
 }
-
-@*dwdwd
-
-dw
-d
-wd
-
-dww
-    <p></p>    <p></p>    <p></p>    <p></p><p></p>*@
-    <p></p>    <p></p><p></p>
+<p></p>
+<p></p>
+<p></p>

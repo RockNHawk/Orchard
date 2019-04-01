@@ -412,6 +412,7 @@
     <Content Include="Views\EditorTemplates\Elements.ValueBindGridElement.cshtml" />
     <Content Include="Views\Elements.ValueBindGridElement.Design.cshtml" />
     <Content Include="Views\Elements.ValueBindGridElement.Design_Staticic.cshtml" />
+    <Content Include="Views\Elements.ValueBindGridElement.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
