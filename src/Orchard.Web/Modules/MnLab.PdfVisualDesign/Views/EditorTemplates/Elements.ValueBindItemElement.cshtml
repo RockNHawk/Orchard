@@ -28,19 +28,23 @@
 
 <fieldset>
     <legend>Bind</legend>
+    <div>
+        @Html.LabelFor(x => x.Binding.ContentPartName)
+        @Html.TextBoxFor(x => x.Binding.ContentPartName)
+    </div>
 
-    ContentPartName
-    @Html.TextBoxFor(x => x.Binding.ContentPartName)
+    <div>
 
+        @Html.LabelFor(x => x.Binding.MemberExpression)
+        @Html.TextBoxFor(x => x.Binding.MemberExpression)
+    </div>
 
-    Bind Property
-    @Html.TextBoxFor(x => x.Binding.MemberExpression)
+    <div>
 
-    ExampleValue:
-    @Html.TextBoxFor(x => x.Binding.DefaultValue)
+        @Html.LabelFor(x => x.Binding.DefaultValue)
+        @Html.TextBoxFor(x => x.Binding.DefaultValue)
+    </div>
 
-    @*Description:*@
-    @*@Html.TextBoxFor(x => x.Bind.Description)*@
 </fieldset>
 
 

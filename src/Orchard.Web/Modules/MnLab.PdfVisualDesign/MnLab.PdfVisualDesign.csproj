@@ -108,6 +108,8 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Scripts\handsontable_custom.js" />
+    <Content Include="Scripts\common.js" />
     <Content Include="Scripts\handsontable\handsontable.css" />
     <Content Include="Scripts\handsontable\handsontable.full.css" />
     <Content Include="Scripts\handsontable\handsontable.full.js" />
@@ -371,9 +373,15 @@
   <ItemGroup>
     <Compile Include="AdminMenu.cs" />
     <Compile Include="Controllers\AdminController.cs" />
-    <Compile Include="Drivers\DriverBase.cs" />
+    <Compile Include="Extensions\ContentDataMemberHelper.cs" />
+    <Compile Include="Extensions\ContentFieldMemberAccessor.cs" />
+    <Compile Include="Extensions\ContentItemExtensions.cs" />
+    <Compile Include="Extensions\ContentPartPropertyEditViewModel.cs" />
+    <Compile Include="Extensions\ContentPropertyMemberAccessor.cs" />
+    <Compile Include="Drivers\FieldDriverBase.cs" />
+    <Compile Include="Extensions\IContentMemberAccessor.cs" />
     <Compile Include="Drivers\ValueBindGridElementDriver.cs" />
-    <Compile Include="Drivers\PropertyBindElementDriver.cs" />
+    <Compile Include="Drivers\ValueBindItemElementDriver.cs" />
     <Compile Include="Elements\IValueBindGridData.cs" />
     <Compile Include="Elements\ValueBindGridElement.cs" />
     <Compile Include="Elements\ValueBindItemElement.cs" />
@@ -389,13 +397,13 @@
     <Content Include="Placement.info" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\EditorTemplates\Elements.PropertyBindElement.cshtml" />
+    <Content Include="Views\EditorTemplates\Elements.ValueBindItemElement.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Elements.PropertyBindElement.Design.cshtml" />
+    <Content Include="Views\Elements.ValueBindItemElement.Design.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Elements.PropertyBindElement.cshtml" />
+    <Content Include="Views\Elements.ValueBindItemElement.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets.json" />

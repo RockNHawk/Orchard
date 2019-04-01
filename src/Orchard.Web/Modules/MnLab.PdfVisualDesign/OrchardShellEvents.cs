@@ -17,8 +17,8 @@ namespace MnLab.PdfVisualDesign {
         public void Activated() {
             Mapper.Initialize(cfg => {
                 //cfg.AddProfile<AppProfile>();
-                cfg.CreateMap<ValueBindingDef, PropertyBindElement>();
-                cfg.CreateMap<PropertyBindElement, ValueBindingDef>();
+                cfg.CreateMap<ValueBindingDef, ValueBindItemElement>();
+                cfg.CreateMap<ValueBindItemElement, ValueBindingDef>();
 
                 cfg.CreateMap<ValueBindGridElement, ValueBindGridViewModel>();
 

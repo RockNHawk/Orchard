@@ -2,8 +2,27 @@
 (function (helper) {
 
 
-        /*
- @renderer is like   Handsontable.renderers.AutocompleteRenderer
+    var parseCellValueIfIsJson = function (d) {
+        if (d && typeof (d) === 'string' && d.startsWith('JSON::')) {
+            try {
+                var obj = JSON.parse(d.substring('JSON::'.length));
+                return obj;
+            } catch (e) {
+                debugger;
+            }
+        } else {
+            return d;
+        }
+    };
+
+
+    var wrapCellValueJson = function (obj) {
+        if (!obj) return obj;
+        return 'JSON::' + JSON.stringify(obj);
+    };
+
+    /*
+@renderer is like   Handsontable.renderers.AutocompleteRenderer
 */
     var createRender = function (type, ValueMaps, renderer) {
 
@@ -32,6 +51,8 @@
 
         return function (instance, td, row, col, prop, value, cellProperties) {
             if (value) {
+                // debugger;
+
                 try {
                     /*
                     if the data is from server (server JSON SerializeObject , value type is Object)
@@ -42,10 +63,8 @@
                     var key = obj['Key'];
                     if (key) {
                         // arguments[5] is value argument, relace it will change the cell display text
-                        arguments[5] = key;
+                        // arguments[5] = key;
                         var _type = type || (obj['BindType']);
-
-                        var memberValue = ValueMaps[key];
                         var valueArgument;
                         switch (_type) {
                             case 'DisplayName':
@@ -54,6 +73,7 @@
                                 break;
                             case 'Value':
                                 if (ValueMaps) {
+                                    var memberValue = ValueMaps[key];
                                     valueArgument = memberValue;
                                 }
                                 break;
@@ -76,6 +96,8 @@
     };
 
     helper.createRender = createRender;
+    helper.parseCellValueIfIsJson = parseCellValueIfIsJson;
+    helper.wrapCellValueJson = wrapCellValueJson;
 })(handsontableHelper);
 
 

@@ -71,7 +71,9 @@
     (function() {
 
         var uniqueId = ['@(uniqueId)'][0];
-
+    var ValueMaps = [
+                @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ValueMaps, Newtonsoft.Json.Formatting.Indented)))
+            ][0];
         var AllCellValues = [
             @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(AllCellValues, Newtonsoft.Json.Formatting.Indented)))
         ][0];
@@ -110,25 +112,13 @@
                             // debugger
                             for (var i = 0; i < newData.length; i++) {
                                 var array = newData[i];
-
                                 if (array) {
                                     for (var j = 0; j < array.length; j++) {
                                         var d = array[j];
-                                        if (d && typeof(d) == 'string') {
-                                            try {
-                                                array[j] = JSON.parse(array[j]);
-                                            } catch (e) {
-                                                debugger
-                                            }
-                                        } else {
-                                            array[j] = d;
-                                        }
+                                        array[j] = handsontableHelper.parseCellValueIfIsJson(d);
                                     }
-
                                 }
                             }
-
-
                         }
 
                         console.info('newData', newData);
@@ -165,7 +155,7 @@
 
         var columnDef = {
             // renderer: Handsontable.renderers.AutocompleteRenderer,
-            renderer: handsontableHelper.createRender(null, null, Handsontable.renderers.AutocompleteRenderer),
+            renderer: handsontableHelper.createRender(null, ValueMaps, Handsontable.renderers.AutocompleteRenderer),
             type: 'handsontable',
             handsontable: {
                 search: true,
@@ -200,7 +190,9 @@
 string ContentPartName { get; set; }
 string MemberExpression { get; set; }
 */
-                    return JSON.stringify(obj);
+                    return    handsontableHelper.wrapCellValueJson(obj);
+
+                    //return 'JSON::'+JSON.stringify(obj);
                     //return obj.ContentPartName + '.' + obj.MemberExpression;
 
                     // the value only accept plain type

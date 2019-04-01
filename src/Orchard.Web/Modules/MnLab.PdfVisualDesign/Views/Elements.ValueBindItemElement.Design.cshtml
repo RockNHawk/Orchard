@@ -10,9 +10,9 @@
 }
 @if (value == null || (value is string s && string.IsNullOrEmpty(s)))
 {
-    @(member.Expression)
+    @(member?.Expression)
 }
 else
 {
-    <span title="Expression: @(member.Expression)">@(value)</span>
+    <span title="Expression: @(member?.Expression)">@(value)</span>
 }

@@ -28,152 +28,7 @@ using System.Web.Mvc;
 using Orchard.Core.Title.Models;
 
 namespace MnLab.PdfVisualDesign.Binding.Drivers {
-
-
-    public static class GetLastContentItem {
-
-        public static ContentItem GetLatestVersion(this IContent content, IContentManager _contentManager) {
-            var contentItem = content.ContentItem;
-            if (content.Id > 0) {
-                /*
-               context.Content's Version is the publish version, if the content never Published, the field will be null.
-               so I get the latest (if have draft) ContentItem from ContentManager
-                */
-                contentItem = _contentManager.Get(content.Id, VersionOptions.Latest);
-            }
-            return contentItem;
-        }
-    }
-
-    public class ContentPartPropertyEditViewModel {
-        public PropertyInfo PropertyInfo { get; set; }
-        public ContentPart ContentPart { get; set; }
-        public object Value { get; set; }
-        public string Prefix { get; set; }
-    }
-
-
-    public interface IContentMemberAccessor {
-        object GetValue();
-        void SetValue(object value);
-    }
-
-    public class ContentFieldMemberAccessor : IContentMemberAccessor {
-        string _memberName;
-        ContentField _field;
-        ContentPart _contentItem;
-        public ContentFieldMemberAccessor(ContentPart contentItem, ContentField field, string memberName) {
-            this._contentItem = contentItem;
-            this._field = field;
-            this._memberName = memberName;
-        }
-
-        public object GetValue() {
-            return _field.Storage.Get<object>(null);
-        }
-
-        public void SetValue(object value) {
-            _field.Storage.Set<object>(null, value);
-        }
-    }
-
-    public class ContentPropertyMemberAccessor : IContentMemberAccessor {
-        string _memberName;
-        PropertyInfo _field;
-        ContentPart _contentItem;
-        public ContentPropertyMemberAccessor(ContentPart contentItem, PropertyInfo field, string memberName) {
-            this._contentItem = contentItem;
-            this._field = field;
-            this._memberName = memberName;
-        }
-
-        public object GetValue() {
-            return _field.GetValue(_contentItem);
-        }
-
-        public void SetValue(object value) {
-            _field.SetValue(_contentItem, value);
-        }
-    }
-
-    [System.Diagnostics.DebuggerDisplay("Name={Part.Name},BindingDef={BindingDef.Key},Field={Field},Property={PropertyInfo}")]
-    public class ContentDataMemberHelper {
-
-        public ContentField Field;
-
-        public PropertyInfo PropertyInfo;
-
-        public ContentPart Part;
-
-        public string Expression;
-
-        public IValueBindingDef BindingDef;
-
-        public bool hasDataMember { get => Field != null || PropertyInfo != null; }
-
-        public ContentDataMemberHelper(ContentPart contentItem, IValueBindingDef bindingDef, ContentField field) : this(contentItem, bindingDef) {
-            this.Field = field;
-        }
-        public ContentDataMemberHelper(ContentPart contentItem, IValueBindingDef bindingDef, PropertyInfo field) : this(contentItem, bindingDef) {
-            this.PropertyInfo = field;
-        }
-
-        public ContentDataMemberHelper(ContentPart contentItem, IValueBindingDef bindingDef) {
-            this.Part = contentItem;
-            this.BindingDef = bindingDef;
-            this.Expression = bindingDef.MemberExpression;
-        }
-
-
-        public IContentMemberAccessor GetAccessor() {
-            if (Field != null) {
-                return new ContentFieldMemberAccessor(Part, Field, Expression);
-            }
-            else if (PropertyInfo != null) {
-                return new ContentPropertyMemberAccessor(Part, PropertyInfo, Expression);
-            }
-            else {
-                throw new InvalidOperationException(string.Format("Data member '{0}' not setted", BindingDef.Key));
-            }
-        }
-
-        public static ContentDataMemberHelper FindFromContentItem(ContentItem contentItem, IValueBindingDef bindingDef) {
-
-            var partName = bindingDef.ContentPartName;
-            string MemberExpression = bindingDef.MemberExpression;
-            if (partName == null) throw new ArgumentNullException(nameof(partName));
-            if (MemberExpression == null) throw new ArgumentNullException(nameof(MemberExpression));
-            var part = contentItem.Parts.FirstOrDefault(x => x.PartDefinition.Name == partName);
-            if (part == null) return null;
-            return FindFromContentPart(part, bindingDef);
-        }
-
-        public static ContentDataMemberHelper FindFromContentPart(ContentPart part, IValueBindingDef bindingDef) {
-            var me = bindingDef.MemberExpression;
-            /*
-               https://docs.orchardproject.net/en/latest/Documentation/Creating-a-custom-field-type/
-
-            field in Orchard is dynamic added to a ContentPart by user
-            the internal ContentPart own it's "hard code" Property like TitlePart.Title is a hard coded property
-            it also storage the data, but it only can edit by hole part no single Property editor support (see TitlePartDriver), or I can add this feature by self.
-            */
-            var field = part?.Fields.FirstOrDefault(x => x.Name == me);
-
-            var helper = new ContentDataMemberHelper(part, bindingDef);
-            if (field != null) {
-                helper.Field = field;
-            }
-            else {
-                var property = part.GetType().GetProperty(me);
-                helper.PropertyInfo = property;
-            }
-            return helper;
-        }
-
-    }
-
-
-    public class PropertyBindElementDriver : ElementDriver<PropertyBindElement> {
+    public class ValueBindItemElementDriver : ElementDriver<ValueBindItemElement> {
 
 
         private readonly IElementFilterProcessor _processor;
@@ -195,7 +50,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
         readonly IWorkContextAccessor _workContextAccessor;
 
 
-        public PropertyBindElementDriver(IElementFilterProcessor processor, IContentFieldDisplay fieldDisplay,
+        public ValueBindItemElementDriver(IElementFilterProcessor processor, IContentFieldDisplay fieldDisplay,
             IShapeFactory shapeFactory,
              Lazy<IShapeTableLocator> shapeTableLocator,
              IVirtualPathProvider virtualPathProvider,
@@ -265,7 +120,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             return flag && !flag2;
         }
 
-        protected override EditorResult OnBuildEditor(PropertyBindElement element, ElementEditorContext context) {
+        protected override EditorResult OnBuildEditor(ValueBindItemElement element, ElementEditorContext context) {
 
             var updater = context.Updater;
 
@@ -277,6 +132,13 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 //Field = field,
                 FieldDisplay = _fieldDisplay,
             };
+
+            //var viewModel = new PropertyBindViewModel {
+            //    ContentPartFieldExpression = element.ContentPartFieldExpression,
+            //    ContentPartName = element.ContentPartName,
+            //    ExampleValue = element.ExampleValue,
+            //    Remark = element.Remark,
+            //};
 
             if (context.Updater != null) {
                 if (!context.Updater.TryUpdateModel(bindingInfo, GetPrefix(context, nameof(PropertyBindViewModel.Binding)), null, null)) {
@@ -294,11 +156,8 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             // var contentItem = content.ContentItem;
             var contentItem = content.GetLatestVersion(_contentManager);//  _contentManager.Get(content.Id, VersionOptions.Latest);
 
-
-            var member = string.IsNullOrEmpty(partName) || string.IsNullOrEmpty(partPropertyName) ? null : ContentDataMemberHelper.FindFromContentItem(contentItem, element);
-
+            var member = string.IsNullOrEmpty(partName) || string.IsNullOrEmpty(partPropertyName) ? null : ContentDataMemberHelper.FindFromContentItem(contentItem, bindingInfo);
             var part = member?.Part;
-
             /*
                https://docs.orchardproject.net/en/latest/Documentation/Creating-a-custom-field-type/
 
@@ -313,19 +172,8 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             viewModel.Content = content;
             viewModel.Field = field;
 
-            //var viewModel = new PropertyBindViewModel {
-            //    ContentPartFieldExpression = element.ContentPartFieldExpression,
-            //    ContentPartName = element.ContentPartName,
-            //    ExampleValue = element.ExampleValue,
-            //    Remark = element.Remark,
-            //};
-
             if (context.Updater != null) {
-                if (!context.Updater.TryUpdateModel(element, GetPrefix(context, nameof(PropertyBindViewModel.Binding)), null, null)) {
-                    //updater.AddModelError("", T("ContentPart {0} not exists", partTypeName));
-                    goto ret;
-                }
-
+             
                 if (part == null) {
                     updater.AddModelError("", T("ContentPart {0} not exists", partName));
                     goto ret;
@@ -358,9 +206,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             //IEnumerable<IContentFieldDriver> drivers;
             if (hasDataMember) {
-
                 // IContentFieldDriver
-
                 var rootShape = _shapeFactory.Create("Content_Edit", Arguments.Empty(), () => new ZoneHolding(() => _shapeFactory.Create("ContentZone", Arguments.Empty())));
 
                 var contentForCurrentFieldEditorBuild = ContentForFieldEditorBuild(field, part, content);
@@ -426,7 +272,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             ret:
 
-            var editor = context.ShapeFactory.EditorTemplate(TemplateName: $"Elements.{nameof(PropertyBindElement)}", Model: viewModel);
+            var editor = context.ShapeFactory.EditorTemplate(TemplateName: $"Elements.{nameof(ValueBindItemElement)}", Model: viewModel);
             return Editor(context, editor);
         }
 
@@ -472,7 +318,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
         }
 
 
-        protected override void OnDisplaying(PropertyBindElement element, ElementDisplayingContext context) {
+        protected override void OnDisplaying(ValueBindItemElement element, ElementDisplayingContext context) {
 
 
             var bindingInfo = element;
