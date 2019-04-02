@@ -338,11 +338,11 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             var member = ContentDataMemberHelper.FindFromContentItem(contentItem, element);
 
-            if (context.DisplayType == "Design") {
+            //if (context.DisplayType == "Design") {
                 context.ElementShape.Member = member;
                 context.ElementShape.Context = context;
                 context.ElementShape.Content = context.Content;
-            }
+           // }
         }
 
         //protected override void OnDisplaying(PropertyBindElement element, ElementDisplayingContext context) {

@@ -2,12 +2,21 @@
 @using MnLab.PdfVisualDesign.Binding
 @using MnLab.PdfVisualDesign.Binding.Drivers
 @*@model ContentDataMemberHelper*@
+@using Orchard.Layouts.Helpers
+
+@{
+    var tagBuilder = TagBuilderExtensions.CreateElementTagBuilder(Model);
+    tagBuilder.AddCssClass("row");
+}
 
 @{
     ContentDataMemberHelper member = Model.Member;
 
     var value = member?.GetAccessor().GetValue();
 }
+
+@tagBuilder.StartElement
+
 @if (value == null || (value is string s && string.IsNullOrEmpty(s)))
 {
     @(member?.Expression)
@@ -16,3 +25,6 @@ else
 {
     <span title="Expression: @(member?.Expression)">@(value)</span>
 }
+
+@*@DisplayChildren(Model)*@
+@tagBuilder.EndElement
