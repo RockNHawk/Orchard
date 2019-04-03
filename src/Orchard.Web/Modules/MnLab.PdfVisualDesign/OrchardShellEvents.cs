@@ -21,8 +21,10 @@ namespace MnLab.PdfVisualDesign {
     /// </summary>
     public class OrchardShellEvents : IOrchardShellEvents {
 
-        public OrchardShellEvents(IOrchardHost orchardHost, ShellSettings settings, ShellContext sc) {
+        public OrchardShellEvents(IOrchardHost orchardHost, ShellSettings settings) {
 
+            /*
+            Cannot resolve parameter  ShellContext 
             var registration = RegistrationBuilder
                        .ForType<CustomElementDisplay>()
                        .ExternallyOwned()
@@ -33,6 +35,8 @@ namespace MnLab.PdfVisualDesign {
             var shellContext = orchardHost.GetShellContext(settings);
 
             shellContext.LifetimeScope.ComponentRegistry.Register(registration);
+
+             */
         }
 
         public void Activated() {
