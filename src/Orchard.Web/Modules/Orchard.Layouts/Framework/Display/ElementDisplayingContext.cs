@@ -5,7 +5,9 @@ namespace Orchard.Layouts.Framework.Display {
     public class ElementDisplayingContext {
         public IContent Content { get; set; }
         public Element Element { get; set; }
-        public string DisplayType { get; set; }
+        public string displayType;
+        public string DisplayType { get => displayType; set => displayType = value; }
+        //public string DisplayType { get; set; }
         public dynamic ElementShape { get; set; }
         public IUpdateModel Updater { get; set; }
     }
