@@ -38,7 +38,7 @@
         BindType = "Value",
     });
 
-    var bs = bs1.Concat(bs2);
+    var bs = bs1.Concat(bs2);//.Where(x=>x.ContentPartName!=null);
 }
 
 @*<script src="https://cdn.jsdelivr.net/npm/handsontable@7.0.0/dist/handsontable.full.min.js"></script>
@@ -121,7 +121,7 @@
                             }
                         }
 
-                        console.info('newData', newData);
+                       // console.info('newData', newData);
                         scope.AllCellValues_JSON = newData && JSON.stringify(newData);
                     });
 
@@ -190,8 +190,9 @@
 string ContentPartName { get; set; }
 string MemberExpression { get; set; }
 */
-                    return    handsontableHelper.wrapCellValueJson(obj);
-
+                    var ret = handsontableHelper.wrapCellValueJson(obj);
+                    console.log('getValue',ret);
+                    return ret;
                     //return 'JSON::'+JSON.stringify(obj);
                     //return obj.ContentPartName + '.' + obj.MemberExpression;
 
@@ -242,6 +243,8 @@ string MemberExpression { get; set; }
                 * 
 https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-being-selected-on-column-header-click
 */
+
+            ///*
             afterOnCellMouseDown: function (event, coords, th) {
                // debugger
                 if (coords.row === -1 || coords.col === -1) {
@@ -288,6 +291,7 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
                     });
                 }
             },
+            //*/
 
             //data: AllCellValues || Handsontable.helper.createSpreadsheetData(5, 2),
             data: AllCellValues,
@@ -322,7 +326,7 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
 
         var girdTable;
         hooks.forEach(function(hook) {
-            console.log("hook", arguments);
+           // console.log("hook", arguments);
             var exists = tableCfg['afterOnCellMouseDown'];
             tableCfg[hook] = function () {
                 //debugger

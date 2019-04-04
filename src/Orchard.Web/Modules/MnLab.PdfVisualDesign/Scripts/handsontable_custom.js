@@ -50,6 +50,14 @@
 */
 
         return function (instance, td, row, col, prop, value, cellProperties) {
+
+            console.log('render ['+row+','+col+']value', value);
+
+            //if (isNullOrUndefined(value) && ValueMaps) {
+            //    debugger
+            //   // value = ValueMaps[row][col];
+            //}
+
             if (value) {
                 // debugger;
 
