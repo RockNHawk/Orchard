@@ -58,7 +58,7 @@
                     if the data is from server (server JSON SerializeObject , value type is Object)
                     if the data is from local user inputed, calue type is string
                     */
-                    var obj = value && (typeof value === 'string' ? JSON.parse(value) : value);
+                    var obj = value && (typeof value === 'string' ? parseCellValueIfIsJson(value) : value);
 
                     var key = obj['Key'];
                     if (key) {

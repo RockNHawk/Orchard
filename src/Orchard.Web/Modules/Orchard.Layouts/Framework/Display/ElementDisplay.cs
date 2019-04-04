@@ -25,7 +25,7 @@ namespace Orchard.Layouts.Framework.Display {
             IContent content,
             string displayType = null,
             IUpdateModel updater = null) {
-
+            //displayType = null; 
             var typeName = element.GetType().Name;
             var category = element.Category.ToSafeName();
             var drivers = element.Descriptor.GetDrivers().ToList();
@@ -100,6 +100,9 @@ namespace Orchard.Layouts.Framework.Display {
         }
 
         public dynamic DisplayElements(IEnumerable<Element> elements, IContent content, string displayType = null, IUpdateModel updater = null) {
+
+          //  displayType = null;
+
             var layoutRoot = (dynamic)_shapeFactory.Create("LayoutRoot");
             var index = 0;
 

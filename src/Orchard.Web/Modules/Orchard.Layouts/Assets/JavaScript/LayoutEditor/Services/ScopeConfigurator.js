@@ -10,13 +10,52 @@
                         e.stopPropagation();
                     });
 
+                    var applyDesign = function (element, $element) {
+
+                        //  $timeout(function () {
+                        //  debugger
+                        // layout-content-markup ng-binding
+                        var $contentMarkup = $element.find('.layout-content-markup');
+                        //debugger;
+
+                        if (element.htmlClass && !$contentMarkup.hasClass(element.htmlClass)) {
+                            $contentMarkup.addClass(element.htmlClass);
+                        }
+
+                        if (element.htmlId) {
+                        }
+
+                        if (element.htmlStyle) {
+                            //  $contentMarkup.attr("style");
+                            $contentMarkup.attr("style", element.htmlStyle);
+                        }
+
+                        if (element.htmlId) {
+                        }
+
+                        //  }, 500);
+
+                    };
+
+                    var element = $scope.element;
+
+                    $timeout(function () {
+                        applyDesign(element, $element);
+                    }, 500);
+
+                    $element.click(function () {
+                        applyDesign(element, $element);
+                    });
+
+
                     $element.parent().keydown(function (e) {
                         var handled = false;
                         var resetFocus = false;
                         var element = $scope.element;
-                    
+
                         if (element.editor.isDragging)
                             return;
+
 
                         // If native clipboard support exists, the pseudo-clipboard will have been disabled.
                         if (!clipboard.isDisabled()) {
