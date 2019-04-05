@@ -212,6 +212,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             var contentItem = content.GetLatestVersion(_contentManager);
 
             var bindingDefGroups = GetBindingDefGroups(contentItem);
+                // the bind member key and value map
             Dictionary<string, object> valueMaps = GetValueMaps(contentItem, bindingDefGroups);
 
             var viewModel = Mapper.Map(element, new ValueBindGridViewModel() {
