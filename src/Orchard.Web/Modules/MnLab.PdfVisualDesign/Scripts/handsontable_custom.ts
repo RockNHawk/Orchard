@@ -1,46 +1,61 @@
-"use strict";
+﻿"use strict";
+declare interface HandsontableOption {
+    uniqueId: string;
+    allCellValues: [][],
+    valueMaps: any,
+    mergedCells: [],
+    cellDropdownData: [],
+    columnHeaderTexts: Array<string>,
+}
+
+declare var Handsontable: any;
+declare var angular: any;
+declare var MnUtil: any;
 //var aaaa = 11;
+
+
 //var handsontableHelper = {};
 //(function (helper) {
-var HandsontableCustomHelper = /** @class */ (function () {
-    function HandsontableCustomHelper() {
-    }
-    HandsontableCustomHelper.prototype.isCellValueJsonExpr = function (d) {
+
+ class HandsontableCustomHelper {
+
+
+    isCellValueJsonExpr(d) {
         if (d && (typeof (d) === 'string' && d.indexOf('JSON::') === 0)) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     };
-    ;
-    HandsontableCustomHelper.prototype.parseCellValueIfIsJsonExpr = function (d) {
+
+
+    parseCellValueIfIsJsonExpr(d: any) {
         if (d && typeof (d) === 'string' && d.indexOf('JSON::') === 0) {
             try {
                 var obj = JSON.parse(d.substring('JSON::'.length));
                 return obj;
-            }
-            catch (e) {
+            } catch (e) {
                 debugger;
             }
-        }
-        else {
+        } else {
             return d;
         }
     };
-    ;
-    HandsontableCustomHelper.prototype.wrapCellValueJson = function (obj) {
-        if (!obj)
-            return obj;
+
+
+    wrapCellValueJson(obj) {
+        if (!obj) return obj;
+
         // handsometable 的 cell value 除非首次通过 tableCfg.data 指定，否则不能为 object
         return 'JSON::' + JSON.stringify(obj);
         //  return obj;
     };
-    ;
+
     /*
 @renderer is like   Handsontable.renderers.AutocompleteRenderer
 */
-    HandsontableCustomHelper.prototype.createRender = function (type, valueMaps, renderer) {
+    createRender(type, valueMaps, renderer) {
+
         /*
 
    /*
@@ -63,31 +78,37 @@ var HandsontableCustomHelper = /** @class */ (function () {
       //  $td.append('▼'); //empty is needed because you are rendering to an existing cell
 
 */
+
         var _that = this;
-        return function (instance, td, row, col, prop, value, cellProperties) {
+        return   function(instance, td, row, col, prop, value, cellProperties) {
+
             console.log('render [' + row + ',' + col + ']value', value);
+
             //if (isNullOrUndefined(value) && valueMaps) {
             //    debugger
             //   // value = valueMaps[row][col];
             //}
+
             if (value) {
                 // debugger;
+
                 try {
                     /*
                     if the data is from server (server JSON SerializeObject , value type is Object)
                     if the data is from local user inputed, calue type is string
                     */
                     var obj = value && (typeof value === 'string' ? _that.parseCellValueIfIsJsonExpr(value) : value);
+
                     // 
                     if (typeof (obj) == 'string') {
                         //   arguments[5] = valueArgument;
                         renderer.apply(instance, arguments);
-                    }
-                    else {
+
+                    } else {
+
                         var key = obj['Key'];
                         var _type = type || (obj['BindType']);
-                        var valueArgument = value;
-                        ;
+                        var valueArgument = value;;
                         if (key) {
                             // arguments[5] is value argument, relace it will change the cell display text
                             // arguments[5] = key;
@@ -103,8 +124,8 @@ var HandsontableCustomHelper = /** @class */ (function () {
                                     }
                                     break;
                             }
-                        }
-                        else {
+                        } else {
+
                             //  debugger
                             // $(td).html(val);
                             //return $("<th>"+value.Key+"</th>");
@@ -121,161 +142,219 @@ var HandsontableCustomHelper = /** @class */ (function () {
                         arguments[5] = valueArgument;
                         renderer.apply(instance, arguments);
                     }
-                }
-                catch (e) {
+
+                } catch (e) {
                     console.error(e);
                 }
-            }
-            else {
+            } else {
                 renderer.apply(instance, arguments);
             }
             //return td;
             return td;
         };
     };
-    ;
-    HandsontableCustomHelper.prototype.createNgBindController = function (tableCfg, option) {
-        var uniqueId = option.uniqueId, AllCellValues = option.allCellValues, valueMaps = option.valueMaps, mergedCells = option.mergedCells, cellDropdownData = option.cellDropdownData, columnHeaderTexts = option.columnHeaderTexts;
+
+
+    createNgBindController(tableCfg,option: HandsontableOption) {
+
+        var uniqueId = option.uniqueId,
+            AllCellValues = option.allCellValues,
+            valueMaps = option.valueMaps,
+            mergedCells = option.mergedCells,
+            cellDropdownData = option.cellDropdownData,
+            columnHeaderTexts = option.columnHeaderTexts;
+
+
         //  debugger
         var gridApp = angular.module('ValueBindGrid_' + uniqueId, []);
+
+
         var scope;
-        var ngController = gridApp.controller('ValueBindGridController_' + uniqueId, function ValueBindGridController($scope) {
-            scope = $scope;
-            $scope.allCellValues_JSON = AllCellValues && JSON.stringify(AllCellValues);
-            $scope.mergedCells_JSON = mergedCells && JSON.stringify(mergedCells);
-            $scope.appplyTableChange = function (newData, mergedCellsNew) {
-                //   debugger
-                // console.log("mergedCellsCollection", mc);
-                //debugger
-                scope.$apply(function () {
-                    //scope.mergedCells = mergedCellsNew;
-                    scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
-                    if (newData) {
-                        // debugger
-                        for (var i = 0; i < newData.length; i++) {
-                            var array = newData[i];
-                            if (array) {
-                                for (var j = 0; j < array.length; j++) {
-                                    var d = array[j];
-                                    if (d) {
-                                        // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
-                                        if (MnUtil.isJson(d)) {
-                                            // 无需更改
-                                            // array[j] = d;//parseCellValueIfIsJsonExpr(d);
-                                        }
-                                        else if (this.isCellValueJsonExpr(d)) {
-                                            // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
-                                            array[j] = this.parseCellValueIfIsJsonExpr(d);
-                                        }
-                                        else {
-                                            // 用户手动输入任意字符串
-                                            array[j] = { BindType: "StaticValue", StaticValue: d };
+        var ngController = gridApp.controller('ValueBindGridController_' + uniqueId,
+            function ValueBindGridController($scope) {
+                scope = $scope;
+
+                $scope.allCellValues_JSON = AllCellValues && JSON.stringify(AllCellValues);
+                $scope.mergedCells_JSON = mergedCells && JSON.stringify(mergedCells);
+
+                $scope.appplyTableChange = function (newData, mergedCellsNew) {
+                    //   debugger
+
+                    // console.log("mergedCellsCollection", mc);
+                    //debugger
+                    scope.$apply(function () {
+                        //scope.mergedCells = mergedCellsNew;
+
+                        scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
+
+
+                        if (newData) {
+                            // debugger
+                            for (var i = 0; i < newData.length; i++) {
+                                var array = newData[i];
+                                if (array) {
+                                    for (var j = 0; j < array.length; j++) {
+                                        var d = array[j];
+                                        if (d) {
+                                            // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
+                                            if (MnUtil.isJson(d)) {
+                                                // 无需更改
+                                                // array[j] = d;//parseCellValueIfIsJsonExpr(d);
+                                            } else if (this.isCellValueJsonExpr(d)) {
+                                                // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
+                                                array[j] = this.parseCellValueIfIsJsonExpr(d);
+                                            } else {
+                                                // 用户手动输入任意字符串
+                                                array[j] = { BindType: "StaticValue", StaticValue: d };
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    // console.info('newData', newData);
-                    scope.allCellValues_JSON = newData && JSON.stringify(newData);
-                });
-            };
-            //$scope.AllCellValues = AllCellValues;
-            //$scope.mergedCells = mergedCells;
-            $scope.headerTexts_JSON = columnHeaderTexts && JSON.stringify(columnHeaderTexts);
-            $scope.appplyHeaderChange = function (index, newText, headers) {
-                $scope.headerTexts_JSON = headers && JSON.stringify(headers);
-            };
-        });
+
+                        // console.info('newData', newData);
+                        scope.allCellValues_JSON = newData && JSON.stringify(newData);
+                    });
+
+                }
+                //$scope.AllCellValues = AllCellValues;
+                //$scope.mergedCells = mergedCells;
+
+
+                $scope.headerTexts_JSON = columnHeaderTexts && JSON.stringify(columnHeaderTexts);
+
+                $scope.appplyHeaderChange = function (index, newText, headers) {
+                    $scope.headerTexts_JSON = headers && JSON.stringify(headers);
+                };
+
+            });
+
+
         ///*
         var afterOnCellMouseDown = function (event, coords, th) {
             // debugger
             // only allow column header edit , do not allow row header edit
             if (coords && /*coords.row === -1 ||*/ coords.col === -1) {
-                var instance_1 = this, isCol_1 = coords.row === -1, input_1 = document.createElement('input'), rect_1 = th.getBoundingClientRect(), addListeners_1 = function (events, headers, index) {
-                    events.split(' ').forEach(function (e) {
-                        input_1.addEventListener(e, function () {
-                            var neText = headers[index] = input_1.value;
-                            instance_1.updateSettings(isCol_1 ? {
-                                colHeaders: headers
-                            } : {
-                                rowHeaders: headers
-                            });
-                            // debugger
-                            if (scope)
-                                scope.appplyHeaderChange(index, neText, headers);
-                            setTimeout(function () {
-                                if (input_1.parentNode)
-                                    input_1.parentNode.removeChild(input_1);
-                            });
-                        });
-                    });
-                }, appendInput = function () {
-                    input_1.setAttribute('type', 'text');
-                    input_1.style.cssText = '' +
-                        'position:absolute;' +
-                        'left:' + rect_1.left + 'px;' +
-                        'top:' + rect_1.top + 'px;' +
-                        'width:' + (rect_1.width - 4) + 'px;' +
-                        'height:' + (rect_1.height - 4) + 'px;' +
-                        'z-index:1060;';
-                    document.body.appendChild(input_1);
-                };
-                input_1.value = th.querySelector(isCol_1 ? '.colHeader' : '.rowHeader').innerText;
+                let instance = this,
+                    isCol = coords.row === -1,
+                    input = document.createElement('input'),
+                    rect = th.getBoundingClientRect(),
+                    addListeners = (events, headers, index) => {
+                        events.split(' ').forEach(e => {
+                            input.addEventListener(e, () => {
+                                var neText = headers[index] = input.value;
+                                instance.updateSettings(isCol ? {
+                                    colHeaders: headers
+                                } : {
+                                        rowHeaders: headers
+                                    });
+
+                               // debugger
+                                if (scope)scope.appplyHeaderChange(index, neText, headers);
+
+
+                                setTimeout(() => {
+                                    if (input.parentNode)
+                                        input.parentNode.removeChild(input)
+                                });
+                            })
+                        })
+                    },
+                    appendInput = () => {
+                        input.setAttribute('type', 'text');
+                        input.style.cssText = '' +
+                            'position:absolute;' +
+                            'left:' + rect.left + 'px;' +
+                            'top:' + rect.top + 'px;' +
+                            'width:' + (rect.width - 4) + 'px;' +
+                            'height:' + (rect.height - 4) + 'px;' +
+                            'z-index:1060;';
+                        document.body.appendChild(input);
+                    };
+                input.value = th.querySelector(
+                    isCol ? '.colHeader' : '.rowHeader'
+                ).innerText;
                 appendInput();
-                setTimeout(function () {
-                    input_1.select();
-                    addListeners_1('change blur', instance_1[isCol_1 ? 'getColHeader' : 'getRowHeader'](), coords[isCol_1 ? 'col' : 'row']);
+                setTimeout(() => {
+                    input.select();
+                    addListeners('change blur', instance[
+                        isCol ? 'getColHeader' : 'getRowHeader'
+                    ](), coords[isCol ? 'col' : 'row']);
                 });
             }
         };
         tableCfg.afterOnCellMouseDown = afterOnCellMouseDown;
         //*/
-        this.bindTableChange(uniqueId, tableCfg, null, function (tableInstance) {
+
+
+        this.bindTableChange(uniqueId, tableCfg, null, (tableInstance) => {
             //    var scope = scopeAccesser();
             if (scope) {
                 //  debugger
                 var mc = tableInstance.getPlugin('mergeCells');
                 var mergedCellsCollection = mc.mergedCellsCollection;
                 var mergedCellsNew = mergedCellsCollection && mergedCellsCollection.mergedCells;
+
                 //// 源数据？
                 // hot.getSourceData();
+
                 // 用户编辑修改后的数据？
                 var newData = tableInstance.getData();
                 scope.appplyTableChange(newData, mergedCellsNew);
             }
         });
-        return function () { return scope; };
-    };
-    HandsontableCustomHelper.prototype.bindTableChange = function (uniqueId, tableCfg, tableAccessor, changeCallback) {
+
+        return () => scope;
+    }
+
+
+
+
+
+    bindTableChange(uniqueId, tableCfg, tableAccessor, changeCallback) {
+
         //['']
         var hooks = Handsontable.hooks.getRegistered()
-            .filter(function (x) { return x.indexOf('Mouse') != -1 || x.indexOf('Scroll') != -1; });
+            .filter(x => x.indexOf('Mouse') != -1 || x.indexOf('Scroll') != -1);
+
         var girdTable;
         hooks.forEach(function (hook) {
             // console.log("hook", arguments);
             var exists = tableCfg['afterOnCellMouseDown'];
             tableCfg[hook] = function (tableInstance) {
                 //debugger
-                if (exists)
-                    exists.apply(this, arguments);
+                if (exists) exists.apply(this, arguments);
                 // if (tableInstance.getPlugin) {
                 // this is handsometable instance
                 changeCallback(this, arguments);
                 //  }
-            };
+            }
         });
     };
-    ;
-    HandsontableCustomHelper.prototype.createDesignTable = function (container, option) {
-        var uniqueId = option.uniqueId, AllCellValues = option.allCellValues, valueMaps = option.valueMaps, mergedCells = option.mergedCells, cellDropdownData = option.cellDropdownData, columnHeaderTexts = option.columnHeaderTexts;
+
+
+
+
+    createDesignTable(container, option: HandsontableOption) {
+
+        var uniqueId = option.uniqueId,
+            AllCellValues = option.allCellValues,
+            valueMaps = option.valueMaps,
+            mergedCells = option.mergedCells,
+            cellDropdownData = option.cellDropdownData,
+            columnHeaderTexts = option.columnHeaderTexts;
+
+
         var _that = this;
+
         var columnDef = {
             // renderer: Handsontable.renderers.AutocompleteRenderer,
             renderer: this.createRender(null, valueMaps, Handsontable.renderers.AutocompleteRenderer),
             type: 'handsontable',
             handsontable: {
                 search: true,
+
                 // https://handsontable.com/docs/7.0.0/demo-hiding-columns.html
                 //columns: [0, 1],
                 //columns: ['ContentPartName','MemberExpression'],
@@ -312,26 +391,33 @@ string MemberExpression { get; set; }
                     return ret;
                     //return 'JSON::'+JSON.stringify(obj);
                     //return obj.ContentPartName + '.' + obj.MemberExpression;
+
                     // the value only accept plain type
                     //return obj.Key;
                     //return obj;
                 }
             }
         };
+
         var tableCfg = {
             licenseKey: 'non-commercial-and-evaluation',
             //afterGetColHeader: function (col, TH) {
+
             //   // debugger
+
             //    // nothing for first column
             //    if (col == -1) {
             //        return;
             //    }
             //    var instance = this;
+
             //    // create input element
             //    var input = document.createElement('input');
             //    input.type = 'text';
             //    input.value = TH.firstChild.textContent;
+
             //    TH.appendChild(input);
+
             //    $(input).change(function (e) {
             //        debugger
             //        var headers = instance.getColHeader();
@@ -340,16 +426,22 @@ string MemberExpression { get; set; }
             //            colHeaders: headers
             //        });
             //    });
+
             //    TH.style.position = 'relative';
             //    TH.firstChild.style.display = 'none';
             //},
+
+
             /*
              *
              * https://stackoverflow.com/questions/18348437/how-do-i-edit-the-header-text-of-a-handsontable
              *
-             *
+             * 
 https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-being-selected-on-column-header-click
 */
+
+
+
             //data: AllCellValues || Handsontable.helper.createSpreadsheetData(5, 2),
             data: AllCellValues,
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
@@ -358,22 +450,49 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
             allowInsertColumn: true,
             allowInsertRow: true,
             // colHeaders: true,
-            colHeaders: columnHeaderTexts,
+            colHeaders: columnHeaderTexts,//['Data Member (First Column)', '', 'Data Member (Second Column)', ''],
             columns: [columnDef, columnDef, columnDef, columnDef],
             mergeCells: mergedCells || [],
+            //mergeCells: [
+            //    { row: 1, col: 1, rowspan: 3, colspan: 3 },
+            //    { row: 3, col: 4, rowspan: 2, colspan: 2 },
+            //    { row: 5, col: 6, rowspan: 3, colspan: 3 }
+            //],
+            //afterMergeCells: function (range, parent, auto) {
+            //    //    debugger
+            //    console.log("afterMergeCells", range, parent, auto);
+
+            //    scope.appplyTableChange(girdTable);
+            //}
         };
+
         //v https://handsontable.com/docs/7.0.0/tutorial-using-callbacks.html
         //var hooks = ['afterChange', 'afterRemoveRow', 'afterRemoveCol', 'afterMergeCells',' afterUnmergeCells'];
+
         // debugger
+
         var girdTable;
         //   var scopeAccesser = createNgBindController(uniqueId, tableCfg, () => girdTable, AllCellValues, mergedCells);
-        var scopeAccesser = this.createNgBindController(tableCfg, option);
+        var scopeAccesser = this.createNgBindController(tableCfg,option);
+
         girdTable = new Handsontable(container, tableCfg);
+
         return girdTable;
     };
-    ;
-    return HandsontableCustomHelper;
-}());
+
+
+    //helper.createDesignTable = createDesignTable;
+    //helper.createNgBindController = createNgBindController;
+    //helper.bindTableChange = bindTableChange;
+
+    //helper.createRender = createRender;
+    //helper.parseCellValueIfIsJsonExpr = parseCellValueIfIsJsonExpr;
+    //helper.wrapCellValueJson = wrapCellValueJson;
+
+}
+
 //})(handsontableHelper);
+
+
+
 var handsontableHelper = new HandsontableCustomHelper();
-//# sourceMappingURL=handsontable_custom.js.map

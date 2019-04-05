@@ -1,4 +1,6 @@
-﻿function isNullOrUndefined(x) {
+﻿//var exports = {};
+
+function isNullOrUndefined(x) {
     if (x === undefined) {
         return true;
     }

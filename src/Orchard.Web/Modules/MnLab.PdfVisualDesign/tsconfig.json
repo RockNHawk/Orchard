@@ -1,0 +1,23 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "noImplicitAny": false,
+        "noEmitOnError": true,
+        "removeComments": false,
+        "sourceMap": true,
+        "target": "es5",
+        "module": "none",
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true, //for angular to be able to use metadata we specify in our components.
+        "experimentalDecorators": true, //angular needs decorators like @Component, @Injectable, etc.
+        "lib": [
+            "es2016",
+            "dom",
+            "es5"
+        ]
+    },
+    "exclude": [
+        "node_modules",
+        "wwwroot"
+    ]
+}

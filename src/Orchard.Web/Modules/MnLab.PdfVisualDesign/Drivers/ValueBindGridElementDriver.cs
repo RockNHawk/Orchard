@@ -142,17 +142,27 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             if (context.Updater != null) {
 
-                var strAllCellValues = ((string[])context.ValueProvider.GetValue($"{nameof(viewModel.DesignData)}.{nameof(viewModel.DesignData.AllCellValues)}")?.RawValue)?[0];
-                var strMergedCells = ((string[])context.ValueProvider.GetValue($"{nameof(viewModel.DesignData)}.{nameof(viewModel.DesignData.MergedCells)}")?.RawValue)?[0];
 
                 var design = new ValueBindGridData();
 
+                updater.TryUpdateModel(design, GetPrefix(context, $"{nameof(viewModel.DesignData)}"),null,null);
+
+                var strAllCellValues = ((string[])context.ValueProvider.GetValue($"{nameof(viewModel.DesignData)}.{nameof(viewModel.DesignData.AllCellValues)}_JSON")?.RawValue)?[0];
                 if (!string.IsNullOrEmpty(strAllCellValues)) {
                     design.AllCellValues = Newtonsoft.Json.JsonConvert.DeserializeObject<ValueBindingDef[][]>(strAllCellValues);
                 }
+                {
+                    var strMergedCells = ((string[])context.ValueProvider.GetValue($"{nameof(viewModel.DesignData)}.{nameof(viewModel.DesignData.MergedCells)}_JSON")?.RawValue)?[0];
+                    if (!string.IsNullOrEmpty(strMergedCells)) {
+                        design.MergedCells = Newtonsoft.Json.JsonConvert.DeserializeObject<MergedCell[]>(strMergedCells);
+                    }
+                }
 
-                if (!string.IsNullOrEmpty(strMergedCells)) {
-                    design.MergedCells = Newtonsoft.Json.JsonConvert.DeserializeObject<MergedCell[]>(strMergedCells);
+                {
+                    var json = ((string[])context.ValueProvider.GetValue($"{nameof(viewModel.DesignData)}.{nameof(viewModel.DesignData.HeaderTexts)}_JSON")?.RawValue)?[0];
+                    if (!string.IsNullOrEmpty(json)) {
+                        design.HeaderTexts = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(json);
+                    }
                 }
 
                 element.DesignData = viewModel.DesignData = design;
@@ -231,6 +241,11 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
         //protected override void OnCreatingDisplay(PropertyBindElement element, ElementCreatingDisplayShapeContext context) {
         //    base.OnCreatingDisplay(element, context);
         //}
+
+        private static string GetPrefix(ElementEditorContext context, string name) {
+            return $"{(string.IsNullOrEmpty(context.Prefix) ? null : ".")}{name}";
+        }
+
 
     }
 }

@@ -20,6 +20,7 @@
     var ValueMaps = ViewModel?.ValueMaps;
     var DesignCellValues = design?.AllCellValues;
     var mergedCells = design?.MergedCells;
+    var HeaderTexts = design?.HeaderTexts;
     var uniqueId = Guid.NewGuid().ToString("N");
 }
 
@@ -32,15 +33,18 @@
         (function() {
 
             // the design page first load data is correct ,but after the element edit form save, the element view design refresh (the data re retrive then get null data of each valueMaps item)
-            var ValueMaps = [
+            var valueMaps = [
                 @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ValueMaps, Newtonsoft.Json.Formatting.Indented)))
             ][0];
-            var DesignCellValues = [
+            var allCellValues = [
                 @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(DesignCellValues, Newtonsoft.Json.Formatting.Indented)))
             ][0];
             var mergedCells = [
                 @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(mergedCells, Newtonsoft.Json.Formatting.Indented)))
             ][0];
+                var headerTexts = [
+                @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(HeaderTexts, Newtonsoft.Json.Formatting.Indented)))
+            ][0]||[];
             var uniqueId = ['@(uniqueId)'][0];
 
             var gridType = ['@(design?.GridType)'][0];
@@ -51,10 +55,10 @@
 
 
             var columnNameDef = {
-                renderer: handsontableHelper.createRender(null, ValueMaps, Handsontable.renderers.TextRenderer),
+                renderer: handsontableHelper.createRender(null, valueMaps, Handsontable.renderers.TextRenderer),
             };
             var columnValueDef = {
-                renderer: handsontableHelper.createRender(null, ValueMaps, Handsontable.renderers.TextRenderer),
+                renderer: handsontableHelper.createRender(null, valueMaps, Handsontable.renderers.TextRenderer),
             };
 
             /*
@@ -65,7 +69,7 @@
 
             var tableCfg = {
                 licenseKey: 'non-commercial-and-evaluation',
-                data: DesignCellValues,
+                data: allCellValues,
                 mergeCells: mergedCells || [],
                 //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
                 rowHeaders: true,
@@ -73,7 +77,7 @@
                 contextMenu: false,
                 // header 分为：属性名字列 和 属性值列，列头在设计页面要可以自定义
                 //colHeaders: ['Data Member (First Column)', 'Data Member (Second Column)'],
-                colHeaders: ['Data Member (Name)', '', 'Data Member (Second Column)', ''],
+                colHeaders: headerTexts,//['Data Member (Name)', '', 'Data Member (Second Column)', ''],
                 columns: [columnNameDef, columnValueDef, columnNameDef, columnValueDef]
             };
 
@@ -83,7 +87,11 @@
                         if (container) {
                             // debugger
                             clearInterval(interval);
-                            girdTable = new Handsontable(container, tableCfg);
+
+                             var girdTable = handsontableHelper.createDesignTable(container, {
+            uniqueId,allCellValues, valueMaps,mergedCells ,headerTexts
+        });
+                          //  girdTable = new Handsontable(container, tableCfg);
                             girdTable.hot = girdTable;
                         }
 
