@@ -114,6 +114,7 @@ GridType:@(design?.GridType)*@
         var uniqueId = ['@(uniqueId)'][0];
         var container = document.getElementById('handsontable-@(uniqueId)');
 
+var handsontableHelper = new HandsontableCustomHelper();
 
        // var girdTable = handsontableHelper.createDesignTable(container,uniqueId,AllCellValues, ValueMaps,mergedCells ,manufacturerData,headerTexts);
         var girdTable = handsontableHelper.createDesignTable(container, {
@@ -128,9 +129,9 @@ GridType:@(design?.GridType)*@
 <div ng-app="ValueBindGrid_@(uniqueId)">
 
     <div ng-controller="ValueBindGridController_@(uniqueId)">
-        <input name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="headerTexts_JSON" />
+        <input name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="columnHeaderTexts_JSON" />
         <input name="@(Html.NameFor(x => x.DesignData.AllCellValues))_JSON" ng-model="allCellValues_JSON" />
-        <input name="@(Html.DropDownListFor(x => x.DesignData.GridType, gridTypes))_JSON" ng-model="mergedCells_JSON" />
+        <input name="@(Html.NameFor(x => x.DesignData.MergedCells))_JSON" ng-model="mergedCells_JSON" />
     </div>
 </div>
 

@@ -135,21 +135,21 @@ var HandsontableCustomHelper = /** @class */ (function () {
     };
     ;
     HandsontableCustomHelper.prototype.createNgBindController = function (tableCfg, option) {
+        var _this = this;
         var uniqueId = option.uniqueId, AllCellValues = option.allCellValues, valueMaps = option.valueMaps, mergedCells = option.mergedCells, cellDropdownData = option.cellDropdownData, columnHeaderTexts = option.columnHeaderTexts;
         //  debugger
         var gridApp = angular.module('ValueBindGrid_' + uniqueId, []);
-        var scope;
-        var ngController = gridApp.controller('ValueBindGridController_' + uniqueId, function ValueBindGridController($scope) {
-            scope = $scope;
+        var ngController = gridApp.controller('ValueBindGridController_' + uniqueId, function ($scope) {
+            _this.scope = $scope;
             $scope.allCellValues_JSON = AllCellValues && JSON.stringify(AllCellValues);
             $scope.mergedCells_JSON = mergedCells && JSON.stringify(mergedCells);
             $scope.appplyTableChange = function (newData, mergedCellsNew) {
                 //   debugger
                 // console.log("mergedCellsCollection", mc);
                 //debugger
-                scope.$apply(function () {
+                $scope.$apply(function () {
                     //scope.mergedCells = mergedCellsNew;
-                    scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
+                    $scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
                     if (newData) {
                         // debugger
                         for (var i = 0; i < newData.length; i++) {
@@ -177,63 +177,70 @@ var HandsontableCustomHelper = /** @class */ (function () {
                         }
                     }
                     // console.info('newData', newData);
-                    scope.allCellValues_JSON = newData && JSON.stringify(newData);
+                    $scope.allCellValues_JSON = newData && JSON.stringify(newData);
                 });
             };
             //$scope.AllCellValues = AllCellValues;
             //$scope.mergedCells = mergedCells;
-            $scope.headerTexts_JSON = columnHeaderTexts && JSON.stringify(columnHeaderTexts);
+            $scope.columnHeaderTexts_JSON = columnHeaderTexts && JSON.stringify(columnHeaderTexts);
             $scope.appplyHeaderChange = function (index, newText, headers) {
-                $scope.headerTexts_JSON = headers && JSON.stringify(headers);
+                $scope.columnHeaderTexts_JSON = headers && JSON.stringify(headers);
             };
         });
+        var _that = this;
         ///*
         var afterOnCellMouseDown = function (event, coords, th) {
             // debugger
             // only allow column header edit , do not allow row header edit
-            if (coords && /*coords.row === -1 ||*/ coords.col === -1) {
-                var instance_1 = this, isCol_1 = coords.row === -1, input_1 = document.createElement('input'), rect_1 = th.getBoundingClientRect(), addListeners_1 = function (events, headers, index) {
-                    events.split(' ').forEach(function (e) {
-                        input_1.addEventListener(e, function () {
-                            var neText = headers[index] = input_1.value;
-                            instance_1.updateSettings(isCol_1 ? {
-                                colHeaders: headers
-                            } : {
-                                rowHeaders: headers
-                            });
-                            // debugger
-                            if (scope)
-                                scope.appplyHeaderChange(index, neText, headers);
-                            setTimeout(function () {
-                                if (input_1.parentNode)
-                                    input_1.parentNode.removeChild(input_1);
-                            });
+            if (!coords)
+                return;
+            var instance = this, isCol = coords.row === -1, isRow = coords.col === -1;
+            if (!(isCol || isRow))
+                return;
+            //if (!isCol) {
+            //    return;
+            //}
+            var input = document.createElement('input'), rect = th.getBoundingClientRect(), addListeners = function (events, headers, index) {
+                events.split(' ').forEach(function (e) {
+                    input.addEventListener(e, function () {
+                        var neText = headers[index] = input.value;
+                        instance.updateSettings(isCol ? {
+                            colHeaders: headers
+                        } : {
+                            rowHeaders: headers
+                        });
+                        // debugger
+                        if (_that.scope)
+                            _that.scope.appplyHeaderChange(index, neText, headers);
+                        setTimeout(function () {
+                            if (input.parentNode)
+                                input.parentNode.removeChild(input);
                         });
                     });
-                }, appendInput = function () {
-                    input_1.setAttribute('type', 'text');
-                    input_1.style.cssText = '' +
-                        'position:absolute;' +
-                        'left:' + rect_1.left + 'px;' +
-                        'top:' + rect_1.top + 'px;' +
-                        'width:' + (rect_1.width - 4) + 'px;' +
-                        'height:' + (rect_1.height - 4) + 'px;' +
-                        'z-index:1060;';
-                    document.body.appendChild(input_1);
-                };
-                input_1.value = th.querySelector(isCol_1 ? '.colHeader' : '.rowHeader').innerText;
-                appendInput();
-                setTimeout(function () {
-                    input_1.select();
-                    addListeners_1('change blur', instance_1[isCol_1 ? 'getColHeader' : 'getRowHeader'](), coords[isCol_1 ? 'col' : 'row']);
                 });
-            }
+            }, appendInput = function () {
+                input.setAttribute('type', 'text');
+                input.style.cssText = '' +
+                    'position:absolute;' +
+                    'left:' + rect.left + 'px;' +
+                    'top:' + rect.top + 'px;' +
+                    'width:' + (rect.width - 4) + 'px;' +
+                    'height:' + (rect.height - 4) + 'px;' +
+                    'z-index:1060;';
+                document.body.appendChild(input);
+            };
+            input.value = th.querySelector(isCol ? '.colHeader' : '.rowHeader').innerText;
+            appendInput();
+            setTimeout(function () {
+                input.select();
+                addListeners('change blur', instance[isCol ? 'getColHeader' : 'getRowHeader'](), coords[isCol ? 'col' : 'row']);
+            });
         };
         tableCfg.afterOnCellMouseDown = afterOnCellMouseDown;
         //*/
         this.bindTableChange(uniqueId, tableCfg, null, function (tableInstance) {
             //    var scope = scopeAccesser();
-            if (scope) {
+            if (_this.scope) {
                 //  debugger
                 var mc = tableInstance.getPlugin('mergeCells');
                 var mergedCellsCollection = mc.mergedCellsCollection;
@@ -242,10 +249,10 @@ var HandsontableCustomHelper = /** @class */ (function () {
                 // hot.getSourceData();
                 // 用户编辑修改后的数据？
                 var newData = tableInstance.getData();
-                scope.appplyTableChange(newData, mergedCellsNew);
+                _this.scope.appplyTableChange(newData, mergedCellsNew);
             }
         });
-        return function () { return scope; };
+        //  return () => scope;
     };
     HandsontableCustomHelper.prototype.bindTableChange = function (uniqueId, tableCfg, tableAccessor, changeCallback) {
         //['']
@@ -318,6 +325,26 @@ string MemberExpression { get; set; }
                 }
             }
         };
+        var columns = [];
+        if (columnHeaderTexts) {
+            for (var i = 0; i < columnHeaderTexts.length; i++) {
+                columns.push(columnDef);
+            }
+            debugger;
+            // if columns length is 0,handsometable will throw Exception,if columns lenth less than data's column length , the column will not display. 
+            if (columns.length == 0) {
+                var firstRow = AllCellValues && AllCellValues[0];
+                if (firstRow) {
+                    for (var i = 0; i < firstRow.length; i++) {
+                        columns.push(columnDef);
+                    }
+                }
+                if (columns.length == 0) {
+                    columns.push(columnDef);
+                }
+            }
+        }
+        //  debugger
         var tableCfg = {
             licenseKey: 'non-commercial-and-evaluation',
             //afterGetColHeader: function (col, TH) {
@@ -359,7 +386,8 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
             allowInsertRow: true,
             // colHeaders: true,
             colHeaders: columnHeaderTexts,
-            columns: [columnDef, columnDef, columnDef, columnDef],
+            columns: columns,
+            //  columns: [columnDef, columnDef, columnDef, columnDef],
             mergeCells: mergedCells || [],
         };
         //v https://handsontable.com/docs/7.0.0/tutorial-using-callbacks.html

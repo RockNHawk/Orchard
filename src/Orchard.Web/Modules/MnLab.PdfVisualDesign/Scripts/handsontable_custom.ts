@@ -17,7 +17,7 @@ declare var MnUtil: any;
 //var handsontableHelper = {};
 //(function (helper) {
 
- class HandsontableCustomHelper {
+class HandsontableCustomHelper {
 
 
     isCellValueJsonExpr(d) {
@@ -80,7 +80,7 @@ declare var MnUtil: any;
 */
 
         var _that = this;
-        return   function(instance, td, row, col, prop, value, cellProperties) {
+        return function (instance, td, row, col, prop, value, cellProperties) {
 
             console.log('render [' + row + ',' + col + ']value', value);
 
@@ -154,8 +154,9 @@ declare var MnUtil: any;
         };
     };
 
+    scope: any;
 
-    createNgBindController(tableCfg,option: HandsontableOption) {
+    createNgBindController(tableCfg, option: HandsontableOption) {
 
         var uniqueId = option.uniqueId,
             AllCellValues = option.allCellValues,
@@ -169,120 +170,129 @@ declare var MnUtil: any;
         var gridApp = angular.module('ValueBindGrid_' + uniqueId, []);
 
 
-        var scope;
-        var ngController = gridApp.controller('ValueBindGridController_' + uniqueId,
-            function ValueBindGridController($scope) {
-                scope = $scope;
+        var ngController = gridApp.controller('ValueBindGridController_' + uniqueId, ($scope) => {
+            this.scope = $scope;
 
-                $scope.allCellValues_JSON = AllCellValues && JSON.stringify(AllCellValues);
-                $scope.mergedCells_JSON = mergedCells && JSON.stringify(mergedCells);
+            $scope.allCellValues_JSON = AllCellValues && JSON.stringify(AllCellValues);
+            $scope.mergedCells_JSON = mergedCells && JSON.stringify(mergedCells);
 
-                $scope.appplyTableChange = function (newData, mergedCellsNew) {
-                    //   debugger
+            $scope.appplyTableChange = function (newData, mergedCellsNew) {
+                //   debugger
 
-                    // console.log("mergedCellsCollection", mc);
-                    //debugger
-                    scope.$apply(function () {
-                        //scope.mergedCells = mergedCellsNew;
+                // console.log("mergedCellsCollection", mc);
+                //debugger
+                $scope.$apply(function () {
+                    //scope.mergedCells = mergedCellsNew;
 
-                        scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
+                    $scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
 
 
-                        if (newData) {
-                            // debugger
-                            for (var i = 0; i < newData.length; i++) {
-                                var array = newData[i];
-                                if (array) {
-                                    for (var j = 0; j < array.length; j++) {
-                                        var d = array[j];
-                                        if (d) {
-                                            // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
-                                            if (MnUtil.isJson(d)) {
-                                                // 无需更改
-                                                // array[j] = d;//parseCellValueIfIsJsonExpr(d);
-                                            } else if (this.isCellValueJsonExpr(d)) {
-                                                // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
-                                                array[j] = this.parseCellValueIfIsJsonExpr(d);
-                                            } else {
-                                                // 用户手动输入任意字符串
-                                                array[j] = { BindType: "StaticValue", StaticValue: d };
-                                            }
+                    if (newData) {
+                        // debugger
+                        for (var i = 0; i < newData.length; i++) {
+                            var array = newData[i];
+                            if (array) {
+                                for (var j = 0; j < array.length; j++) {
+                                    var d = array[j];
+                                    if (d) {
+                                        // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
+                                        if (MnUtil.isJson(d)) {
+                                            // 无需更改
+                                            // array[j] = d;//parseCellValueIfIsJsonExpr(d);
+                                        } else if (this.isCellValueJsonExpr(d)) {
+                                            // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
+                                            array[j] = this.parseCellValueIfIsJsonExpr(d);
+                                        } else {
+                                            // 用户手动输入任意字符串
+                                            array[j] = { BindType: "StaticValue", StaticValue: d };
                                         }
                                     }
                                 }
                             }
                         }
+                    }
 
-                        // console.info('newData', newData);
-                        scope.allCellValues_JSON = newData && JSON.stringify(newData);
-                    });
+                    // console.info('newData', newData);
+                    $scope.allCellValues_JSON = newData && JSON.stringify(newData);
+                });
 
-                }
-                //$scope.AllCellValues = AllCellValues;
-                //$scope.mergedCells = mergedCells;
+            }
+            //$scope.AllCellValues = AllCellValues;
+            //$scope.mergedCells = mergedCells;
 
 
-                $scope.headerTexts_JSON = columnHeaderTexts && JSON.stringify(columnHeaderTexts);
+            $scope.columnHeaderTexts_JSON = columnHeaderTexts && JSON.stringify(columnHeaderTexts);
 
-                $scope.appplyHeaderChange = function (index, newText, headers) {
-                    $scope.headerTexts_JSON = headers && JSON.stringify(headers);
-                };
+            $scope.appplyHeaderChange = function (index, newText, headers) {
+                $scope.columnHeaderTexts_JSON = headers && JSON.stringify(headers);
+            };
 
-            });
+        });
 
+        var _that = this;
 
         ///*
         var afterOnCellMouseDown = function (event, coords, th) {
             // debugger
             // only allow column header edit , do not allow row header edit
-            if (coords && /*coords.row === -1 ||*/ coords.col === -1) {
-                let instance = this,
-                    isCol = coords.row === -1,
-                    input = document.createElement('input'),
-                    rect = th.getBoundingClientRect(),
-                    addListeners = (events, headers, index) => {
-                        events.split(' ').forEach(e => {
-                            input.addEventListener(e, () => {
-                                var neText = headers[index] = input.value;
-                                instance.updateSettings(isCol ? {
-                                    colHeaders: headers
-                                } : {
-                                        rowHeaders: headers
-                                    });
+            if (!coords) return;
 
-                               // debugger
-                                if (scope)scope.appplyHeaderChange(index, neText, headers);
+            let instance = this,
+                isCol = coords.row === -1,
+                isRow = coords.col === -1
+                ;
+
+            if (!(isCol || isRow)) return;
 
 
-                                setTimeout(() => {
-                                    if (input.parentNode)
-                                        input.parentNode.removeChild(input)
+            //if (!isCol) {
+            //    return;
+            //}
+
+            let input = document.createElement('input'),
+                rect = th.getBoundingClientRect(),
+                addListeners = (events, headers, index) => {
+                    events.split(' ').forEach(e => {
+                        input.addEventListener(e, () => {
+                            var neText = headers[index] = input.value;
+                            instance.updateSettings(isCol ? {
+                                colHeaders: headers
+                            } : {
+                                    rowHeaders: headers
                                 });
-                            })
+
+                            // debugger
+                            if (_that.scope) _that.scope.appplyHeaderChange(index, neText, headers);
+
+
+                            setTimeout(() => {
+                                if (input.parentNode)
+                                    input.parentNode.removeChild(input)
+                            });
                         })
-                    },
-                    appendInput = () => {
-                        input.setAttribute('type', 'text');
-                        input.style.cssText = '' +
-                            'position:absolute;' +
-                            'left:' + rect.left + 'px;' +
-                            'top:' + rect.top + 'px;' +
-                            'width:' + (rect.width - 4) + 'px;' +
-                            'height:' + (rect.height - 4) + 'px;' +
-                            'z-index:1060;';
-                        document.body.appendChild(input);
-                    };
-                input.value = th.querySelector(
-                    isCol ? '.colHeader' : '.rowHeader'
-                ).innerText;
-                appendInput();
-                setTimeout(() => {
-                    input.select();
-                    addListeners('change blur', instance[
-                        isCol ? 'getColHeader' : 'getRowHeader'
-                    ](), coords[isCol ? 'col' : 'row']);
-                });
-            }
+                    })
+                },
+                appendInput = () => {
+                    input.setAttribute('type', 'text');
+                    input.style.cssText = '' +
+                        'position:absolute;' +
+                        'left:' + rect.left + 'px;' +
+                        'top:' + rect.top + 'px;' +
+                        'width:' + (rect.width - 4) + 'px;' +
+                        'height:' + (rect.height - 4) + 'px;' +
+                        'z-index:1060;';
+                    document.body.appendChild(input);
+                };
+            input.value = th.querySelector(
+                isCol ? '.colHeader' : '.rowHeader'
+            ).innerText;
+            appendInput();
+            setTimeout(() => {
+                input.select();
+                addListeners('change blur', instance[
+                    isCol ? 'getColHeader' : 'getRowHeader'
+                ](), coords[isCol ? 'col' : 'row']);
+            });
         };
         tableCfg.afterOnCellMouseDown = afterOnCellMouseDown;
         //*/
@@ -290,7 +300,7 @@ declare var MnUtil: any;
 
         this.bindTableChange(uniqueId, tableCfg, null, (tableInstance) => {
             //    var scope = scopeAccesser();
-            if (scope) {
+            if (this.scope) {
                 //  debugger
                 var mc = tableInstance.getPlugin('mergeCells');
                 var mergedCellsCollection = mc.mergedCellsCollection;
@@ -301,11 +311,11 @@ declare var MnUtil: any;
 
                 // 用户编辑修改后的数据？
                 var newData = tableInstance.getData();
-                scope.appplyTableChange(newData, mergedCellsNew);
+                this.scope.appplyTableChange(newData, mergedCellsNew);
             }
         });
 
-        return () => scope;
+        //  return () => scope;
     }
 
 
@@ -399,6 +409,28 @@ string MemberExpression { get; set; }
             }
         };
 
+        var columns = [];
+        if (columnHeaderTexts) {
+            for (var i = 0; i < columnHeaderTexts.length; i++) {
+                columns.push(columnDef);
+            }
+            debugger
+            // if columns length is 0,handsometable will throw Exception,if columns lenth less than data's column length , the column will not display. 
+            if (columns.length == 0) {
+                var firstRow = AllCellValues && AllCellValues[0];
+                if (firstRow) {
+                    for (var i = 0; i < firstRow.length; i++) {
+                        columns.push(columnDef);
+                    }
+                }
+                if (columns.length == 0) {
+                    columns.push(columnDef);
+                }
+            }
+
+        }
+        //  debugger
+
         var tableCfg = {
             licenseKey: 'non-commercial-and-evaluation',
             //afterGetColHeader: function (col, TH) {
@@ -451,7 +483,8 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
             allowInsertRow: true,
             // colHeaders: true,
             colHeaders: columnHeaderTexts,//['Data Member (First Column)', '', 'Data Member (Second Column)', ''],
-            columns: [columnDef, columnDef, columnDef, columnDef],
+            columns: columns,
+            //  columns: [columnDef, columnDef, columnDef, columnDef],
             mergeCells: mergedCells || [],
             //mergeCells: [
             //    { row: 1, col: 1, rowspan: 3, colspan: 3 },
@@ -473,7 +506,7 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
 
         var girdTable;
         //   var scopeAccesser = createNgBindController(uniqueId, tableCfg, () => girdTable, AllCellValues, mergedCells);
-        var scopeAccesser = this.createNgBindController(tableCfg,option);
+        var scopeAccesser = this.createNgBindController(tableCfg, option);
 
         girdTable = new Handsontable(container, tableCfg);
 

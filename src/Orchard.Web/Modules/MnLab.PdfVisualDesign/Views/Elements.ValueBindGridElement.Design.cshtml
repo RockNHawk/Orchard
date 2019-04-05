@@ -20,7 +20,7 @@
     var ValueMaps = ViewModel?.ValueMaps;
     var DesignCellValues = design?.AllCellValues;
     var mergedCells = design?.MergedCells;
-    var HeaderTexts = design?.HeaderTexts;
+    var columnHeaderTexts = design?.HeaderTexts;
     var uniqueId = Guid.NewGuid().ToString("N");
 }
 
@@ -42,8 +42,8 @@
             var mergedCells = [
                 @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(mergedCells, Newtonsoft.Json.Formatting.Indented)))
             ][0];
-                var headerTexts = [
-                @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(HeaderTexts, Newtonsoft.Json.Formatting.Indented)))
+                var columnHeaderTexts = [
+                @(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(columnHeaderTexts, Newtonsoft.Json.Formatting.Indented)))
             ][0]||[];
             var uniqueId = ['@(uniqueId)'][0];
 
@@ -54,12 +54,21 @@
             }
 
 
-            var columnNameDef = {
-                renderer: handsontableHelper.createRender(null, valueMaps, Handsontable.renderers.TextRenderer),
-            };
-            var columnValueDef = {
-                renderer: handsontableHelper.createRender(null, valueMaps, Handsontable.renderers.TextRenderer),
-            };
+            //var columnNameDef = {
+            //    renderer: handsontableHelper.createRender(null, valueMaps, Handsontable.renderers.TextRenderer),
+            //};
+            //var columnValueDef = {
+            //    renderer: handsontableHelper.createRender(null, valueMaps, Handsontable.renderers.TextRenderer),
+            //};
+
+            var columns = [];
+            if (columnHeaderTexts) {
+                for (var i = 0; i < columnHeaderTexts.length; i++) {
+                    columns.push({
+                        renderer: handsontableHelper.createRender(null, valueMaps, Handsontable.renderers.TextRenderer),
+                    });
+                }
+            }
 
             /*
             hot.updateSettings({
@@ -77,8 +86,8 @@
                 contextMenu: false,
                 // header 分为：属性名字列 和 属性值列，列头在设计页面要可以自定义
                 //colHeaders: ['Data Member (First Column)', 'Data Member (Second Column)'],
-                colHeaders: headerTexts,//['Data Member (Name)', '', 'Data Member (Second Column)', ''],
-                columns: [columnNameDef, columnValueDef, columnNameDef, columnValueDef]
+                colHeaders: columnHeaderTexts,//['Data Member (Name)', '', 'Data Member (Second Column)', ''],
+                columns: columns,//[columnNameDef, columnValueDef, columnNameDef, columnValueDef]
             };
 
             $(function() {
@@ -88,8 +97,9 @@
                             // debugger
                             clearInterval(interval);
 
+var handsontableHelper = new HandsontableCustomHelper();
                              var girdTable = handsontableHelper.createDesignTable(container, {
-            uniqueId,allCellValues, valueMaps,mergedCells ,headerTexts
+            uniqueId,allCellValues, valueMaps,mergedCells ,columnHeaderTexts
         });
                           //  girdTable = new Handsontable(container, tableCfg);
                             girdTable.hot = girdTable;
