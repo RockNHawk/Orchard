@@ -61,14 +61,22 @@
             //    renderer: handsontableHelper.createRender(null, valueMaps, Handsontable.renderers.TextRenderer),
             //};
 
-            var columns = [];
-            if (columnHeaderTexts) {
-                for (var i = 0; i < columnHeaderTexts.length; i++) {
-                    columns.push({
-                        renderer: handsontableHelper.createRender(null, valueMaps, Handsontable.renderers.TextRenderer),
-                    });
-                }
-            }
+            //var columns = [];
+            //if (columnHeaderTexts) {
+            //    for (var i = 0; i < columnHeaderTexts.length; i++) {
+            //        columns.push({
+            //            renderer: handsontableHelper.createRender(null, valueMaps, Handsontable.renderers.TextRenderer),
+            //        });
+            //    }
+            //}
+
+            var handsontableHelper = new HandsontableCustomHelper();
+            handsontableHelper.init({
+                uniqueId, allCellValues, valueMaps, mergedCells, columnHeaderTexts
+            });
+            var columns = handsontableHelper.getColumns({
+                renderer: handsontableHelper.createRender(null, valueMaps, Handsontable.renderers.TextRenderer),
+            });
 
             /*
             hot.updateSettings({
@@ -97,11 +105,8 @@
                             // debugger
                             clearInterval(interval);
 
-var handsontableHelper = new HandsontableCustomHelper();
-                             var girdTable = handsontableHelper.createDesignTable(container, {
-            uniqueId,allCellValues, valueMaps,mergedCells ,columnHeaderTexts
-        });
-                          //  girdTable = new Handsontable(container, tableCfg);
+                           //  var girdTable = handsontableHelper.createDesignTable(container);
+                          var  girdTable = new Handsontable(container, tableCfg);
                             girdTable.hot = girdTable;
                         }
 

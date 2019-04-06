@@ -1,5 +1,5 @@
 ﻿"use strict";
-declare interface HandsontableOption {
+declare interface HandsontableData {
     uniqueId: string;
     allCellValues: [][],
     valueMaps: any,
@@ -54,7 +54,7 @@ class HandsontableCustomHelper {
     /*
 @renderer is like   Handsontable.renderers.AutocompleteRenderer
 */
-    createRender(type, valueMaps, renderer) {
+    createRender(mode, valueMaps, renderer) {
 
         /*
 
@@ -107,8 +107,13 @@ class HandsontableCustomHelper {
                     } else {
 
                         var key = obj['Key'];
-                        var _type = type || (obj['BindType']);
-                        var valueArgument = value;;
+                        var _type = obj['BindType'];
+                        var valueArgument = value;
+                        var memberValue = valueMaps && valueMaps[key];
+
+                        //switch (mode) {
+                        //    case 'BindingEdit':
+                        //    default:
                         if (key) {
                             // arguments[5] is value argument, relace it will change the cell display text
                             // arguments[5] = key;
@@ -118,10 +123,7 @@ class HandsontableCustomHelper {
                                     valueArgument = key;
                                     break;
                                 case 'Value':
-                                    if (valueMaps) {
-                                        var memberValue = valueMaps[key];
-                                        valueArgument = memberValue;
-                                    }
+                                    valueArgument = memberValue;
                                     break;
                             }
                         } else {
@@ -130,6 +132,7 @@ class HandsontableCustomHelper {
                             // $(td).html(val);
                             //return $("<th>"+value.Key+"</th>");
                         }
+
                         // some old value key is not null
                         switch (_type) {
                             default:
@@ -139,6 +142,23 @@ class HandsontableCustomHelper {
                                 valueArgument = obj['StaticValue'];
                                 break;
                         }
+
+                        // break;
+                        //    case 'ValueEdit':
+                        //        switch (_type) {
+                        //            case 'Value':
+                        //            default:
+                        //                valueArgument = memberValue;
+                        //                break;
+                        //            /// 保存直接输入值，不绑定时的值，此时 BindType 为 "StaticValue"，其它字段为空
+                        //            case 'StaticValue':
+                        //                valueArgument = obj['StaticValue'];
+                        //                break;
+                        //        }
+                        //        break;
+                        //}
+
+
                         arguments[5] = valueArgument;
                         renderer.apply(instance, arguments);
                     }
@@ -155,11 +175,16 @@ class HandsontableCustomHelper {
     };
 
     scope: any;
+    data: HandsontableData;
 
-    createNgBindController(tableCfg, option: HandsontableOption) {
+    init(data: HandsontableData) {
+        this.data = data;
+    }
+
+    createController(option: HandsontableData) {
 
         var uniqueId = option.uniqueId,
-            AllCellValues = option.allCellValues,
+            allCellValues = option.allCellValues,
             valueMaps = option.valueMaps,
             mergedCells = option.mergedCells,
             cellDropdownData = option.cellDropdownData,
@@ -170,18 +195,20 @@ class HandsontableCustomHelper {
         var gridApp = angular.module('ValueBindGrid_' + uniqueId, []);
 
 
+        var _that = this;
+
         var ngController = gridApp.controller('ValueBindGridController_' + uniqueId, ($scope) => {
             this.scope = $scope;
 
-            $scope.allCellValues_JSON = AllCellValues && JSON.stringify(AllCellValues);
+            $scope.allCellValues_JSON = allCellValues && JSON.stringify(allCellValues);
             $scope.mergedCells_JSON = mergedCells && JSON.stringify(mergedCells);
 
-            $scope.appplyTableChange = function (newData, mergedCellsNew) {
+            $scope.appplyTableChange =   (newData, mergedCellsNew)=> {
                 //   debugger
 
                 // console.log("mergedCellsCollection", mc);
                 //debugger
-                $scope.$apply(function () {
+                $scope.$apply( ()=> {
                     //scope.mergedCells = mergedCellsNew;
 
                     $scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
@@ -217,7 +244,7 @@ class HandsontableCustomHelper {
                 });
 
             }
-            //$scope.AllCellValues = AllCellValues;
+            //$scope.allCellValues = allCellValues;
             //$scope.mergedCells = mergedCells;
 
 
@@ -227,7 +254,151 @@ class HandsontableCustomHelper {
                 $scope.columnHeaderTexts_JSON = headers && JSON.stringify(headers);
             };
 
+
+            $scope.mode = 'BindingEdit';
+            $scope.switchMode = (mode?: string) => {
+               var newMode =  $scope.mode = mode || ($scope.mode == 'ValueEdit' ? 'BindingEdit' : 'ValueEdit');
+
+                switch (newMode) {
+                    case 'ValueEdit':
+                        var valueEditTableContainer = this.valueEditTableContainer;
+                        _that.createValueEditTable(valueEditTableContainer, this.data);
+                    default:
+                        break;
+                    case 'BindingEdit':
+                        break;
+                }
+            };
+
         });
+
+
+        return ngController;
+    }
+
+
+    bindTableChange(uniqueId, tableCfg, tableAccessor, changeCallback) {
+
+        //['']
+        var hooks = Handsontable.hooks.getRegistered()
+            .filter(x => x.indexOf('Mouse') != -1 || x.indexOf('Scroll') != -1);
+
+        var girdTable;
+        hooks.forEach(function (hook) {
+            // console.log("hook", arguments);
+            var exists = tableCfg['afterOnCellMouseDown'];
+            tableCfg[hook] = function (tableInstance) {
+                //debugger
+                if (exists) exists.apply(this, arguments);
+                // if (tableInstance.getPlugin) {
+                // this is handsometable instance
+                changeCallback(this, arguments);
+                //  }
+            }
+        });
+    };
+
+    getColumns(columnDef) {
+        var columns = [];
+        var columnHeaderTexts = this.data.columnHeaderTexts;
+        var allCellValues = this.data.allCellValues;
+        if (columnHeaderTexts) {
+            for (var i = 0; i < columnHeaderTexts.length; i++) {
+                columns.push(columnDef);
+            }
+            // debugger
+            // if columns length is 0,handsometable will throw Exception,if columns lenth less than data's column length , the column will not display. 
+            if (columns.length == 0) {
+                var firstRow = allCellValues && allCellValues[0];
+                if (firstRow) {
+                    for (var i = 0; i < firstRow.length; i++) {
+                        columns.push(columnDef);
+                    }
+                }
+                if (columns.length == 0) {
+                    columns.push(columnDef);
+                }
+            }
+        }
+        return columns;
+    }
+
+
+    createTable(container) {
+
+    }
+
+
+
+    createDesignTable(container) {
+        var option = this.data;
+
+        var uniqueId = option.uniqueId,
+            allCellValues = option.allCellValues,
+            valueMaps = option.valueMaps,
+            mergedCells = option.mergedCells,
+            cellDropdownData = option.cellDropdownData,
+            columnHeaderTexts = option.columnHeaderTexts;
+
+
+        var _that = this;
+
+        var scopeAccesser = this.createController(option);
+        //   var scopeAccesser = createNgBindController(uniqueId, tableCfg, () => girdTable, allCellValues, mergedCells);
+
+        var columnDef = {
+            // renderer: Handsontable.renderers.AutocompleteRenderer,
+            renderer: this.createRender(null, valueMaps, Handsontable.renderers.AutocompleteRenderer),
+            type: 'handsontable',
+            handsontable: {
+                search: true,
+
+                // https://handsontable.com/docs/7.0.0/demo-hiding-columns.html
+                //columns: [0, 1],
+                //columns: ['ContentPartName','MemberExpression'],
+                //indicators: true,
+                columns: [
+                    { data: 'BindType' },
+                    { data: 'ContentPartName' },
+                    { data: 'MemberExpression' }
+                ],
+                colHeaders: ['Bind Type', 'Part Type', 'Member Name'],
+                autoColumnSize: true,
+                data: cellDropdownData,
+                /*
+                // https://github.com/handsontable/handsontable/issues/865
+                renderer:function (instance, td, row, col, prop, value, cellProperties) {
+            if(value != null){
+            var escaped = Handsontable.helper.stringify(value);
+                $(td).empty().append(value['ContentPartName']); //empty is needed because you are rendering to an existing cell
+            }
+            return td;
+        },
+                */
+                getValue: function () {
+                    var selection = this.getSelectedLast();
+                    // debugger
+                    // Get the row's data object, object is from BindingDefSources
+                    var obj = this.getSourceDataAtRow(selection[0]);
+                    /*
+string ContentPartName { get; set; }
+string MemberExpression { get; set; }
+*/
+                    var ret = _that.wrapCellValueJson(obj);
+                    console.log('getValue', ret);
+                    return ret;
+                    //return 'JSON::'+JSON.stringify(obj);
+                    //return obj.ContentPartName + '.' + obj.MemberExpression;
+
+                    // the value only accept plain type
+                    //return obj.Key;
+                    //return obj;
+                }
+            }
+        };
+
+        var columns = this.getColumns(columnDef);
+        //  debugger
 
         var _that = this;
 
@@ -294,145 +465,12 @@ class HandsontableCustomHelper {
                 ](), coords[isCol ? 'col' : 'row']);
             });
         };
-        tableCfg.afterOnCellMouseDown = afterOnCellMouseDown;
+        //  tableCfg.afterOnCellMouseDown = afterOnCellMouseDown;
         //*/
-
-
-        this.bindTableChange(uniqueId, tableCfg, null, (tableInstance) => {
-            //    var scope = scopeAccesser();
-            if (this.scope) {
-                //  debugger
-                var mc = tableInstance.getPlugin('mergeCells');
-                var mergedCellsCollection = mc.mergedCellsCollection;
-                var mergedCellsNew = mergedCellsCollection && mergedCellsCollection.mergedCells;
-
-                //// 源数据？
-                // hot.getSourceData();
-
-                // 用户编辑修改后的数据？
-                var newData = tableInstance.getData();
-                this.scope.appplyTableChange(newData, mergedCellsNew);
-            }
-        });
-
-        //  return () => scope;
-    }
-
-
-
-
-
-    bindTableChange(uniqueId, tableCfg, tableAccessor, changeCallback) {
-
-        //['']
-        var hooks = Handsontable.hooks.getRegistered()
-            .filter(x => x.indexOf('Mouse') != -1 || x.indexOf('Scroll') != -1);
-
-        var girdTable;
-        hooks.forEach(function (hook) {
-            // console.log("hook", arguments);
-            var exists = tableCfg['afterOnCellMouseDown'];
-            tableCfg[hook] = function (tableInstance) {
-                //debugger
-                if (exists) exists.apply(this, arguments);
-                // if (tableInstance.getPlugin) {
-                // this is handsometable instance
-                changeCallback(this, arguments);
-                //  }
-            }
-        });
-    };
-
-
-
-
-    createDesignTable(container, option: HandsontableOption) {
-
-        var uniqueId = option.uniqueId,
-            AllCellValues = option.allCellValues,
-            valueMaps = option.valueMaps,
-            mergedCells = option.mergedCells,
-            cellDropdownData = option.cellDropdownData,
-            columnHeaderTexts = option.columnHeaderTexts;
-
-
-        var _that = this;
-
-        var columnDef = {
-            // renderer: Handsontable.renderers.AutocompleteRenderer,
-            renderer: this.createRender(null, valueMaps, Handsontable.renderers.AutocompleteRenderer),
-            type: 'handsontable',
-            handsontable: {
-                search: true,
-
-                // https://handsontable.com/docs/7.0.0/demo-hiding-columns.html
-                //columns: [0, 1],
-                //columns: ['ContentPartName','MemberExpression'],
-                //indicators: true,
-                columns: [
-                    { data: 'BindType' },
-                    { data: 'ContentPartName' },
-                    { data: 'MemberExpression' }
-                ],
-                colHeaders: ['Bind Type', 'Part Type', 'Member Name'],
-                autoColumnSize: true,
-                data: cellDropdownData,
-                /*
-                // https://github.com/handsontable/handsontable/issues/865
-                renderer:function (instance, td, row, col, prop, value, cellProperties) {
-            if(value != null){
-            var escaped = Handsontable.helper.stringify(value);
-                $(td).empty().append(value['ContentPartName']); //empty is needed because you are rendering to an existing cell
-            }
-            return td;
-        },
-                */
-                getValue: function () {
-                    var selection = this.getSelectedLast();
-                    // debugger
-                    // Get the row's data object, object is from BindingDefSources
-                    var obj = this.getSourceDataAtRow(selection[0]);
-                    /*
-string ContentPartName { get; set; }
-string MemberExpression { get; set; }
-*/
-                    var ret = _that.wrapCellValueJson(obj);
-                    console.log('getValue', ret);
-                    return ret;
-                    //return 'JSON::'+JSON.stringify(obj);
-                    //return obj.ContentPartName + '.' + obj.MemberExpression;
-
-                    // the value only accept plain type
-                    //return obj.Key;
-                    //return obj;
-                }
-            }
-        };
-
-        var columns = [];
-        if (columnHeaderTexts) {
-            for (var i = 0; i < columnHeaderTexts.length; i++) {
-                columns.push(columnDef);
-            }
-            debugger
-            // if columns length is 0,handsometable will throw Exception,if columns lenth less than data's column length , the column will not display. 
-            if (columns.length == 0) {
-                var firstRow = AllCellValues && AllCellValues[0];
-                if (firstRow) {
-                    for (var i = 0; i < firstRow.length; i++) {
-                        columns.push(columnDef);
-                    }
-                }
-                if (columns.length == 0) {
-                    columns.push(columnDef);
-                }
-            }
-
-        }
-        //  debugger
 
         var tableCfg = {
             licenseKey: 'non-commercial-and-evaluation',
+            afterOnCellMouseDown: afterOnCellMouseDown,
             //afterGetColHeader: function (col, TH) {
 
             //   // debugger
@@ -474,8 +512,8 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
 
 
 
-            //data: AllCellValues || Handsontable.helper.createSpreadsheetData(5, 2),
-            data: AllCellValues,
+            //data: allCellValues || Handsontable.helper.createSpreadsheetData(5, 2),
+            data: allCellValues,
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
             rowHeaders: true,
             contextMenu: true,
@@ -502,17 +540,92 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
         //v https://handsontable.com/docs/7.0.0/tutorial-using-callbacks.html
         //var hooks = ['afterChange', 'afterRemoveRow', 'afterRemoveCol', 'afterMergeCells',' afterUnmergeCells'];
 
-        // debugger
+
+        this.bindTableChange(uniqueId, tableCfg, null, (tableInstance) => {
+            //    var scope = scopeAccesser();
+            if (this.scope) {
+                //  debugger
+                var mc = tableInstance.getPlugin('mergeCells');
+                var mergedCellsCollection = mc.mergedCellsCollection;
+                var mergedCellsNew = mergedCellsCollection && mergedCellsCollection.mergedCells;
+
+                //// 源数据？
+                // hot.getSourceData();
+
+                // 用户编辑修改后的数据？
+                var newData = tableInstance.getData();
+                this.scope.appplyTableChange(newData, mergedCellsNew);
+            }
+        });
 
         var girdTable;
-        //   var scopeAccesser = createNgBindController(uniqueId, tableCfg, () => girdTable, AllCellValues, mergedCells);
-        var scopeAccesser = this.createNgBindController(tableCfg, option);
-
         girdTable = new Handsontable(container, tableCfg);
 
         return girdTable;
     };
 
+
+    existsValueEditTable: any;
+
+
+    valueEditTableContainer:any;
+
+    createValueEditTable(container, data: HandsontableData) {
+        //var option = this.option;
+
+        if (this.existsValueEditTable) {
+            this.existsValueEditTable.destory();
+            this.existsValueEditTable = null;
+        }
+
+        var uniqueId = data.uniqueId,
+            allCellValues = data.allCellValues,
+            valueMaps = data.valueMaps,
+            mergedCells = data.mergedCells,
+            cellDropdownData = data.cellDropdownData,
+            columnHeaderTexts = data.columnHeaderTexts;
+
+        var _that = this;
+
+        var columnDef = {
+            // renderer: Handsontable.renderers.AutocompleteRenderer,
+            renderer: this.createRender('ValueEdit', valueMaps, Handsontable.renderers.AutocompleteRenderer),
+        };
+
+        var columns = this.getColumns(columnDef);
+
+        //  debugger
+
+        var tableCfg = {
+            licenseKey: 'non-commercial-and-evaluation',
+            data: allCellValues,
+            //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
+            rowHeaders: false,
+            contextMenu: false,
+            allowInsertColumn: false,
+            allowInsertRow: false,
+            colHeaders: columnHeaderTexts,
+            columns: columns,
+            mergeCells: mergedCells || [],
+        };
+
+        this.bindTableChange(uniqueId, tableCfg, null, (tableInstance) => {
+            //    var scope = scopeAccesser();
+            if (this.scope) {
+                // 源数据
+                var sourceData = tableInstance.getSourceData();
+
+                // 用户编辑修改后的数据
+                var newData = tableInstance.getData();
+
+            }
+        });
+
+       // debugger
+        var girdTable = new Handsontable(container, tableCfg);
+
+        return girdTable;
+    };
 
     //helper.createDesignTable = createDesignTable;
     //helper.createNgBindController = createNgBindController;
