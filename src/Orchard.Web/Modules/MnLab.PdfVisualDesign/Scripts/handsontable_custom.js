@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 //var aaaa = 11;
 //var handsontableHelper = {};
 //(function (helper) {
@@ -149,7 +160,8 @@ var HandsontableCustomHelper = /** @class */ (function () {
     };
     ;
     HandsontableCustomHelper.prototype.init = function (data) {
-        this.data = data;
+        this.sourceData = data;
+        this.changedData = __assign({}, data);
     };
     HandsontableCustomHelper.prototype.createController = function (option) {
         var _this = this;
@@ -210,7 +222,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
                 switch (newMode) {
                     case 'ValueEdit':
                         var valueEditTableContainer = _this.valueEditTableContainer;
-                        _that.createValueEditTable(valueEditTableContainer, _this.data);
+                        _that.createValueEditTable(valueEditTableContainer, _this.changedData || _this.sourceData);
                     default:
                         break;
                     case 'BindingEdit':
@@ -219,6 +231,19 @@ var HandsontableCustomHelper = /** @class */ (function () {
             };
         });
         return ngController;
+    };
+    HandsontableCustomHelper.prototype.onDesignTableChange = function (newData, mergedCellsNew) {
+        this.changedData.allCellValues = newData;
+        this.changedData.mergedCells = mergedCellsNew;
+        //    var scope = scopeAccesser();
+        if (this.scope) {
+            this.scope.appplyTableChange(newData, mergedCellsNew);
+        }
+    };
+    HandsontableCustomHelper.prototype.onDesignTableHeaderChange = function (index, newText, headers) {
+        this.changedData.columnHeaderTexts = headers;
+        if (this.scope)
+            this.scope.appplyHeaderChange(index, newText, headers);
     };
     HandsontableCustomHelper.prototype.bindTableChange = function (uniqueId, tableCfg, tableAccessor, changeCallback) {
         //['']
@@ -242,8 +267,8 @@ var HandsontableCustomHelper = /** @class */ (function () {
     ;
     HandsontableCustomHelper.prototype.getColumns = function (columnDef) {
         var columns = [];
-        var columnHeaderTexts = this.data.columnHeaderTexts;
-        var allCellValues = this.data.allCellValues;
+        var columnHeaderTexts = this.sourceData.columnHeaderTexts;
+        var allCellValues = this.sourceData.allCellValues;
         if (columnHeaderTexts) {
             for (var i = 0; i < columnHeaderTexts.length; i++) {
                 columns.push(columnDef);
@@ -268,7 +293,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
     };
     HandsontableCustomHelper.prototype.createDesignTable = function (container) {
         var _this = this;
-        var option = this.data;
+        var option = this.sourceData;
         var uniqueId = option.uniqueId, allCellValues = option.allCellValues, valueMaps = option.valueMaps, mergedCells = option.mergedCells, cellDropdownData = option.cellDropdownData, columnHeaderTexts = option.columnHeaderTexts;
         var _that = this;
         var scopeAccesser = this.createController(option);
@@ -339,15 +364,14 @@ string MemberExpression { get; set; }
             var input = document.createElement('input'), rect = th.getBoundingClientRect(), addListeners = function (events, headers, index) {
                 events.split(' ').forEach(function (e) {
                     input.addEventListener(e, function () {
-                        var neText = headers[index] = input.value;
+                        var newText = headers[index] = input.value;
                         instance.updateSettings(isCol ? {
                             colHeaders: headers
                         } : {
                             rowHeaders: headers
                         });
                         // debugger
-                        if (_that.scope)
-                            _that.scope.appplyHeaderChange(index, neText, headers);
+                        _that.onDesignTableHeaderChange(index, newText, headers);
                         setTimeout(function () {
                             if (input.parentNode)
                                 input.parentNode.removeChild(input);
@@ -423,18 +447,15 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
         //v https://handsontable.com/docs/7.0.0/tutorial-using-callbacks.html
         //var hooks = ['afterChange', 'afterRemoveRow', 'afterRemoveCol', 'afterMergeCells',' afterUnmergeCells'];
         this.bindTableChange(uniqueId, tableCfg, null, function (tableInstance) {
-            //    var scope = scopeAccesser();
-            if (_this.scope) {
-                //  debugger
-                var mc = tableInstance.getPlugin('mergeCells');
-                var mergedCellsCollection = mc.mergedCellsCollection;
-                var mergedCellsNew = mergedCellsCollection && mergedCellsCollection.mergedCells;
-                //// 源数据？
-                // hot.getSourceData();
-                // 用户编辑修改后的数据？
-                var newData = tableInstance.getData();
-                _this.scope.appplyTableChange(newData, mergedCellsNew);
-            }
+            //  debugger
+            var mc = tableInstance.getPlugin('mergeCells');
+            var mergedCellsCollection = mc.mergedCellsCollection;
+            var mergedCellsNew = mergedCellsCollection && mergedCellsCollection.mergedCells;
+            //// 源数据？
+            // hot.getSourceData();
+            // 用户编辑修改后的数据？
+            var newData = tableInstance.getData();
+            _this.onDesignTableChange(newData, mergedCellsNew);
         });
         var girdTable;
         girdTable = new Handsontable(container, tableCfg);
@@ -444,9 +465,13 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
     HandsontableCustomHelper.prototype.createValueEditTable = function (container, data) {
         //var option = this.option;
         var _this = this;
-        if (this.existsValueEditTable) {
-            this.existsValueEditTable.destory();
+        var exists = this.existsValueEditTable;
+        if (exists) {
+            if (exists.destory) {
+                exists.destory();
+            }
             this.existsValueEditTable = null;
+            $(container).html();
         }
         var uniqueId = data.uniqueId, allCellValues = data.allCellValues, valueMaps = data.valueMaps, mergedCells = data.mergedCells, cellDropdownData = data.cellDropdownData, columnHeaderTexts = data.columnHeaderTexts;
         var _that = this;
@@ -479,6 +504,7 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
         });
         // debugger
         var girdTable = new Handsontable(container, tableCfg);
+        this.existsValueEditTable = girdTable;
         return girdTable;
     };
     ;
