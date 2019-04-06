@@ -217,30 +217,6 @@ class HandsontableCustomHelper {
                     $scope.mergedCells_JSON = mergedCellsNew && JSON.stringify(mergedCellsNew);
 
 
-                    if (newData) {
-                        // debugger
-                        for (var i = 0; i < newData.length; i++) {
-                            var array = newData[i];
-                            if (array) {
-                                for (var j = 0; j < array.length; j++) {
-                                    var d = array[j];
-                                    if (d) {
-                                        // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
-                                        if (MnUtil.isJson(d)) {
-                                            // 无需更改
-                                            // array[j] = d;//parseCellValueIfIsJsonExpr(d);
-                                        } else if (this.isCellValueJsonExpr(d)) {
-                                            // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
-                                            array[j] = this.parseCellValueIfIsJsonExpr(d);
-                                        } else {
-                                            // 用户手动输入任意字符串
-                                            array[j] = { BindType: "StaticValue", StaticValue: d };
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
 
                     // console.info('newData', newData);
                     $scope.allCellValues_JSON = newData && JSON.stringify(newData);
@@ -283,8 +259,40 @@ class HandsontableCustomHelper {
         this.changedData.allCellValues = newData;
         this.changedData.mergedCells = mergedCellsNew;
         //    var scope = scopeAccesser();
+
+        this.fixNewData(newData);
+
         if (this.scope) {
             this.scope.appplyTableChange(newData, mergedCellsNew);
+        }
+    }
+
+    private fixNewData(newData: any) {
+        if (newData) {
+            // debugger
+            for (var i = 0; i < newData.length; i++) {
+                var array = newData[i];
+                if (array) {
+                    for (var j = 0; j < array.length; j++) {
+                        var d = array[j];
+                        if (d) {
+                            // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
+                            if (MnUtil.isJson(d)) {
+                                // 无需更改
+                                // array[j] = d;//parseCellValueIfIsJsonExpr(d);
+                            }
+                            else if (this.isCellValueJsonExpr(d)) {
+                                // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
+                                array[j] = this.parseCellValueIfIsJsonExpr(d);
+                            }
+                            else {
+                                // 用户手动输入任意字符串
+                                array[j] = { BindType: "StaticValue", StaticValue: d };
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -628,15 +636,21 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
         };
 
         this.bindTableChange(uniqueId, tableCfg, null, (tableInstance) => {
-            //    var scope = scopeAccesser();
-            if (this.scope) {
-                // 源数据
-                var sourceData = tableInstance.getSourceData();
+            // 源数据
+            var sourceData = tableInstance.getSourceData();
 
-                // 用户编辑修改后的数据
-                var newData = tableInstance.getData();
+            // 用户编辑修改后的数据
+            var newData = tableInstance.getData();
+
+            this.fixNewData(newData);
+
+            
+            
+
+            if (true) {
 
             }
+
         });
 
         // debugger
