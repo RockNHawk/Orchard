@@ -76,7 +76,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
 */
         var _that = this;
         return function (instance, td, row, col, prop, value, cellProperties) {
-            console.log('render [' + row + ',' + col + ']value', value);
+            //console.log('render [' + row + ',' + col + ']value', value);
             //if (isNullOrUndefined(value) && valueMaps) {
             //    debugger
             //   // value = valueMaps[row][col];
@@ -354,6 +354,12 @@ string MemberExpression { get; set; }
         var _that = this;
         ///*
         var afterOnCellMouseDown = function (event, coords, th) {
+            // 鼠标左键
+            // if (event.button !== 0 || event.button !== 1) return;
+            if (event.button === 2)
+                return;
+            //  debugger;
+            //console.log("even.button:" + event.button + 'window.event.button:' + (<any>(window.event)).button);
             // debugger
             // only allow column header edit , do not allow row header edit
             if (!coords)
@@ -361,42 +367,46 @@ string MemberExpression { get; set; }
             var instance = this, isCol = coords.row === -1, isRow = coords.col === -1;
             if (!(isCol || isRow))
                 return;
-            //if (!isCol) {
-            //    return;
-            //}
-            var input = document.createElement('input'), rect = th.getBoundingClientRect(), addListeners = function (events, headers, index) {
-                events.split(' ').forEach(function (e) {
-                    input.addEventListener(e, function () {
-                        var newText = headers[index] = input.value;
-                        instance.updateSettings(isCol ? {
-                            colHeaders: headers
-                        } : {
-                            rowHeaders: headers
-                        });
-                        // debugger
-                        _that.onDesignTableHeaderChange(index, newText, headers);
-                        setTimeout(function () {
-                            if (input.parentNode)
-                                input.parentNode.removeChild(input);
+            // fix bug , hover 也会触发此回调
+            if (th.__fixafterOnCellMouseDown) {
+                return;
+            }
+            th.__fixafterOnCellMouseDown = 1;
+            $(th).click(function () {
+                var input = document.createElement('input'), rect = th.getBoundingClientRect(), addListeners = function (events, headers, index) {
+                    events.split(' ').forEach(function (e) {
+                        input.addEventListener(e, function () {
+                            var newText = headers[index] = input.value;
+                            instance.updateSettings(isCol ? {
+                                colHeaders: headers
+                            } : {
+                                rowHeaders: headers
+                            });
+                            // debugger
+                            _that.onDesignTableHeaderChange(index, newText, headers);
+                            setTimeout(function () {
+                                if (input.parentNode)
+                                    input.parentNode.removeChild(input);
+                            });
                         });
                     });
+                }, appendInput = function () {
+                    input.setAttribute('type', 'text');
+                    input.style.cssText = '' +
+                        'position:absolute;' +
+                        'left:' + rect.left + 'px;' +
+                        'top:' + rect.top + 'px;' +
+                        'width:' + (rect.width - 4) + 'px;' +
+                        'height:' + (rect.height - 4) + 'px;' +
+                        'z-index:1060;';
+                    document.body.appendChild(input);
+                };
+                input.value = th.querySelector(isCol ? '.colHeader' : '.rowHeader').innerText;
+                appendInput();
+                setTimeout(function () {
+                    input.select();
+                    addListeners('change blur', instance[isCol ? 'getColHeader' : 'getRowHeader'](), coords[isCol ? 'col' : 'row']);
                 });
-            }, appendInput = function () {
-                input.setAttribute('type', 'text');
-                input.style.cssText = '' +
-                    'position:absolute;' +
-                    'left:' + rect.left + 'px;' +
-                    'top:' + rect.top + 'px;' +
-                    'width:' + (rect.width - 4) + 'px;' +
-                    'height:' + (rect.height - 4) + 'px;' +
-                    'z-index:1060;';
-                document.body.appendChild(input);
-            };
-            input.value = th.querySelector(isCol ? '.colHeader' : '.rowHeader').innerText;
-            appendInput();
-            setTimeout(function () {
-                input.select();
-                addListeners('change blur', instance[isCol ? 'getColHeader' : 'getRowHeader'](), coords[isCol ? 'col' : 'row']);
             });
         };
         //  tableCfg.afterOnCellMouseDown = afterOnCellMouseDown;

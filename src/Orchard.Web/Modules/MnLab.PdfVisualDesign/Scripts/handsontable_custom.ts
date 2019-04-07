@@ -83,7 +83,7 @@ class HandsontableCustomHelper {
         var _that = this;
         return function (instance, td, row, col, prop, value, cellProperties) {
 
-            console.log('render [' + row + ',' + col + ']value', value);
+            //console.log('render [' + row + ',' + col + ']value', value);
 
             //if (isNullOrUndefined(value) && valueMaps) {
             //    debugger
@@ -428,6 +428,14 @@ string MemberExpression { get; set; }
 
         ///*
         var afterOnCellMouseDown = function (event, coords, th) {
+
+            // 鼠标左键
+            // if (event.button !== 0 || event.button !== 1) return;
+            if (event.button === 2) return;
+            //  debugger;
+
+            //console.log("even.button:" + event.button + 'window.event.button:' + (<any>(window.event)).button);
+
             // debugger
             // only allow column header edit , do not allow row header edit
             if (!coords) return;
@@ -439,54 +447,62 @@ string MemberExpression { get; set; }
 
             if (!(isCol || isRow)) return;
 
+            // fix bug , hover 也会触发此回调
+            if (th.__fixafterOnCellMouseDown) {
+                return;
+            }
 
-            //if (!isCol) {
-            //    return;
-            //}
+            th.__fixafterOnCellMouseDown = 1;
 
-            let input = document.createElement('input'),
-                rect = th.getBoundingClientRect(),
-                addListeners = (events, headers, index) => {
-                    events.split(' ').forEach(e => {
-                        input.addEventListener(e, () => {
-                            var newText = headers[index] = input.value;
-                            instance.updateSettings(isCol ? {
-                                colHeaders: headers
-                            } : {
-                                    rowHeaders: headers
+
+            $(th).click(() => {
+
+                let input = document.createElement('input'),
+                    rect = th.getBoundingClientRect(),
+                    addListeners = (events, headers, index) => {
+                        events.split(' ').forEach(e => {
+                            input.addEventListener(e, () => {
+                                var newText = headers[index] = input.value;
+                                instance.updateSettings(isCol ? {
+                                    colHeaders: headers
+                                } : {
+                                        rowHeaders: headers
+                                    });
+
+                                // debugger
+                                _that.onDesignTableHeaderChange(index, newText, headers);
+
+                                setTimeout(() => {
+                                    if (input.parentNode)
+                                        input.parentNode.removeChild(input)
                                 });
-
-                            // debugger
-                            _that.onDesignTableHeaderChange(index, newText, headers);
-
-                            setTimeout(() => {
-                                if (input.parentNode)
-                                    input.parentNode.removeChild(input)
-                            });
+                            })
                         })
-                    })
-                },
-                appendInput = () => {
-                    input.setAttribute('type', 'text');
-                    input.style.cssText = '' +
-                        'position:absolute;' +
-                        'left:' + rect.left + 'px;' +
-                        'top:' + rect.top + 'px;' +
-                        'width:' + (rect.width - 4) + 'px;' +
-                        'height:' + (rect.height - 4) + 'px;' +
-                        'z-index:1060;';
-                    document.body.appendChild(input);
-                };
-            input.value = th.querySelector(
-                isCol ? '.colHeader' : '.rowHeader'
-            ).innerText;
-            appendInput();
-            setTimeout(() => {
-                input.select();
-                addListeners('change blur', instance[
-                    isCol ? 'getColHeader' : 'getRowHeader'
-                ](), coords[isCol ? 'col' : 'row']);
+                    },
+                    appendInput = () => {
+                        input.setAttribute('type', 'text');
+                        input.style.cssText = '' +
+                            'position:absolute;' +
+                            'left:' + rect.left + 'px;' +
+                            'top:' + rect.top + 'px;' +
+                            'width:' + (rect.width - 4) + 'px;' +
+                            'height:' + (rect.height - 4) + 'px;' +
+                            'z-index:1060;';
+                        document.body.appendChild(input);
+                    };
+                input.value = th.querySelector(
+                    isCol ? '.colHeader' : '.rowHeader'
+                ).innerText;
+                appendInput();
+                setTimeout(() => {
+                    input.select();
+                    addListeners('change blur', instance[
+                        isCol ? 'getColHeader' : 'getRowHeader'
+                    ](), coords[isCol ? 'col' : 'row']);
+                });
+
             });
+
         };
         //  tableCfg.afterOnCellMouseDown = afterOnCellMouseDown;
         //*/
@@ -644,8 +660,8 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
 
             this.fixNewData(newData);
 
-            
-            
+
+
 
             if (true) {
 
