@@ -61,32 +61,35 @@
             .Select(x => new SelectListItem() { Value = x, Text = x, Selected = x == design?.GridType }));
 }
 
-    <div ng-app="ValueBindGrid_@(uniqueId)">
-        <div ng-controller="ValueBindGridController_@(uniqueId)">
-            <p>in template binding edit mode</p>
-            <button type="button" ng-click="switchMode()">switch to {{mode=='ValueEdit'?'BindingEdit':'ValueEdit'}}</button>
+<div ng-app="ValueBindGrid_@(uniqueId)">
+    <div ng-controller="ValueBindGridController_@(uniqueId)">
+        <p>in template binding edit mode</p>
+        <button type="button" ng-click="switchMode()">switch to {{mode=='ValueEdit'?'BindingEdit':'ValueEdit'}}</button>
 
-            @*GridType:@(design)
-            GridType:@(design?.GridType)*@
-            <fieldset>
-                <legend>Grid Type Setting</legend>
-                @*<input name="" />*@
-                @Html.DropDownListFor(x => x.DesignData.GridType, gridTypes)
-                @Html.TextBoxFor(x => x.DesignData.DisplayType)
-            </fieldset>
-
-
-            {{mode}}
-            <div ng-show="mode=='BindingEdit'" id="handsontable-bindingedit-@(uniqueId)" class="hot handsontable htRowHeaders htColumnHeaders"></div>
-
-            <div ng-show="mode=='ValueEdit'" id="handsontable-valueedit-@(uniqueId)" class="hot handsontable htRowHeaders htColumnHeaders">ValueEdit</div>
+        @*GridType:@(design)
+        GridType:@(design?.GridType)*@
+        <fieldset>
+            <legend>Grid Type Setting</legend>
+            @*<input name="" />*@
+            @Html.DropDownListFor(x => x.DesignData.GridType, gridTypes)
+            @Html.TextBoxFor(x => x.DesignData.DisplayType)
+        </fieldset>
 
 
-            <input name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="columnHeaderTexts_JSON" />
-            <input name="@(Html.NameFor(x => x.DesignData.AllCellValues))_JSON" ng-model="allCellValues_JSON" />
-            <input name="@(Html.NameFor(x => x.DesignData.MergedCells))_JSON" ng-model="mergedCells_JSON" />
-        </div>
+        {{mode}}
+        <div ng-show="mode=='BindingEdit'" id="handsontable-bindingedit-@(uniqueId)" class="hot handsontable htRowHeaders htColumnHeaders"></div>
+
+        <div ng-show="mode=='ValueEdit'" id="handsontable-valueedit-@(uniqueId)" class="hot handsontable htRowHeaders htColumnHeaders">ValueEdit</div>
+
+        <input style="width:100%" name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="columnHeaderTexts_JSON" />
+        @*<textarea name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="columnHeaderTexts_JSON"></textarea>*@
+        <textarea name="@(Html.NameFor(x => x.DesignData.AllCellValues))_JSON" ng-model="allCellValues_JSON"></textarea>
+        <textarea name="@(Html.NameFor(x => x.DesignData.MergedCells))_JSON" ng-model="mergedCells_JSON"></textarea>
+        @*<input name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="columnHeaderTexts_JSON" />
+        <input name="@(Html.NameFor(x => x.DesignData.AllCellValues))_JSON" ng-model="allCellValues_JSON" />
+        <input name="@(Html.NameFor(x => x.DesignData.MergedCells))_JSON" ng-model="mergedCells_JSON" />*@
     </div>
+</div>
 
 
 <script>
