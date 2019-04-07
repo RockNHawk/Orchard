@@ -405,7 +405,7 @@ class HandsontableCustomHelper {
         });
     };
 
-    getColumns(columnDef) {
+    getColumns(columnDef,allowEdit?:boolean) {
         var columns = [];
         var columnHeaderTexts = this.sourceData.columnHeaderTexts;
         var allCellValues = this.sourceData.allCellValues;
@@ -457,6 +457,7 @@ class HandsontableCustomHelper {
             // renderer: Handsontable.renderers.AutocompleteRenderer,
             renderer: this.createRender(null, valueMaps, Handsontable.renderers.AutocompleteRenderer),
             type: 'handsontable',
+            //editor: 'text',
             handsontable: {
                 search: true,
 
@@ -492,7 +493,7 @@ string ContentPartName { get; set; }
 string MemberExpression { get; set; }
 */
                     var ret = _that.wrapCellValueJson(obj);
-                    console.log('getValue', ret);
+                   // console.log('getValue', ret);
                     return ret;
                     //return 'JSON::'+JSON.stringify(obj);
                     //return obj.ContentPartName + '.' + obj.MemberExpression;
@@ -637,7 +638,7 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
             //data: allCellValues || Handsontable.helper.createSpreadsheetData(5, 2),
             data: allCellValues,
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
-            rowHeaders: true,
+          //  rowHeaders: true,
             contextMenu: true,
             allowInsertColumn: true,
             allowInsertRow: true,
@@ -666,6 +667,7 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
 
         //https://handsontable.com/docs/7.0.0/Hooks.html#event:afterChange
         tableCfg['afterChange'] = function (changes) {
+            console.log('afterChange',changes);
             var tableInstance = this;
             if (changes) {
                 //  debugger
