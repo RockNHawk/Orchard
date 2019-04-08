@@ -28,7 +28,7 @@
     <IISExpressUseClassicPipelineMode />
     <Use64BitIISExpress />
     <UseGlobalApplicationHostFile />
-    <TypeScriptToolsVersion>3.3</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.0</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -369,7 +369,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Fields\" />
     <Folder Include="Services\" />
     <Folder Include="Settings\" />
     <Folder Include="Views\Admin\" />
@@ -392,6 +391,8 @@
     <Compile Include="Elements\ValueBindItemElement.cs" />
     <Compile Include="Extensions\HtmlHelper.cs" />
     <Compile Include="Extensions\ModelBindingUtility.cs" />
+    <Compile Include="Fields\HtmlBlockField.cs" />
+    <Compile Include="Fields\HtmlBlockFieldDriver.cs" />
     <Compile Include="Hooks\CustomElementDisplay.cs" />
     <Compile Include="Hooks\ElementEventHandler.cs" />
     <Compile Include="Hooks\VsdModule.cs" />
@@ -431,6 +432,8 @@
     <Content Include="Views\Elements.ValueBindGridElement.Design_Staticic.cshtml" />
     <Content Include="Views\Elements.ValueBindGridElement.cshtml" />
     <Content Include="tsconfig.json" />
+    <Content Include="Views\Fields_HtmlBlockField_Edit.cshtml" />
+    <Content Include="Views\Fields_HtmlBlockField.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
