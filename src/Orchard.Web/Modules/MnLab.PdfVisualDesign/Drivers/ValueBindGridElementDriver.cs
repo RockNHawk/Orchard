@@ -94,20 +94,33 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             this._workContextAccessor = workContextAccessor;
         }
 
-
+        /// <summary>
+        /// Get ContentPart's IValueBindingDef from ContentPartDefinition
+        /// </summary>
+        /// <param name="def"></param>
+        /// <returns></returns>
         static IList<IValueBindingDef> GetBindingItems(ContentPartDefinition def) {
+            // Fields Def, Field can dynamic added by user
             var fields = def.Fields;
+            /*
+            Property is a .NET Property , it's hard-code in the ContentPart,sucha as TitlePart.Title is definded as:
+            public class TitlePart : ContentPart{
+                public string Title {get..., set...}
+            }
+             */
             var properties = def.GetType().GetProperties(BindingFlags.Public);
 
             var items = new List<IValueBindingDef>((fields?.Count() ?? 0) + properties.Count());
             if (fields != null) {
                 foreach (var item in fields) {
+                    // Field 之下还有子属性，这里只处理了它本身
                     items.Add(new ValueBindingDef() {
                         ContentPartName = def.Name,
                         MemberExpression = item.Name,
                     });
                 }
             }
+
             if (properties != null) {
                 foreach (var item in properties) {
                     items.Add(new ValueBindingDef() {
@@ -183,26 +196,34 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             return Editor(context, editor);
         }
 
-        private static IEnumerable<Grouping<ContentPartDefinition, IValueBindingDef>> GetBindingDefGroups(ContentItem contentItem) {
+        public static IEnumerable<Grouping<ContentPartDefinition, IValueBindingDef>> GetBindingDefGroups(ContentItem contentItem) {
             // in 'Create' page, the content is empty
             return contentItem.TypeDefinition.Parts?
                 .Select(x => x.PartDefinition)
                 .GroupBy(x => x)
+                // the key is ContentPartDefinition
                 .Select(x => new Grouping<ContentPartDefinition, IValueBindingDef>(x.Key, GetBindingItems(x.Key)))
                 .Where(x => x.Count() > 0);
                 ;
         }
 
-        private static Dictionary<string, object> GetValueMaps(ContentItem contentItem, IEnumerable<Grouping<ContentPartDefinition, IValueBindingDef>> bindingDefGroups) {
+        /// <summary>
+        /// 根据 bindingDefGroups 获取所有 Field/Property 的值
+        /// </summary>
+        /// <param name="contentItem"></param>
+        /// <param name="bindingDefGroups"></param>
+        /// <returns></returns>
+        public static Dictionary<string, object> GetValueMaps(ContentItem contentItem, IEnumerable<Grouping<ContentPartDefinition, IValueBindingDef>> bindingDefGroups) {
             var valueMaps = new Dictionary<string, object>();
             foreach (var group in bindingDefGroups) {
                 var partDef = group.Key;
                 var part = contentItem.Parts.First(x => x.PartDefinition == partDef);
                 foreach (var item in group) {
-                    var helper = ContentDataMemberHelper.FindFromContentPart(part, item);
+                    var helper = ContentPartDataMemberHelper.FindFromContentPart(part, item);
                     //var helper = new ContentDataMemberHelper(part, item);
                     try {
-                        var value = helper.GetAccessor().GetValue();
+                        var value = helper.GetAccessor().GetObject();
+                        //var value = helper.GetAccessor().GetValue();
                         valueMaps[item.Key] = value;
                     }
                     catch (Exception ex) {

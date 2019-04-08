@@ -391,6 +391,7 @@
     <Compile Include="Elements\ValueBindItemElement.cs" />
     <Compile Include="Extensions\HtmlHelper.cs" />
     <Compile Include="Extensions\ModelBindingUtility.cs" />
+    <Compile Include="Fields\IContentItem.cs" />
     <Compile Include="Fields\TempalteSupportFieldDriver.cs" />
     <Compile Include="Fields\TempalteSupportField.cs" />
     <Compile Include="Hooks\CustomElementDisplay.cs" />
@@ -432,7 +433,7 @@
     <Content Include="Views\Elements.ValueBindGridElement.Design_Staticic.cshtml" />
     <Content Include="Views\Elements.ValueBindGridElement.cshtml" />
     <Content Include="tsconfig.json" />
-    <Content Include="Views\Fields_TempalteSupportField_Edit.cshtml" />
+    <Content Include="Views\EditorTemplates\Fields_TempalteSupportField_Edit.cshtml" />
     <Content Include="Views\Fields_TempalteSupportField.cshtml" />
   </ItemGroup>
   <ItemGroup>

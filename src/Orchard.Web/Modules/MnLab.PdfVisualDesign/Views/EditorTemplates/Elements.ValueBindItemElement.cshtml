@@ -68,7 +68,7 @@
                     @Display(item)
                 }*@
 
-           // @Model.EditorShape
+            // @Model.EditorShape
 
             @*@Display(Model.EditorShapeContext.Shape)*@
             // @Display(Model.EditorShape.Zones["1"])
@@ -93,9 +93,13 @@
 
 @using (Script.Foot())
 {
-    <script type="text/javascript">
-        $().ready(function () {
+    @*if (Model.Context.Updater!=null)
+    {
+        <script type="text/javascript">
+            alert(11);
+            $().ready(function () {
 
-        });
-    </script>
+            });
+        </script>
+    }*@
 }

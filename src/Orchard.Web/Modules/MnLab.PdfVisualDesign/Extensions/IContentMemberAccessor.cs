@@ -26,10 +26,14 @@ using System.Reflection;
 using System.Web.Mvc;
 using Orchard.Core.Title.Models;
 
-namespace MnLab.PdfVisualDesign.Binding.Drivers
-{
-public interface IContentMemberAccessor {
-        object GetValue();
+namespace MnLab.PdfVisualDesign.Binding.Drivers {
+    public interface IContentPartMemberAccessor {
+        object GetObject();
+        object GetValue(string name=null);
+
+        //bool HasValueProperty
+        bool IsSimply { get; }
+
         void SetValue(object value);
     }
 }

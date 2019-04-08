@@ -98,7 +98,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
                         var key = obj['Key'];
                         var _type = obj['BindType'];
                         var valueArgument = value;
-                        var memberValue = valueMaps && valueMaps[key];
+                        var memberValue = valueMaps && valueMaps[key] && valueMaps[key].Value;
                         //switch (mode) {
                         //    case 'BindingEdit':
                         //    default:

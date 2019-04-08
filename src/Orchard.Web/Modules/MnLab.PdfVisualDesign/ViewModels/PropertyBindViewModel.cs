@@ -6,6 +6,7 @@ using MnLab.PdfVisualDesign.Binding.Elements;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
 using Orchard.ContentManagement.Handlers;
+using Orchard.Layouts.Framework.Drivers;
 using Orchard.Layouts.Services;
 
 namespace MnLab.PdfVisualDesign.ViewModels {
@@ -27,6 +28,7 @@ namespace MnLab.PdfVisualDesign.ViewModels {
         public IContentFieldDisplay FieldDisplay { get; set; }
 
         public ValueBindingDef Binding { get; set; }
+        public ElementEditorContext Context { get;  set; }
 
         //public object Value { get; set; }
 

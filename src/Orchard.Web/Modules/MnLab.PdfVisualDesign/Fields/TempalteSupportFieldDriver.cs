@@ -11,6 +11,16 @@ using Orchard.Localization;
 
 namespace MnLab.PdfVisualDesign.Fields
 {
+
+
+    public class TemplateSupportViewModel {
+
+        public TempalteSupportField Field;
+        public IContent Content;
+        public ContentItem ContentItem;
+    }
+
+
     public class TempalteSupportFieldDriver : FieldDriverBase<TempalteSupportField> 
     {
         public Localizer T { get; set; }
@@ -33,10 +43,14 @@ namespace MnLab.PdfVisualDesign.Fields
 
         protected override DriverResult Editor(ContentPart part, TempalteSupportField field, dynamic shapeHelper)
         {
+            
             return ContentShape("Fields_TempalteSupportField_Edit", GetDifferentiator(field, part),
                 () => shapeHelper.EditorTemplate(
                     TemplateName: "Fields_TempalteSupportField_Edit", 
-                    Model: field, 
+                    Model: new TemplateSupportViewModel {
+                        Field =field,
+                        ContentItem= part.ContentItem,
+                    }, 
                     Prefix: GetPrefix(field, part)));
         }
 

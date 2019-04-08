@@ -1,68 +1,41 @@
-﻿//using System.Web.Mvc;
-//using MnLab.PdfVisualDesign.HtmlBlocks.Models;
-//using MnLab.PdfVisualDesign.HtmlBlocks.Services;
-//using Orchard;
-//using Orchard.Logging;
-//using Orchard.UI.Admin;
+﻿using System.Collections.Generic;
+using System.Web.Mvc;
+using MnLab.PdfVisualDesign.Binding.Drivers;
+using Orchard;
+using Orchard.ContentManagement;
+using Orchard.Logging;
+using Orchard.UI.Admin;
 
-//namespace MnLab.PdfVisualDesign.HtmlBlocks.Controllers
-//{
-//    [Admin]
-//    [ValidateInput(false)]
-//    public class AdminController : Controller
-//    {
-//        private readonly IHtmlBlockService _htmlBlockService;
-//        private readonly IOrchardServices _services;
-     
-//        public ILogger Logger { get; set; }
+namespace MnLab.PdfVisualDesign.HtmlBlocks.Controllers {
+    [Admin]
+    [ValidateInput(false)]
+    public class AdminController : Controller {
+        private readonly IOrchardServices _services;
 
-//        public AdminController(
-            
-//            IHtmlBlockService htmlBlockService,
-//            IOrchardServices services
-         
-//            )
-//        {
-//            _services = services;
-//            _htmlBlockService = htmlBlockService;
-            
-//            Logger = NullLogger.Instance;
-//        }
+        public ILogger Logger { get; set; }
+        IContentManager _contentManager;
+        public AdminController(
+        IContentManager contentManager,
+        IOrchardServices services
 
-//        public ActionResult List()
-//        {
-//            var blockList = _htmlBlockService.GetAllBlocks();
-//            return View(blockList);    
-//        }
+            ) {
+            _services = services;
+            _contentManager = contentManager;
 
-//        public ActionResult Edit(int id = 0)
-//        {
-//            var record = _htmlBlockService.GetHtmlBlock(id);
-//            if (record == null)
-//            {
-//                record = new HtmlBlockRecord();
-//            }
-//            return View(record);
-//        }
+            Logger = NullLogger.Instance;
+        }
 
-//        [HttpPost]
-//        public ActionResult Edit(HtmlBlockRecord record)
-//        {
-//            record.BlockKey = record.BlockKey.Trim();
-//            if (_htmlBlockService.BlockExists(record.BlockKey) && record.Id <= 0)
-//            {
-//                ModelState.AddModelError("BlockKey", "Html block with this key already exists");
+        public ActionResult GetContentValueMap(int id) {
 
-//                return View(record);
-//            }
-//            _htmlBlockService.SaveHtmlBlock(record);
-//            return RedirectToAction("List");
-//        }
+            var content = this._contentManager.GetLatest(id);
 
-//        public ActionResult Delete(int id = 0)
-//        {
-//            _htmlBlockService.Delete(id);
-//            return RedirectToAction("List");
-//        }
-//    }
-//}
+            var contentItem = content.GetLatestVersion(_contentManager);
+
+            var bindingDefGroups = ValueBindGridElementDriver.GetBindingDefGroups(contentItem);
+            Dictionary<string, object> valueMaps = ValueBindGridElementDriver.GetValueMaps(contentItem, bindingDefGroups);
+
+            return Json(valueMaps, JsonRequestBehavior.AllowGet);
+        }
+
+    }
+}
