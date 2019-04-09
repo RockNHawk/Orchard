@@ -42,14 +42,42 @@ function StringFormat(str) {
 
                 if (settings.Required && String.IsNullOrWhiteSpace(field.Value)) {
                     updater.AddModelError("Text", T("The field {0} is mandatory", T(field.DisplayName)));
-                }
+                }PropertyNameToEditorInputName
             }
 * */
-var defaultFieldEditorInputNameToActualPropertyNameMap = {
+var defaultPropertyNameToEditorInputNameMap = {
     "NHProductDescriptionPart.Description.Value": "Text",
-    "NHProductDescriptionPart.ProductName.Value": "Text",
 };
-function syncContentPart(url, fieldEditorInputNameToActualPropertyNameMap, form) {
+function mapPropertyNameToEditorInputName(field, baseKey, propName, propertyNameToEditorInputNameMap) {
+    var map = propertyNameToEditorInputNameMap || defaultPropertyNameToEditorInputNameMap;
+    var key = StringFormat('{0}.{1}', baseKey, propName);
+    // var propValue = field[propName];
+    var mappedName = (map && map[key]);
+    if (mappedName)
+        return mappedName;
+    switch (propName) {
+        case 'DisplayName':
+        case 'PartFieldDefinition':
+        case 'FieldDefinition':
+        case 'Storage':
+            return null;
+        default:
+            var FieldDefinition = field.FieldDefinition;
+            if (FieldDefinition) {
+                var fieldType = FieldDefinition.Name;
+                switch (fieldType) {
+                    case 'TextField':
+                        switch (propName) {
+                            case 'Value':
+                                return 'Text';
+                        }
+                        break;
+                }
+            }
+    }
+    return null;
+}
+function syncContentPart(url, propertyNameToEditorInputNameMap, form) {
     var dataExample = {
         "NHProductDescriptionPart.Description": {
             "Value": null,
@@ -190,7 +218,6 @@ function syncContentPart(url, fieldEditorInputNameToActualPropertyNameMap, form)
             "Storage": {}
         }
     };
-    var map = fieldEditorInputNameToActualPropertyNameMap || defaultFieldEditorInputNameToActualPropertyNameMap;
     //var $formSubmits = form && $(form).find("button,input[type='button'],input[type='submit']").filter(':enabled');
     //if ($formSubmits) $formSubmits.attr('disabled', 'disabled');
     $.ajax({
@@ -205,8 +232,9 @@ function syncContentPart(url, fieldEditorInputNameToActualPropertyNameMap, form)
                     var field = data[baseKey];
                     for (var propName in field) {
                         var propValue = field[propName];
-                        var key = StringFormat('{0}.{1}', baseKey, propName);
-                        var propMapName = (map && map[key]) || propName;
+                        var propMapName = mapPropertyNameToEditorInputName(field, baseKey, propName, propertyNameToEditorInputNameMap);
+                        if (!propMapName)
+                            continue;
                         var inputFullName = StringFormat('{0}.{1}', baseKey, propMapName);
                         var $input = $(StringFormat("[name='{0}']", inputFullName));
                         if ($input.length) {
@@ -224,7 +252,7 @@ function syncContentPart(url, fieldEditorInputNameToActualPropertyNameMap, form)
         complete: function () {
             //if ($formSubmits) $formSubmits.removeAttr('disabled');
             setTimeout(function () {
-                syncContentPart(url, map, form);
+                syncContentPart(url, propertyNameToEditorInputNameMap, form);
             }, 500);
         }
     });
