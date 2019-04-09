@@ -191,9 +191,8 @@ function syncContentPart(url, fieldEditorInputNameToActualPropertyNameMap, form)
         }
     };
     var map = fieldEditorInputNameToActualPropertyNameMap || defaultFieldEditorInputNameToActualPropertyNameMap;
-    var $formSubmits = form && $(form).find("button,input[type='button'],input[type='submit']").filter(':enabled');
-    if ($formSubmits)
-        $formSubmits.attr('disabled', 'disabled');
+    //var $formSubmits = form && $(form).find("button,input[type='button'],input[type='submit']").filter(':enabled');
+    //if ($formSubmits) $formSubmits.attr('disabled', 'disabled');
     $.ajax({
         type: "GET",
         url: url,
@@ -212,14 +211,18 @@ function syncContentPart(url, fieldEditorInputNameToActualPropertyNameMap, form)
                         var $input = $(StringFormat("[name='{0}']", inputFullName));
                         if ($input.length) {
                             $input.val(propValue);
+                            //$input.hide();
+                            /// hide the fieldset
+                            $input.parent().hide();
+                            // // find the label
+                            // $(StringFormat("label[for='{0}']", inputFullName.replace(/./ig,'_'))).hide();
                         }
                     }
                 }
             }
         },
         complete: function () {
-            if ($formSubmits)
-                $formSubmits.removeAttr('disabled');
+            //if ($formSubmits) $formSubmits.removeAttr('disabled');
             setTimeout(function () {
                 syncContentPart(url, map, form);
             }, 500);
