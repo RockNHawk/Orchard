@@ -23,7 +23,7 @@ Edit for TempalteSupportField
     {
         <script>
     var url = '@(base.WorkContext.CurrentSite.BaseUrl)/Admin/MnLab.PdfVisualDesign/GetContentValueMap/@(contentId)';
-    syncContentPart(url);
+    syncContentPart(url,null,$("form[action='/Admin/Contents/Edit/@contentId']"));
         </script>
     }
 

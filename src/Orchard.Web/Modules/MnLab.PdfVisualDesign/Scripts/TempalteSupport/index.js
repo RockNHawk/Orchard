@@ -25,8 +25,32 @@ function StringFormat(str) {
     }
     return str;
 }
-function syncContentPart(url) {
-    var j = {
+/*
+     * the Field's Editor generated input name not always use Field.PropertyXxx,
+     *
+     * such as TextField.Value 's Editor generated input is:
+     *
+     * <input name="PartName.FieldName.Text" /> (.Text not .Value)
+     *
+     * then the Driver map the Text's value to field.Value
+     *
+     * \Orchard.Web\Core\Common\Drivers\TextFieldDriver.cs
+     *  if (updater.TryUpdateModel(viewModel, GetPrefix(field, part), null, null)) {
+                var settings = field.PartFieldDefinition.Settings.GetModel<TextFieldSettings>();
+
+                field.Value = viewModel.Text;
+
+                if (settings.Required && String.IsNullOrWhiteSpace(field.Value)) {
+                    updater.AddModelError("Text", T("The field {0} is mandatory", T(field.DisplayName)));
+                }
+            }
+* */
+var defaultFieldEditorInputNameToActualPropertyNameMap = {
+    "NHProductDescriptionPart.Description.Value": "Text",
+    "NHProductDescriptionPart.ProductName.Value": "Text",
+};
+function syncContentPart(url, fieldEditorInputNameToActualPropertyNameMap, form) {
+    var dataExample = {
         "NHProductDescriptionPart.Description": {
             "Value": null,
             "Name": "Description",
@@ -166,30 +190,10 @@ function syncContentPart(url) {
             "Storage": {}
         }
     };
-    /*
-     * the Field's Editor generated input name not always use Field.PropertyXxx,
-     *
-     * such as TextField.Value 's Editor generated input is:
-     *
-     * <input name="PartName.FieldName.Text" /> (.Text not .Value)
-     *
-     * then the Driver map the Text's value to field.Value
-     *
-     * \Orchard.Web\Core\Common\Drivers\TextFieldDriver.cs
-     *  if (updater.TryUpdateModel(viewModel, GetPrefix(field, part), null, null)) {
-                var settings = field.PartFieldDefinition.Settings.GetModel<TextFieldSettings>();
-
-                field.Value = viewModel.Text;
-
-                if (settings.Required && String.IsNullOrWhiteSpace(field.Value)) {
-                    updater.AddModelError("Text", T("The field {0} is mandatory", T(field.DisplayName)));
-                }
-            }
-     * */
-    var fieldEditorInputNameToPropertyMap = {
-        "NHProductDescriptionPart.Description.Value": "Text",
-        "NHProductDescriptionPart.ProductName.Value": "Text",
-    };
+    var map = fieldEditorInputNameToActualPropertyNameMap || defaultFieldEditorInputNameToActualPropertyNameMap;
+    var $formSubmits = form && $(form).find("button,input[type='button'],input[type='submit']").filter(':enabled');
+    if ($formSubmits)
+        $formSubmits.attr('disabled', 'disabled');
     $.ajax({
         type: "GET",
         url: url,
@@ -203,7 +207,7 @@ function syncContentPart(url) {
                     for (var propName in field) {
                         var propValue = field[propName];
                         var key = StringFormat('{0}.{1}', baseKey, propName);
-                        var propMapName = fieldEditorInputNameToPropertyMap[key] || propName;
+                        var propMapName = (map && map[key]) || propName;
                         var inputFullName = StringFormat('{0}.{1}', baseKey, propMapName);
                         var $input = $(StringFormat("[name='{0}']", inputFullName));
                         if ($input.length) {
@@ -214,7 +218,11 @@ function syncContentPart(url) {
             }
         },
         complete: function () {
-            syncContentPart(url);
+            if ($formSubmits)
+                $formSubmits.removeAttr('disabled');
+            setTimeout(function () {
+                syncContentPart(url, map, form);
+            }, 500);
         }
     });
     //setInterval(function () {
