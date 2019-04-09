@@ -169,7 +169,10 @@ function syncContentPart(url) {
     /*
      * the Field's Editor generated input name not always use Field.PropertyXxx,
      *
-     * such as TextField.Value 's Editor generated input is:<input name="PartName.FieldName.Text" />
+     * such as TextField.Value 's Editor generated input is:
+     *
+     * <input name="PartName.FieldName.Text" /> (.Text not .Value)
+     *
      * then the Driver map the Text's value to field.Value
      *
      * \Orchard.Web\Core\Common\Drivers\TextFieldDriver.cs
