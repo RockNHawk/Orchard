@@ -232,7 +232,7 @@ function syncContentPart(url, propertyNameToEditorInputNameMap, form) {
                     var field = data[baseKey];
                     for (var propName in field) {
                         var propValue = field[propName];
-                        var propMapName = mapPropertyNameToEditorInputName(field, baseKey, propName, propertyNameToEditorInputNameMap);
+                        var propMapName = mapPropertyNameToEditorInputName(field, baseKey, propName, propertyNameToEditorInputNameMap) || propName;
                         if (!propMapName)
                             continue;
                         var inputFullName = StringFormat('{0}.{1}', baseKey, propMapName);
