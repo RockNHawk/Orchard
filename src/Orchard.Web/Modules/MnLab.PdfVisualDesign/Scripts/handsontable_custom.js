@@ -421,12 +421,10 @@ string MemberExpression { get; set; }
         ///*
         var afterOnCellMouseDown = function (event, coords, th) {
             // 鼠标左键
-            if (event.button !== 0 || event.button !== 1)
-                return;
-            if (!event || event.button === 2)
-                return;
+            // if (event.button !== 0 || event.button !== 1) return;
+            //if (!event || event.button === 2) return;
             //  debugger;
-            //console.log("even.button:" + event.button + 'window.event.button:' + (<any>(window.event)).button);
+            console.log("even.button:" + event.button + 'window.event.button:' + (window.event).button);
             // debugger
             // only allow column header edit , do not allow row header edit
             if (!coords)
@@ -435,46 +433,47 @@ string MemberExpression { get; set; }
             if (!(isCol || isRow))
                 return;
             // fix bug , hover 也会触发此回调
-            //if (th.__fixafterOnCellMouseDown) {
-            //    return;
-            //}
-            //th.__fixafterOnCellMouseDown = 1;
-            //  $(th).click(() => {
-            var input = document.createElement('input'), rect = th.getBoundingClientRect(), addListeners = function (events, headers, index) {
-                events.split(' ').forEach(function (e) {
-                    input.addEventListener(e, function () {
-                        var newText = headers[index] = input.value;
-                        instance.updateSettings(isCol ? {
-                            colHeaders: headers
-                        } : {
-                            rowHeaders: headers
-                        });
-                        // debugger
-                        _that.onDesignTableHeaderChange(index, newText, headers);
-                        setTimeout(function () {
-                            if (input.parentNode)
-                                input.parentNode.removeChild(input);
+            if (th.__fixafterOnCellMouseDown) {
+                return;
+            }
+            th.__fixafterOnCellMouseDown = 1;
+            $(th).click(function () {
+                console.log("th click");
+                var input = document.createElement('input'), rect = th.getBoundingClientRect(), addListeners = function (events, headers, index) {
+                    events.split(' ').forEach(function (e) {
+                        input.addEventListener(e, function () {
+                            var newText = headers[index] = input.value;
+                            instance.updateSettings(isCol ? {
+                                colHeaders: headers
+                            } : {
+                                rowHeaders: headers
+                            });
+                            // debugger
+                            _that.onDesignTableHeaderChange(index, newText, headers);
+                            setTimeout(function () {
+                                if (input.parentNode)
+                                    input.parentNode.removeChild(input);
+                            });
                         });
                     });
+                }, appendInput = function () {
+                    input.setAttribute('type', 'text');
+                    input.style.cssText = '' +
+                        'position:absolute;' +
+                        'left:' + rect.left + 'px;' +
+                        'top:' + rect.top + 'px;' +
+                        'width:' + (rect.width - 4) + 'px;' +
+                        'height:' + (rect.height - 4) + 'px;' +
+                        'z-index:1060;';
+                    document.body.appendChild(input);
+                };
+                input.value = th.querySelector(isCol ? '.colHeader' : '.rowHeader').innerText;
+                appendInput();
+                setTimeout(function () {
+                    input.select();
+                    addListeners('change blur', instance[isCol ? 'getColHeader' : 'getRowHeader'](), coords[isCol ? 'col' : 'row']);
                 });
-            }, appendInput = function () {
-                input.setAttribute('type', 'text');
-                input.style.cssText = '' +
-                    'position:absolute;' +
-                    'left:' + rect.left + 'px;' +
-                    'top:' + rect.top + 'px;' +
-                    'width:' + (rect.width - 4) + 'px;' +
-                    'height:' + (rect.height - 4) + 'px;' +
-                    'z-index:1060;';
-                document.body.appendChild(input);
-            };
-            input.value = th.querySelector(isCol ? '.colHeader' : '.rowHeader').innerText;
-            appendInput();
-            setTimeout(function () {
-                input.select();
-                addListeners('change blur', instance[isCol ? 'getColHeader' : 'getRowHeader'](), coords[isCol ? 'col' : 'row']);
             });
-            // });
         };
         //  tableCfg.afterOnCellMouseDown = afterOnCellMouseDown;
         //*/

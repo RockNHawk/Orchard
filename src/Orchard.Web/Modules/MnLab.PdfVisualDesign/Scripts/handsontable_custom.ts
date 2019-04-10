@@ -516,11 +516,11 @@ string MemberExpression { get; set; }
         var afterOnCellMouseDown = function (event, coords, th) {
 
             // 鼠标左键
-             if (event.button !== 0 || event.button !== 1) return;
-             if (!event || event.button === 2) return;
+            // if (event.button !== 0 || event.button !== 1) return;
+             //if (!event || event.button === 2) return;
             //  debugger;
 
-            //console.log("even.button:" + event.button + 'window.event.button:' + (<any>(window.event)).button);
+            console.log("even.button:" + event.button + 'window.event.button:' + (<any>(window.event)).button);
 
             // debugger
             // only allow column header edit , do not allow row header edit
@@ -534,14 +534,15 @@ string MemberExpression { get; set; }
             if (!(isCol || isRow)) return;
 
             // fix bug , hover 也会触发此回调
-            //if (th.__fixafterOnCellMouseDown) {
-            //    return;
-            //}
+            if (th.__fixafterOnCellMouseDown) {
+                return;
+            }
 
-            //th.__fixafterOnCellMouseDown = 1;
+            th.__fixafterOnCellMouseDown = 1;
 
 
-            //  $(th).click(() => {
+              $(th).click(() => {
+                  console.log("th click");
 
             let input = document.createElement('input'),
                 rect = th.getBoundingClientRect(),
@@ -587,7 +588,7 @@ string MemberExpression { get; set; }
                 ](), coords[isCol ? 'col' : 'row']);
             });
 
-            // });
+             });
 
         };
         //  tableCfg.afterOnCellMouseDown = afterOnCellMouseDown;
