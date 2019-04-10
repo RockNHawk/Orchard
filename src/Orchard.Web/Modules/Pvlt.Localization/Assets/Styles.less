@@ -1,0 +1,32 @@
+.widget-culture-picker-widget {
+}
+
+.language-switcher {
+    float: right;
+
+    > ul {
+        li {
+            list-style: none;
+            display: inline-block;
+
+            &:after {
+                content: " | ";
+            }
+
+            &:last-child {
+                &:after {
+                    content: none;
+                }
+            }
+
+            &.disabled {
+                cursor: default;
+                opacity: 0.5;
+            }
+
+            a.current {
+                text-decoration: underline;
+            }
+        }
+    }
+}

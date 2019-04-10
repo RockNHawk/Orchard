@@ -1,0 +1,20 @@
+<Placement>
+  <Place Parts_CulturePicker_Edit="Content:10"/>
+  <Place Parts_CulturePicker="Content:1"/>
+
+  <Match DisplayType="Detail">
+    <Place Parts_Localization_ContentTranslations="-"/>
+
+    <Match ContentType="Page">
+      <Place Parts_Localization_ContentTranslations="Content:before"/>
+    </Match>
+
+    <Match ContentType="BlogPost">
+      <Place Parts_Localization_ContentTranslations="Content:before"/>
+    </Match>
+  </Match>
+
+  <Match DisplayType="Summary">
+    <Place Parts_Localization_ContentTranslations_Summary="-"/>
+  </Match>
+</Placement>

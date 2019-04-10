@@ -1,0 +1,36 @@
+﻿@{
+    Script.Require("jQuery");
+    Style.Require("ICTranslatorCss");
+}
+@using (Script.Foot())
+{
+    <script type="text/javascript">
+        doneCallback = function (response) {
+            $(".TransDiv .TransAfter").html(response);
+        }
+
+        function showTab(tab, curElem) {
+            $(".NavTab").hide();
+            $(".Nav").addClass("disabled");
+            $(curElem).removeClass("disabled");
+            $(tab).show();
+        }
+
+        $(function () {
+            var s = document.createElement("script");
+            s.src = "http://api.microsofttranslator.com/V2/Ajax.svc/Translate?oncomplete=doneCallback&appId=" +
+                "F2A07182C6BC85FA3F04A16F5E601BE01C514A76" +
+                "&from=@(Model.FromLanguage)&to=@(Model.ToLanguage)"  +
+                "&text=" + encodeURIComponent($(".TransOrig").html());
+                
+            document.getElementsByTagName("head")[0].appendChild(s);
+        });
+
+    </script>
+}
+<div class="TransDiv">
+<div class="Nav" onclick="showTab('.TransOrig', this)">@(Model.FromLanguage)</div>
+<div class="Nav disabled" onclick="showTab('.TransAfter', this)">@(Model.ToLanguage)</div>
+<div class="TransOrig NavTab" style="position: relative;">@Html.Raw(@Model.TranslateText)</div>
+<div class="TransAfter NavTab" style="position: relative;display:none">Translating...</div>
+</div>

@@ -1,0 +1,11 @@
+﻿@using Orchard.Localization.Models;
+@{
+    IEnumerable<LocalizationPart> localizations = Model.Localizations;
+}
+@if (localizations != null && localizations.Any()) {
+    using (Script.Head()) {
+        foreach (var localization in localizations) {
+            <link rel="alternate" hreflang="@localization.Culture.Culture" href="@Url.ItemDisplayUrl(localization)" />
+        }
+    }
+}

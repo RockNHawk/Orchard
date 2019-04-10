@@ -1,0 +1,24 @@
+Name: Ljosland Localization Enhancements
+AntiForgery: enabled
+Author: Ingvar Ljosland
+Website: http://www.ljosland.net
+Version: 1.6
+OrchardVersion: 1.6
+Description: Localization enhancements for multilingual sites
+Category: Localization
+Features:
+    Localized.Tags:
+        Name: Localized Tag Filter
+        Description: Filter tag clicks to only show tags for current site language
+        Dependencies: Ljosland.Localization, Orchard.Tags, Orchard.Localization
+        Category: Localization
+    Localized.Search
+        Name: Localized Search filter
+        Description: Filter search to only show results for conent with current site language
+        Dependencies: Ljosland.Localization, Orchard.Search, Orchard.Localization
+        Category: Localization
+    Localized.Blogs
+        Name: Localized Blogs
+        Description: Filter blogs to only show results for conent with current site language
+        Dependencies: Ljosland.Localization, Orchard.Blogs, Orchard.Localization
+        Category: Localization

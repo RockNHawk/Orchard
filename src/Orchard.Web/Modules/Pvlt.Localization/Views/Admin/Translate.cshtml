@@ -1,0 +1,9 @@
+﻿@{
+    Layout.Title = T("Translate Content").ToString();
+}
+
+@using (Html.BeginForm("Translate", "Admin", new { area = "Orchard.Localization" }, FormMethod.Post, new { })) {
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary()
+    @Display(Model)
+}
