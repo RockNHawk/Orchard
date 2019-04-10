@@ -11,6 +11,7 @@ declare interface ValueBindingDef {
     Remark?: any;
     BindType: string;
     Key?: any;
+    DisplayName?:any;
 }
 
 
@@ -123,6 +124,7 @@ class HandsontableCustomHelper {
                     } else {
 
                         var key = obj['Key'];
+                        var DisplayName = obj['DisplayName'];
                         var _type = obj['BindType'];
                         var valueArgument = value;
                         var memberValue = valueMaps && valueMaps[key] && valueMaps[key].Value;
@@ -136,7 +138,7 @@ class HandsontableCustomHelper {
                             switch (_type) {
                                 case 'DisplayName':
                                 default:
-                                    valueArgument = key;
+                                    valueArgument = DisplayName|| key;
                                     break;
                                 case 'Value':
                                     valueArgument = memberValue;

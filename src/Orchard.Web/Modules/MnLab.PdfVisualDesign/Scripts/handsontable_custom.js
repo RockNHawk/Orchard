@@ -96,6 +96,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
                     }
                     else {
                         var key = obj['Key'];
+                        var DisplayName = obj['DisplayName'];
                         var _type = obj['BindType'];
                         var valueArgument = value;
                         var memberValue = valueMaps && valueMaps[key] && valueMaps[key].Value;
@@ -108,7 +109,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
                             switch (_type) {
                                 case 'DisplayName':
                                 default:
-                                    valueArgument = key;
+                                    valueArgument = DisplayName || key;
                                     break;
                                 case 'Value':
                                     valueArgument = memberValue;

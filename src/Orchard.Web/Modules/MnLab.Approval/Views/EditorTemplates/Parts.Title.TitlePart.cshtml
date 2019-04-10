@@ -1,0 +1,7 @@
+﻿@model MnLab.Approval.Models.ApprovalPart
+
+<fieldset>
+    <label for="@Html.FieldIdFor(m => m.UserCommit)" class="required">@T("Title")</label>    
+    @Html.TextBoxFor(m => m.UserCommit, new { @class = "text large", autofocus = "autofocus" })
+    <span class="hint">@T("You must provide a title for this content item")</span>
+</fieldset>

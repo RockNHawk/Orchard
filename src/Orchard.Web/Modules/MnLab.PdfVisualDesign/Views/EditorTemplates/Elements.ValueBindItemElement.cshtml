@@ -1,49 +1,27 @@
 ﻿@using MnLab.PdfVisualDesign.ViewModels
 @model PropertyBindViewModel
 @{
-    /*
-    Script.Require("HB_CodeMirror_JS").AtFoot();
-    Script.Require("HB_CodeMirror_HtmlMixed").AtFoot();
-
-    Script.Require("HB_CodeMirror_Search").AtFoot();
-    Script.Require("HB_CodeMirror_Search_Cursor").AtFoot();
-    Script.Require("HB_CodeMirror_Search_MatchHighLight").AtFoot();
-    Script.Require("HB_CodeMirror_Search_Dialog").AtFoot();
-    Script.Require("HB_CodeMirror_Lint").AtFoot();
-    Script.Require("jQueryUI_Tabs").AtHead();
-
-    Style.Require("jQueryUI_Orchard").AtHead();
-
-    Style.Require("HB_CodeMirror").AtHead();
-    Style.Require("HB_CodeMirror_Lint").AtHead();
-    Style.Require("HB_CodeMirror_MatchScrollbar").AtHead();
-    Style.Require("HB_CodeMirror_Dialog").AtHead();
-
-    Style.Include("EditorStyle.css");
-    */
-
     var field = Model.Field;
-
 }
 
 <fieldset>
-    <legend>Bind</legend>
+    <legend>@T("Binding Setting")</legend>
     <div>
-        @Html.LabelFor(x => x.Binding.ContentPartName)
+        <label for="@Html.FieldIdFor(x => x.Binding.ContentPartName)">@T("ContentPartName")</label>
+        @*@Html.LabelFor(x => x.Binding.ContentPartName)*@
         @Html.TextBoxFor(x => x.Binding.ContentPartName)
     </div>
 
     <div>
-
-        @Html.LabelFor(x => x.Binding.MemberExpression)
+        <label for="@Html.FieldIdFor(x => x.Binding.MemberExpression)">@T("FieldName")</label>
+@*        @Html.LabelFor(x => x.Binding.MemberExpression)*@
         @Html.TextBoxFor(x => x.Binding.MemberExpression)
     </div>
 
-    <div>
-
+    @*<div>
         @Html.LabelFor(x => x.Binding.DefaultValue)
         @Html.TextBoxFor(x => x.Binding.DefaultValue)
-    </div>
+    </div>*@
 
 </fieldset>
 
@@ -51,8 +29,7 @@
 @if (Model.EditorShape != null)
 {
     <fieldset>
-        <legend>Value</legend>
-
+        <legend>@T("Value Edit")</legend>
         @{
             @*@Model.FieldDisplay*@
             //   var contentFieldShape = Model.FieldDisplay.BuildEditor(Model.Content, Model.Field);
@@ -94,12 +71,12 @@
 @using (Script.Foot())
 {
     @*if (Model.Context.Updater!=null)
-    {
-        <script type="text/javascript">
-            alert(11);
-            $().ready(function () {
+        {
+            <script type="text/javascript">
+                alert(11);
+                $().ready(function () {
 
-            });
-        </script>
-    }*@
+                });
+            </script>
+        }*@
 }
