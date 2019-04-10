@@ -516,8 +516,8 @@ string MemberExpression { get; set; }
         var afterOnCellMouseDown = function (event, coords, th) {
 
             // 鼠标左键
-            // if (event.button !== 0 || event.button !== 1) return;
-            // if (!event || event.button === 2) return;
+             if (event.button !== 0 || event.button !== 1) return;
+             if (!event || event.button === 2) return;
             //  debugger;
 
             //console.log("even.button:" + event.button + 'window.event.button:' + (<any>(window.event)).button);
@@ -595,6 +595,8 @@ string MemberExpression { get; set; }
 
         var tableCfg = {
             licenseKey: 'non-commercial-and-evaluation',
+            autoRowSize: false,
+            autoColumnSize: false,
             afterOnCellMouseDown: afterOnCellMouseDown,
             //afterGetColHeader: function (col, TH) {
 
@@ -771,6 +773,9 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
 
         var tableCfg = {
             licenseKey: 'non-commercial-and-evaluation',
+            autoRowSize: false,
+            autoColumnSize: false,
+
             data: allCellValues,
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
             rowHeaders: false,
