@@ -9,14 +9,14 @@ namespace MnLab.PdfVisualDesign.Controllers
 {
     [Admin]
     [ValidateInput(false)]
-    public class AdminController : Controller
+    public class ContentAdminController : Controller
     {
         private readonly IHtmlBlockService _htmlBlockService;
         private readonly IOrchardServices _services;
      
         public ILogger Logger { get; set; }
 
-        public AdminController(
+        public ContentAdminController(
             
             IHtmlBlockService htmlBlockService,
             IOrchardServices services

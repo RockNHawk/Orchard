@@ -373,6 +373,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="NewFolder1\" />
+    <Folder Include="Services\" />
     <Folder Include="Settings\" />
     <Folder Include="Views\DefinitionTemplates\" />
   </ItemGroup>
@@ -400,9 +401,6 @@
     <Compile Include="Hooks\CustomElementDisplay.cs" />
     <Compile Include="Hooks\ElementEventHandler.cs" />
     <Compile Include="Hooks\VsdModule.cs" />
-    <Compile Include="Services\AdminController.cs" />
-    <Compile Include="Services\HtmlBlockRecord.cs" />
-    <Compile Include="Services\HtmlBlockService.cs" />
     <Compile Include="Models\IValueBindingInfo.cs" />
     <Compile Include="Models\ValueBindingInfo.cs" />
     <Compile Include="Migrations.cs" />
