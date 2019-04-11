@@ -1,0 +1,37 @@
+﻿.ht_clone_top .wtHider {
+    width: 100% !important;
+}
+
+    .ht_clone_top .wtHider th {
+        background: #ffffff;
+        border-top: 0 !important;
+        border-left: 0 !important;
+        border-right: 0 !important;
+        border-bottom: 1px solid #000000 !important;
+        text-align: left;
+        padding: 20px 0;
+        font-size: 20px;
+        line-height: 1.47 !important;
+    }
+
+.ht_master .wtHider {
+    width: 100% !important;
+}
+
+.wtHider .wtSpreader {
+    width: 100%;
+}
+
+    .wtHider .wtSpreader table {
+        width: 100%;
+    }
+        .wtHider .wtSpreader table td {
+            background: #ffffff;
+            border-top: 0 !important;
+            border-left: 0 !important;
+            border-right: 0 !important;
+            border-bottom: 0 solid #000000 !important;
+            font-size: 17px;
+            line-height: 1.47 !important;
+            padding: 10px 10px 10px 10px !important;
+        }

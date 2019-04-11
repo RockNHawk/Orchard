@@ -646,6 +646,13 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
             columns: columns,
             //  columns: [columnDef, columnDef, columnDef, columnDef],
             mergeCells: mergedCells || [],
+            //afterRender: function () { //add custom header
+            //    //$('.htCore > thead').html(jsonObj.Headers);
+            //    //add container resize event handler for images that loaded in header
+            //    $('.htCore > thead img').load(function () {
+            //        $('.wtHider').height("100%");
+            //    });
+            //} 
             //mergeCells: [
             //    { row: 1, col: 1, rowspan: 3, colspan: 3 },
             //    { row: 3, col: 4, rowspan: 2, colspan: 2 },

@@ -11,10 +11,10 @@
     Script.Require("handsontable").AtHead();
     Style.Require("handsontable").AtHead();
 
-
     Script.Require("common").AtHead();
     Script.Require("handsontable_custom").AtHead();
-
+    Script.Require("tbales").AtHead();
+    Style.Require("table").AtHead();
     ValueBindGridViewModel ViewModel = Model?.ViewModel;
     ValueBindGridData design = ViewModel?.DesignData;
     var ValueMaps = ViewModel?.ValueMaps;
@@ -23,13 +23,10 @@
     var columnHeaderTexts = design?.HeaderTexts;
     var uniqueId = Guid.NewGuid().ToString("N");
 }
-
 <div id="handsontable-@(uniqueId)" class="hot handsontable htRowHeaders htColumnHeaders"></div>
 @{
     //@using (Script.Foot()){
     <script>
-
-
         (function() {
 
             // the design page first load data is correct ,but after the element edit form save, the element view design refresh (the data re retrive then get null data of each valueMaps item)
@@ -89,7 +86,7 @@
                 data: allCellValues,
                 mergeCells: mergedCells || [],
                 //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
-                rowHeaders: true,
+                rowHeaders: false,
                 colHeaders: true,
                 contextMenu: false,
                 // header 分为：属性名字列 和 属性值列，列头在设计页面要可以自定义
@@ -115,7 +112,7 @@
 
             });
         })();
-
+      
     </script>
 }
 <p></p>

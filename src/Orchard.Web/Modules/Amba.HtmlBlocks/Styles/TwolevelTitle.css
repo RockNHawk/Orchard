@@ -1,0 +1,18 @@
+﻿
+.two-title {
+    height: 30px;
+    background-color: #d6d9dc;
+}
+
+    .two-title .TwolevelTitle strong {
+        font-size: x-large;
+        padding-left: 10px;
+        font-weight: bold;
+        color: black;
+    }
+
+    .two-title .TwolevelTitle span {
+        color: grey;
+        font-size: x-large;
+       
+    }

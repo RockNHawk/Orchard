@@ -38385,9 +38385,9 @@ function () {
       var realHeight = (0, _array.arrayReduce)(data, function (accumulator, value) {
         return accumulator + (value.name === _predefinedItems.SEPARATOR ? 1 : 26);
       }, 0);
-      holderStyle.width = "".concat(currentHiderWidth + 22, "px");
-      holderStyle.height = "".concat(realHeight + 4, "px");
-      hiderStyle.height = holderStyle.height;
+      //holderStyle.width = "".concat(currentHiderWidth + 22, "px");
+      //holderStyle.height = "".concat(realHeight + 4, "px");
+      //hiderStyle.height = holderStyle.height;
     }
     /**
      * On after selection listener.
@@ -45287,9 +45287,9 @@ function () {
       var totalRows = this.wot.getSetting('totalRows');
       var headerRowSize = wtViewport.getRowHeaderWidth();
       var headerColumnSize = wtViewport.getColumnHeaderHeight();
-      var hiderStyle = wtTable.hider.style;
-      hiderStyle.width = "".concat(headerRowSize + this.leftOverlay.sumCellSizes(0, totalColumns), "px");
-      hiderStyle.height = "".concat(headerColumnSize + this.topOverlay.sumCellSizes(0, totalRows) + 1, "px");
+      //var hiderStyle = wtTable.hider.style;
+      //hiderStyle.width = "".concat(headerRowSize + this.leftOverlay.sumCellSizes(0, totalColumns), "px");
+      //hiderStyle.height = "".concat(headerColumnSize + this.topOverlay.sumCellSizes(0, totalRows) + 1, "px");
 
       if (this.scrollbarSize > 0) {
         var _wtTable$wtRootElemen = wtTable.wtRootElement,
@@ -46106,9 +46106,9 @@ function () {
 
           width = Math.min(width, scrollWidth);
           height = Math.min(height, scrollHeight);
-          holderStyle.width = "".concat(width, "px");
-          holderStyle.height = trimmingHeight === 'auto' ? 'auto' : "".concat(height, "px");
-          holderStyle.overflow = '';
+          //holderStyle.width = "".concat(width, "px");
+          //holderStyle.height = trimmingHeight === 'auto' ? 'auto' : "".concat(height, "px");
+          //holderStyle.overflow = '';
         }
       }
     }

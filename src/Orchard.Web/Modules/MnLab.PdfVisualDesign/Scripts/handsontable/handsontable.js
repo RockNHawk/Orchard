@@ -18755,7 +18755,7 @@ function () {
       var realHeight = (0, _array.arrayReduce)(data, function (accumulator, value) {
         return accumulator + (value.name === _predefinedItems.SEPARATOR ? 1 : 26);
       }, 0);
-      holderStyle.width = "".concat(currentHiderWidth + 22, "px");
+      //holderStyle.width = "".concat(currentHiderWidth + 22, "px");
       holderStyle.height = "".concat(realHeight + 4, "px");
       hiderStyle.height = holderStyle.height;
     }
@@ -24916,7 +24916,7 @@ function () {
       var headerRowSize = wtViewport.getRowHeaderWidth();
       var headerColumnSize = wtViewport.getColumnHeaderHeight();
       var hiderStyle = wtTable.hider.style;
-      hiderStyle.width = "".concat(headerRowSize + this.leftOverlay.sumCellSizes(0, totalColumns), "px");
+      //hiderStyle.width = "".concat(headerRowSize + this.leftOverlay.sumCellSizes(0, totalColumns), "px");
       hiderStyle.height = "".concat(headerColumnSize + this.topOverlay.sumCellSizes(0, totalRows) + 1, "px");
 
       if (this.scrollbarSize > 0) {
@@ -25734,7 +25734,7 @@ function () {
 
           width = Math.min(width, scrollWidth);
           height = Math.min(height, scrollHeight);
-          holderStyle.width = "".concat(width, "px");
+          //holderStyle.width = "".concat(width, "px");
           holderStyle.height = trimmingHeight === 'auto' ? 'auto' : "".concat(height, "px");
           holderStyle.overflow = '';
         }
@@ -26481,13 +26481,13 @@ function () {
         this.wot.wtViewport.createVisibleCalculators();
         this.wot.wtOverlays.refresh(false);
         this.wot.wtOverlays.applyToDOM();
-        var hiderWidth = (0, _element.outerWidth)(this.wtTable.hider);
+        //var hiderWidth = (0, _element.outerWidth)(this.wtTable.hider);
         var tableWidth = (0, _element.outerWidth)(this.wtTable.TABLE);
 
-        if (hiderWidth !== 0 && tableWidth !== hiderWidth) {
-          // Recalculate the column widths, if width changes made in the overlays removed the scrollbar, thus changing the viewport width.
-          this.adjustColumnWidths(columnsToRender);
-        }
+        //if (hiderWidth !== 0 && tableWidth !== hiderWidth) {
+        //  // Recalculate the column widths, if width changes made in the overlays removed the scrollbar, thus changing the viewport width.
+        //  this.adjustColumnWidths(columnsToRender);
+        //}
 
         if (workspaceWidth !== this.wot.wtViewport.getWorkspaceWidth()) {
           // workspace width changed though to shown/hidden vertical scrollbar. Let's reapply stretching
@@ -38237,7 +38237,7 @@ function (_Overlay) {
     key: "adjustRootChildrenSize",
     value: function adjustRootChildrenSize() {
       var scrollbarWidth = (0, _element.getScrollbarWidth)(this.wot.rootDocument);
-      this.clone.wtTable.hider.style.width = this.hider.style.width;
+      //this.clone.wtTable.hider.style.width = this.hider.style.width;
       this.clone.wtTable.holder.style.width = this.clone.wtTable.holder.parentNode.style.width;
 
       if (scrollbarWidth === 0) {
@@ -55971,7 +55971,7 @@ function (_BasePlugin) {
       var scrollLeft = typeof scrollableElement.scrollX === 'number' ? scrollableElement.scrollX : scrollableElement.scrollLeft;
       var tdOffsetLeft = this.hot.view.THEAD.offsetLeft + this.getColumnsWidth(0, priv.coordsColumn);
       var mouseOffsetLeft = priv.target.eventPageX - (priv.rootElementOffset - (scrollableElement.scrollX === void 0 ? scrollLeft : 0));
-      var hiderWidth = wtTable.hider.offsetWidth;
+      //var hiderWidth = wtTable.hider.offsetWidth;
       var tbodyOffsetLeft = wtTable.TBODY.offsetLeft;
       var backlightElemMarginLeft = this.backlight.getOffset().left;
       var backlightElemWidth = this.backlight.getSize().width;

@@ -1,0 +1,19 @@
+﻿@{
+    //Script.Require("HB_Highlightjs").AtHead();
+    //Script.Require("HB_Highlightjs_Init").AtFoot();
+    //Style.Require("HB_Highlightjs").AtHead();
+    //Style.Require("TwolevelTitle").Athead();
+    //Style.Include("TwolevelTitle.css");
+
+    var id = Guid.NewGuid().ToString("N");
+    //Style.Require("TwolevelTitle").AtHead();
+    Style.Include("TwolevelTitle.css");
+}
+<div style="background: white; padding: 5px;">
+    <pre class="two-title"><code class="TwolevelTitle"><strong>@(Model.viewMode.MemberExpression)</strong><span>@(Model.viewMode.MemberExpressions)</span></code></pre>
+</div>
+<script>
+    $('#@(id)').each(function (i, block) {
+        hljs.highlightBlock(block);
+    });
+</script>

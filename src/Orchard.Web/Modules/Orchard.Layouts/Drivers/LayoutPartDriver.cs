@@ -86,6 +86,8 @@ namespace Orchard.Layouts.Drivers {
         }
 
         protected override DriverResult Editor(LayoutPart part, dynamic shapeHelper) {
+            //part.LayoutData = Convert.ToString(System.Text.Encoding.Default.GetBytes(part.LayoutData.ToString())).ToJson();
+            //var settings = part.TypePartDefinition.Settings.GetModel<LayoutTypePartSettings>();
             return Editor(part, null, shapeHelper);
         }
 

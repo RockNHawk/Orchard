@@ -25,7 +25,7 @@ namespace Amba.HtmlBlocks
             manifest.DefineScript("HB_CodeMirror_HtmlMixed").SetUrl("codemirror/mode/htmlmixed/htmlmixed.js ")
                 .SetDependencies("HB_CodeMirror", "HB_CodeMirror_XML", "HB_CodeMirror_CSS", "HB_CodeMirror_JS");
 
-
+            manifest.DefineStyle("TwolevelTitle").SetUrl("~/modules/Amba.HtmlBlocks/Styles/TwolevelTitle.css");
             manifest.DefineStyle("HB_CodeMirror").SetUrl("~/modules/Amba.HtmlBlocks/Scripts/codemirror/lib/codemirror.css");
             manifest.DefineStyle("HB_CodeMirror_Lint").SetUrl("~/modules/Amba.HtmlBlocks/Scripts/codemirror/addon/lint/lint.css").SetDependencies("HB_CodeMirror");
             manifest.DefineStyle("HB_CodeMirror_MatchScrollbar").SetUrl("~/modules/Amba.HtmlBlocks/Scripts/codemirror/addon/search/matchesonscrollbar.css").SetDependencies("HB_CodeMirror");

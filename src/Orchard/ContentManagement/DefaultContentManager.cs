@@ -197,6 +197,7 @@ namespace Orchard.ContentManagement {
                 }
                 else {
                     versionRecord = contentItemVersionRecords.LastOrDefault();
+                    
                 }
             }
 

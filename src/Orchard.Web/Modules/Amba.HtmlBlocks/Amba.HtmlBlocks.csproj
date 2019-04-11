@@ -50,6 +50,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper">
+      <HintPath>..\..\..\packages\AutoMapper.7.0.1\lib\net45\AutoMapper.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -390,6 +393,7 @@
     <Content Include="Scripts\highlightjs\styles\xcode.css" />
     <Content Include="Scripts\highlightjs\styles\zenburn.css" />
     <Content Include="Styles\EditorStyle.css" />
+    <Content Include="Styles\TwolevelTitle.css" />
     <Content Include="Styles\Web.config" />
     <Content Include="Web.config" />
     <Content Include="Views\Web.config" />
@@ -418,13 +422,16 @@
     <Compile Include="AdminMenu.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Drivers\DriverBase.cs" />
+    <Compile Include="Drivers\TwolevelTitletDriver.cs" />
     <Compile Include="Drivers\HtmlBlockFieldDriver.cs" />
     <Compile Include="Drivers\HtmlBlockElementDriver.cs" />
+    <Compile Include="Elements\TwolevelTitle.cs" />
     <Compile Include="Elements\HtmlBlockElement.cs" />
     <Compile Include="Extensions\HtmlHelper.cs" />
     <Compile Include="Fields\HtmlBlockField.cs" />
     <Compile Include="Migrations.cs" />
     <Compile Include="Models\HtmlBlockRecord.cs" />
+    <Compile Include="Elements\IValueTitleData.cs" />
     <Compile Include="ResourceManifest.cs" />
     <Compile Include="Services\HtmlBlockService.cs" />
     <Compile Include="Settings\HtmlBlockFieldFieldEditorEvents.cs" />
@@ -472,6 +479,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <Content Include="Views\Elements.TwolevelTitle.Design.cshtml" />
+    <Content Include="Views\Elements.TwolevelTitle.cshtml" />
+    <Content Include="Views\EditorTemplates\Elements.TwolevelTitle.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

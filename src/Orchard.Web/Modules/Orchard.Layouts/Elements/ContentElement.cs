@@ -11,5 +11,6 @@ namespace Orchard.Layouts.Elements {
             get { return this.Retrieve(x => x.Content); }
             set { this.Store(x => x.Content, value); }
         }
+
     }
 }

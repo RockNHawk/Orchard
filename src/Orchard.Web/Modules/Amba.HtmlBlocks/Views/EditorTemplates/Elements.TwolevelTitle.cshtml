@@ -1,0 +1,44 @@
+﻿@model Amba.HtmlBlocks.Binding.Elements.ValueTitleViewModel
+@using Amba.HtmlBlocks.Settings
+@{
+    Script.Require("HB_CodeMirror_JS").AtFoot();
+    Script.Require("HB_CodeMirror_HtmlMixed").AtFoot();
+
+    Script.Require("HB_CodeMirror_Search").AtFoot();
+    Script.Require("HB_CodeMirror_Search_Cursor").AtFoot();
+    Script.Require("HB_CodeMirror_Search_MatchHighLight").AtFoot();
+    Script.Require("HB_CodeMirror_Search_Dialog").AtFoot();
+    Script.Require("HB_CodeMirror_Lint").AtFoot();
+    Script.Require("jQueryUI_Tabs").AtHead();
+
+    Style.Require("jQueryUI_Orchard").AtHead();
+
+    Style.Require("HB_CodeMirror").AtHead();
+    Style.Require("HB_CodeMirror_Lint").AtHead();
+    Style.Require("HB_CodeMirror_MatchScrollbar").AtHead();
+    Style.Require("HB_CodeMirror_Dialog").AtHead();
+
+    Style.Include("EditorStyle.css");
+
+    Style.Require("TwolevelTitle").AtHead();
+
+    var id = Guid.NewGuid().ToString();
+}
+
+@*中文标题 @Html.TextAreaFor(x => x.DesignData.MemberExpression, new { id = id })
+    英文标题 @Html.TextAreaFor(x => x.DesignData.MemberExpressions, new { id = id })*@
+中文标题<input name="@Html.NameFor(x => x.DesignData.MemberExpression)" />
+英文标题<input name="@Html.NameFor(x => x.DesignData.MemberExpressions)" />
+@using (Script.Foot())
+{
+    <script type="text/javascript">
+        $().ready(function () {
+            alert(""@(id)"")
+            CodeMirror.fromTextArea(document.getElementById("@(id)"), {
+                lineNumbers: true,
+                mode: "text/html",
+                lineWrapping: true
+            });
+        });
+    </script>
+}

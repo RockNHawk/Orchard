@@ -343,6 +343,10 @@
     <Content Include="Scripts\handsontable\numbro\numbro.js" />
     <Content Include="Scripts\handsontable\pikaday\pikaday.css" />
     <Content Include="Scripts\handsontable\pikaday\pikaday.js" />
+    <Content Include="Scripts\inputclassEnhance.js" />
+    <Content Include="Scripts\table.js" />
+    <Content Include="Scripts\Template\T1\index.css" />
+    <Content Include="Styles\table.css" />
     <Content Include="Styles\Web.config" />
     <Content Include="Web.config" />
     <Content Include="Views\Web.config" />
