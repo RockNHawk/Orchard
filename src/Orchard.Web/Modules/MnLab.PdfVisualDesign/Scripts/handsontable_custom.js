@@ -56,14 +56,14 @@ var HandsontableCustomHelper = /** @class */ (function () {
         //  return obj;
     };
     ;
-    HandsontableCustomHelper.prototype.getCellDisplayText = function (mode, row, col, cellValueAccrssor, valueMaps) {
+    HandsontableCustomHelper.prototype.getCellDisplayText = function (tableType, row, col, cellValueAccrssor, valueMaps) {
         var valueDef = cellValueAccrssor(row, col);
         if (!valueDef) {
             return;
         }
-        return this.getCellDisplayText2(mode, valueDef, valueMaps);
+        return this.getCellDisplayText2(tableType, valueDef, valueMaps);
     };
-    HandsontableCustomHelper.prototype.getCellDisplayText2 = function (mode, valueDef, valueMaps) {
+    HandsontableCustomHelper.prototype.getCellDisplayText2 = function (tableType, valueDef, valueMaps) {
         if (!valueDef) {
             return;
         }
@@ -74,6 +74,11 @@ var HandsontableCustomHelper = /** @class */ (function () {
             var _type = valueDef['BindType'];
             var valueArgument;
             var memberValue = valueMaps && valueMaps[key] && valueMaps[key].Value;
+            if (tableType == 'ValueEdit') {
+                if ('SetValue' in valueDef) {
+                    memberValue = valueDef.SetValue;
+                }
+            }
             //switch (mode) {
             //    case 'BindingEdit':
             //    default:
@@ -85,8 +90,9 @@ var HandsontableCustomHelper = /** @class */ (function () {
                     default:
                         valueArgument = DisplayName || key;
                         break;
+                    //  case 'SetValue':
                     case 'Value':
-                        if (memberValue || this.mode == 'ValueEdit') {
+                        if (memberValue || tableType == 'ValueEdit') {
                             valueArgument = memberValue;
                         }
                         else {
@@ -168,7 +174,10 @@ var HandsontableCustomHelper = /** @class */ (function () {
     ;
     HandsontableCustomHelper.prototype.init = function (data) {
         this.sourceData = data;
-        this.changedData = __assign({}, data);
+        var changed = this.changedData = __assign({}, data);
+        if (!changed.allCellValues) {
+            changed.allCellValues = [];
+        }
     };
     HandsontableCustomHelper.prototype.createController = function (option) {
         var _this = this;
@@ -214,7 +223,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
         });
         return ngController;
     };
-    HandsontableCustomHelper.prototype.processTableValueChange = function (changes) {
+    HandsontableCustomHelper.prototype.processTableValueChange = function (tableType, changes) {
         var _this = this;
         var scope = this.scope;
         var isBindingEdit = scope && scope.mode == 'BindingEdit';
@@ -244,8 +253,8 @@ var HandsontableCustomHelper = /** @class */ (function () {
             if (isValueChanged) {
                 changedItems.push(info);
             }
-            if (row > oldData.length) {
-                for (var i = oldData.length; i < row; i++) {
+            if (row + 1 > oldData.length) {
+                for (var i = oldData.length; i < row + 1; i++) {
                     oldData[i] = [];
                 }
                 //  oldData.length = row;
@@ -254,8 +263,8 @@ var HandsontableCustomHelper = /** @class */ (function () {
             //if (!oldCells) {
             //    oldCells = [];
             //}
-            if (col > oldColumns.length) {
-                for (var i = oldColumns.length; i < col; i++) {
+            if (col + 1 > oldColumns.length) {
+                for (var i = oldColumns.length; i < col + 1; i++) {
                     oldColumns[i] = null;
                 }
             }
@@ -277,9 +286,10 @@ var HandsontableCustomHelper = /** @class */ (function () {
                 }
                 else {
                     var sourceDef = oldValueObj;
-                    if (isBindingEdit && sourceDef && sourceDef.BindType == 'Value') {
-                        debugger;
+                    debugger;
+                    if (isValueEdit && sourceDef && sourceDef.BindType == 'Value') {
                         sourceDef.SetValue = newValue;
+                        obj = sourceDef;
                     }
                     else {
                         // 用戶手動輸入自定義文本（不是從 Dropdown 内選擇）
@@ -287,7 +297,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
                         obj = { BindType: "StaticValue", StaticValue: newValue };
                     }
                 }
-                var text = _this.getCellDisplayText2(null, obj, _this.changedData.valueMaps);
+                var text = _this.getCellDisplayText2(tableType, obj, _this.changedData.valueMaps);
                 // [[row, prop, oldVal, newVal], ...]
                 // table 只能處理 string 類型數據，無法處理 Object
                 changes[index][3] = text;
@@ -627,7 +637,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
             //  rowHeaders: true,
             contextMenu: true, allowInsertColumn: true, allowInsertRow: true });
-        this.bindTableValueChange(tableCfg);
+        this.bindTableValueChange('BindingEdit', tableCfg);
         this.bindTableEvent(uniqueId, tableCfg, ['afterMergeCells', 'afterUnmergeCells'], function (tableInstance) {
             var mc = tableInstance.getPlugin('mergeCells');
             var mergedCellsCollection = mc.mergedCellsCollection;
@@ -690,7 +700,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
             //data: allCellValues,
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
             rowHeaders: false, contextMenu: false, allowInsertColumn: false, allowInsertRow: false, colHeaders: columnHeaderTexts });
-        this.bindTableValueChange(tableCfg);
+        this.bindTableValueChange('ValueEdit', tableCfg);
         //this.bindTableChange(uniqueId, tableCfg, null, (tableInstance) => {
         //    // 源数据
         //    var sourceData = tableInstance.getSourceData();
@@ -728,19 +738,19 @@ var HandsontableCustomHelper = /** @class */ (function () {
         return girdTable;
     };
     ;
-    HandsontableCustomHelper.prototype.bindTableValueChange = function (tableCfg) {
+    HandsontableCustomHelper.prototype.bindTableValueChange = function (tableType, tableCfg) {
         var _that = this;
         //https://handsontable.com/docs/7.0.0/Hooks.html#event:beforeChange
         tableCfg['beforeChange'] = function (changes) {
             var tableInstance = this;
             if (changes) {
                 // var newData = tableInstance.getData();
-                var changedItems = _that.processTableValueChange(changes);
+                var changedItems = _that.processTableValueChange(tableType, changes);
                 if (changedItems && changedItems.length) {
-                    var mode = _that.mode;
-                    if (mode) {
+                    var currentMode = _that.mode;
+                    if (currentMode) {
                         var table;
-                        switch (mode) {
+                        switch (currentMode) {
                             case 'ValueEdit':
                                 table = _that.bindingEditTable;
                                 break;

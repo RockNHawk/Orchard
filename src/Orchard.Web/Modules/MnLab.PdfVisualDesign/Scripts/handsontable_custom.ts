@@ -68,15 +68,15 @@ class HandsontableCustomHelper {
         //  return obj;
     };
 
-    getCellDisplayText(mode, row, col, cellValueAccrssor: (row, col) => ValueBindingDef, valueMaps) {
+    getCellDisplayText(tableType, row, col, cellValueAccrssor: (row, col) => ValueBindingDef, valueMaps) {
         var valueDef = cellValueAccrssor(row, col);
         if (!valueDef) {
             return;
         }
-        return this.getCellDisplayText2(mode, valueDef, valueMaps);
+        return this.getCellDisplayText2(tableType, valueDef, valueMaps);
     }
 
-    getCellDisplayText2(mode, valueDef: ValueBindingDef, valueMaps): string {
+    getCellDisplayText2(tableType, valueDef: ValueBindingDef, valueMaps): string {
         if (!valueDef) {
             return;
         }
@@ -89,7 +89,11 @@ class HandsontableCustomHelper {
             var _type = valueDef['BindType'];
             var valueArgument: string;
             var memberValue = valueMaps && valueMaps[key] && valueMaps[key].Value;
-
+            if (tableType =='ValueEdit') {
+                if ('SetValue' in valueDef) {
+                    memberValue = valueDef.SetValue;
+                }
+            }
             //switch (mode) {
             //    case 'BindingEdit':
             //    default:
@@ -101,11 +105,12 @@ class HandsontableCustomHelper {
                     default:
                         valueArgument = DisplayName || key;
                         break;
+                  //  case 'SetValue':
                     case 'Value':
-                        if (memberValue || this.mode == 'ValueEdit') {
+                        if (memberValue || tableType == 'ValueEdit') {
                             valueArgument = memberValue;
                         } else {
-                           // debugger
+                            // debugger
                             valueArgument = `(${DisplayName})`;
                         }
                         break;
@@ -191,7 +196,10 @@ class HandsontableCustomHelper {
 
     init(data: HandsontableData) {
         this.sourceData = data;
-        this.changedData = { ...data };
+        var changed = this.changedData = { ...data };
+        if (!changed.allCellValues) {
+            changed.allCellValues = [];
+        }
     }
 
     private createController(option: HandsontableData) {
@@ -261,7 +269,7 @@ class HandsontableCustomHelper {
         return ngController;
     }
 
-    processTableValueChange(changes: any[][]) {
+    processTableValueChange(tableType,changes: any[][]) {
         var scope = this.scope;
         var isBindingEdit = scope && scope.mode == 'BindingEdit';
         var isValueEdit = !isBindingEdit;
@@ -296,18 +304,19 @@ class HandsontableCustomHelper {
             if (isValueChanged) {
                 changedItems.push(info);
             }
-            if (row > oldData.length) {
-                for (var i = oldData.length; i < row; i++) {
+            if (row + 1 > oldData.length) {
+                for (var i = oldData.length; i < row + 1; i++) {
                     oldData[i] = [];
                 }
                 //  oldData.length = row;
             }
+
             var oldColumns = oldData[row];
             //if (!oldCells) {
             //    oldCells = [];
             //}
-            if (col > oldColumns.length) {
-                for (var i = oldColumns.length; i < col; i++) {
+            if (col+1 > oldColumns.length) {
+                for (var i = oldColumns.length; i < col + 1; i++) {
                     oldColumns[i] = null;
                 }
             }
@@ -331,9 +340,10 @@ class HandsontableCustomHelper {
                 }
                 else {
                     var sourceDef = oldValueObj;
-                    if (isBindingEdit && sourceDef && sourceDef.BindType == 'Value') {
-                        debugger
+                    debugger
+                    if (isValueEdit && sourceDef && sourceDef.BindType == 'Value') {
                         sourceDef.SetValue = newValue;
+                        obj = sourceDef;
                     } else {
 
                         // 用戶手動輸入自定義文本（不是從 Dropdown 内選擇）
@@ -341,7 +351,7 @@ class HandsontableCustomHelper {
                         obj = { BindType: "StaticValue", StaticValue: newValue };
                     }
                 }
-                var text = this.getCellDisplayText2(null, obj, this.changedData.valueMaps);
+                var text = this.getCellDisplayText2(tableType, obj, this.changedData.valueMaps);
                 // [[row, prop, oldVal, newVal], ...]
                 // table 只能處理 string 類型數據，無法處理 Object
                 changes[index][3] = text
@@ -788,7 +798,7 @@ class HandsontableCustomHelper {
             //}
         };
 
-        this.bindTableValueChange(tableCfg);
+        this.bindTableValueChange('BindingEdit',tableCfg);
 
 
         this.bindTableEvent(uniqueId, tableCfg, ['afterMergeCells', 'afterUnmergeCells'], (tableInstance) => {
@@ -884,7 +894,7 @@ class HandsontableCustomHelper {
         };
 
 
-        this.bindTableValueChange(tableCfg);
+        this.bindTableValueChange('ValueEdit',tableCfg);
 
         //this.bindTableChange(uniqueId, tableCfg, null, (tableInstance) => {
         //    // 源数据
@@ -935,7 +945,7 @@ class HandsontableCustomHelper {
     };
 
 
-    private bindTableValueChange(tableCfg) {
+    private bindTableValueChange(tableType,tableCfg) {
         var _that = this;
 
         //https://handsontable.com/docs/7.0.0/Hooks.html#event:beforeChange
@@ -943,12 +953,12 @@ class HandsontableCustomHelper {
             var tableInstance = this;
             if (changes) {
                 // var newData = tableInstance.getData();
-                var changedItems = _that.processTableValueChange(changes);
+                var changedItems = _that.processTableValueChange(tableType,changes);
                 if (changedItems && changedItems.length) {
-                    var mode = _that.mode;
-                    if (mode) {
+                    var currentMode = _that.mode;
+                    if (currentMode) {
                         var table;
-                        switch (mode) {
+                        switch (currentMode) {
                             case 'ValueEdit':
                                 table = _that.bindingEditTable;
                                 break;
