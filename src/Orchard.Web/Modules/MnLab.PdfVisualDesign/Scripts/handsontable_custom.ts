@@ -781,6 +781,8 @@ class HandsontableCustomHelper {
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
             //  rowHeaders: true,
             contextMenu: true,
+            allowRemoveColumn: true,
+            allowRemoveRow: true,
             allowInsertColumn: true,
             allowInsertRow: true,
             // colHeaders: true,

@@ -636,7 +636,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
             //mergeCells: mergedCells || [],
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
             //  rowHeaders: true,
-            contextMenu: true, allowInsertColumn: true, allowInsertRow: true });
+            contextMenu: true, allowRemoveColumn: true, allowRemoveRow: true, allowInsertColumn: true, allowInsertRow: true });
         this.bindTableValueChange('BindingEdit', tableCfg);
         this.bindTableEvent(uniqueId, tableCfg, ['afterMergeCells', 'afterUnmergeCells'], function (tableInstance) {
             var mc = tableInstance.getPlugin('mergeCells');
