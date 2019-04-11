@@ -104,9 +104,10 @@
             <code>{{mergedCells_JSON}}</code>
         </fieldset>
 
-        <input type="hidden" name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="columnHeaderTexts_JSON" />
-        <input type="hidden" name="@(Html.NameFor(x => x.DesignData.AllCellValues))_JSON" ng-model="allCellValues_JSON" />
-        <input type="hidden" name="@(Html.NameFor(x => x.DesignData.MergedCells))_JSON" ng-model="mergedCells_JSON" />
+        @*  if input  type set to hidden ,angular  could not sync the value *@
+        <input type="text" name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="columnHeaderTexts_JSON" />
+        <input type="text" name="@(Html.NameFor(x => x.DesignData.AllCellValues))_JSON" ng-model="allCellValues_JSON" />
+        <input type="text" name="@(Html.NameFor(x => x.DesignData.MergedCells))_JSON" ng-model="mergedCells_JSON" />
 
 
     </div>

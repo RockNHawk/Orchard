@@ -3,12 +3,15 @@
 namespace MnLab.PdfVisualDesign {
     public interface IValueDef {
         string BindType { get; set; }
-       string Remark { get; set; }
-
+        string Remark { get; set; }
     }
 
     public interface IStaticValueDef : IValueDef {
-          string StaticValue { get; set; }
+        string StaticValue { get; set; }
+    }
+
+    public interface ISetValueDef : IValueDef {
+        string SetValue { get; set; }
     }
 
     public interface IValueBindingDef : IValueDef {

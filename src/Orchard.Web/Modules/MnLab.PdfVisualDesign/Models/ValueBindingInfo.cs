@@ -7,7 +7,7 @@ using Orchard.Localization;
 namespace MnLab.PdfVisualDesign {
 
 
-        public class ValueDef : IValueBindingDef , IStaticValueDef {
+    public class ValueDef : IValueBindingDef, IStaticValueDef, ISetValueDef {
 
         public string BindType { get; set; }
         public string Remark { get; set; }
@@ -19,13 +19,15 @@ namespace MnLab.PdfVisualDesign {
         /// </summary>
         public string StaticValue { get; set; }
 
+        public string SetValue { get; set; }
+
 
         public string ContentPartName { get; set; }
         public string MemberExpression { get; set; }
         public string DefaultValue { get; set; }
-      
+
         public LocalizedString Description { get; set; }
         public string DisplayName { get; set; }
-        public string Key => string.IsNullOrEmpty(ContentPartName)|| string.IsNullOrEmpty(MemberExpression)?null: ContentPartName + "." + MemberExpression;
+        public string Key => string.IsNullOrEmpty(ContentPartName) || string.IsNullOrEmpty(MemberExpression) ? null : ContentPartName + "." + MemberExpression;
     }
 }

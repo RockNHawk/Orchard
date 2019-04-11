@@ -340,7 +340,7 @@ class HandsontableCustomHelper {
                 }
                 else {
                     var sourceDef = oldValueObj;
-                    debugger
+                    //debugger
                     if (isValueEdit && sourceDef && sourceDef.BindType == 'Value') {
                         sourceDef.SetValue = newValue;
                         obj = sourceDef;
