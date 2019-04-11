@@ -33,7 +33,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
         }
     };
     ;
-    HandsontableCustomHelper.prototype.parseCellValueIfIsJsonExpr = function (d) {
+    HandsontableCustomHelper.prototype.parseCellValueIfIsTextExpr = function (d) {
         if (d && typeof (d) === 'string' && d.indexOf('JSON::') === 0) {
             try {
                 var obj = JSON.parse(d.substring('JSON::'.length));
@@ -48,7 +48,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
         }
     };
     ;
-    HandsontableCustomHelper.prototype.wrapCellValueJson = function (obj) {
+    HandsontableCustomHelper.prototype.wrapCellValueJsonToTextExpr = function (obj) {
         if (!obj)
             return obj;
         // handsometable 的 cell value 除非首次通过 tableCfg.data 指定，否则不能为 object
@@ -138,7 +138,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
            if the data is from server (server JSON SerializeObject , value type is Object)
            if the data is from local user inputed, calue type is string
            */
-            var valueDef = value && (typeof value === 'string' ? _that.parseCellValueIfIsJsonExpr(value) : value);
+            var valueDef = value && (typeof value === 'string' ? _that.parseCellValueIfIsTextExpr(value) : value);
             var displayText;
             if (typeof (valueDef) == 'string') {
                 displayText = value;
@@ -201,9 +201,25 @@ var HandsontableCustomHelper = /** @class */ (function () {
         });
         return ngController;
     };
-    HandsontableCustomHelper.prototype.onTableValueChange = function (changes, newData) {
+    HandsontableCustomHelper.prototype.onBeforeTableValueChange = function (changes) {
         var _this = this;
+        var scope = this.scope;
+        var isBindingEdit = scope && scope.mode == 'BindingEdit';
+        var isValueEdit = !isBindingEdit;
         var oldData = this.changedData.allCellValues;
+        //var allValues = _that.changedData.allCellValues;
+        ////  debugger
+        //changes.forEach(([row, col, oldValue, newValue]) => {
+        //    var sourceDef = allValues[row][col];
+        //    if (sourceDef == null) {
+        //    } else if (typeof sourceDef == 'undefined') {
+        //    } else {
+        //        if (sourceDef.BindType == 'Value') {
+        //            sourceDef.SetValue = newValue;
+        //            // _that.changedData.allCellValues[row][col]=
+        //        }
+        //    }
+        //});
         /**
          *
          * */
@@ -230,27 +246,39 @@ var HandsontableCustomHelper = /** @class */ (function () {
                     oldColumns[i] = null;
                 }
             }
+            var oldValueObj = oldColumns[col];
             // debugger
             // 不管有沒有 change，都需要算一下 text ？
             if (newValue) {
                 var obj;
-                // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
+                // 這個 if 分支目前不會進入
                 if (MnUtil.isJson(newValue)) {
                     obj = newValue;
                     // 无需更改
                     // array[j] = d;//parseCellValueIfIsJsonExpr(d);
                 }
+                // 用戶 Dropdown 選擇綁定后，會進入此分支
                 else if (_this.isCellValueJsonExpr(newValue)) {
                     // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
-                    obj = _this.parseCellValueIfIsJsonExpr(newValue);
+                    obj = _this.parseCellValueIfIsTextExpr(newValue);
                 }
                 else {
-                    // 用户手动输入任意字符串
-                    obj = { BindType: "StaticValue", StaticValue: newValue };
+                    var sourceDef = oldValueObj;
+                    if (isBindingEdit && sourceDef && sourceDef.BindType == 'Value') {
+                        debugger;
+                        sourceDef.SetValue = newValue;
+                    }
+                    else {
+                        // 用戶手動輸入自定義文本（不是從 Dropdown 内選擇）
+                        // 用户手动输入任意字符串
+                        obj = { BindType: "StaticValue", StaticValue: newValue };
+                    }
                 }
                 var text = _this.getCellDisplayText2(null, obj, _this.changedData.valueMaps);
                 // [[row, prop, oldVal, newVal], ...]
+                // table 只能處理 string 類型數據，無法處理 Object
                 changes[index][3] = text;
+                // 把對象更新到這裏，後面 angular 會更新到表單上
                 oldColumns[col] = obj;
             }
             else {
@@ -261,6 +289,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
         //  this.fixNewData(changes, newData, oldData, this.scope && this.scope.mode == 'BindingEdit');
         // this.changedData.allCellValues = newData;
         if (this.scope) {
+            // angular 更新
             this.scope.applyTableValueChange(oldData);
         }
     };
@@ -270,52 +299,50 @@ var HandsontableCustomHelper = /** @class */ (function () {
             this.scope.applyTableMergeChange(mergedCellsNew);
         }
     };
-    /**
-     *
-     * 全量 fix data 是必要的，因为 fix 后的对象没有 update 到 table
-     * 所以下次 change 还需要 fix 上次的 change
-     * @param newData
-     */
-    HandsontableCustomHelper.prototype.fixNewData = function (changes, newData, oldData, isBindingEditMode) {
-        if (newData) {
-            // debugger
-            for (var row = 0; row < newData.length; row++) {
-                var cells = newData[row];
-                if (cells) {
-                    for (var col = 0; col < cells.length; col++) {
-                        var value = cells[col];
-                        if (value) {
-                            // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
-                            if (MnUtil.isJson(value)) {
-                                // 无需更改
-                                // array[j] = d;//parseCellValueIfIsJsonExpr(d);
-                            }
-                            else if (this.isCellValueJsonExpr(value)) {
-                                // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
-                                cells[col] = this.parseCellValueIfIsJsonExpr(value);
-                            }
-                            else {
-                                var sourceDef = oldData[row][col];
-                                if (sourceDef) {
-                                    if (!isBindingEditMode && sourceDef.BindType == 'Value') {
-                                        sourceDef.SetValue = value;
-                                        // _that.changedData.allCellValues[row][col]=
-                                    }
-                                    else {
-                                        // 用户手动输入任意字符串
-                                        cells[col] = { BindType: "StaticValue", StaticValue: value };
-                                    }
-                                }
-                                else {
-                                    cells[col] = { BindType: "StaticValue", StaticValue: value };
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    };
+    ///**
+    // *
+    // * 全量 fix data 是必要的，因为 fix 后的对象没有 update 到 table
+    // * 所以下次 change 还需要 fix 上次的 change
+    // * @param newData
+    // */
+    //private fixNewData(changes, newData: Array<Array<ValueBindingDef>>, oldData: Array<Array<ValueBindingDef>>, isBindingEditMode: boolean) {
+    //    if (newData) {
+    //        // debugger
+    //        for (var row = 0; row < newData.length; row++) {
+    //            var cells = newData[row];
+    //            if (cells) {
+    //                for (var col = 0; col < cells.length; col++) {
+    //                    var value = cells[col];
+    //                    if (value) {
+    //                        // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
+    //                        if (MnUtil.isJson(value)) {
+    //                            // 无需更改
+    //                            // array[j] = d;//parseCellValueIfIsJsonExpr(d);
+    //                        }
+    //                        else if (this.isCellValueJsonExpr(value)) {
+    //                            // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
+    //                            cells[col] = this.parseCellValueIfIsTextExpr(value);
+    //                        }
+    //                        else {
+    //                            var sourceDef = oldData[row][col];
+    //                            if (sourceDef) {
+    //                                if (!isBindingEditMode && sourceDef.BindType == 'Value') {
+    //                                    sourceDef.SetValue = value;
+    //                                    // _that.changedData.allCellValues[row][col]=
+    //                                } else {
+    //                                    // 用户手动输入任意字符串
+    //                                    cells[col] = { BindType: "StaticValue", StaticValue: value };
+    //                                }
+    //                            } else {
+    //                                cells[col] = { BindType: "StaticValue", StaticValue: value };
+    //                            }
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
     //private fixEditNewData(oldData: Array<Array<ValueBindingDef>>, newData: Array<Array<ValueBindingDef>>) {
     //    for (var i = 0; i < newData.length; i++) {
     //        var array = newData[i];
@@ -419,13 +446,16 @@ var HandsontableCustomHelper = /** @class */ (function () {
         var _this = this;
         var option = this.sourceData;
         var uniqueId = option.uniqueId, allCellValues = option.allCellValues, valueMaps = option.valueMaps, mergedCells = option.mergedCells, cellDropdownData = option.cellDropdownData, columnHeaderTexts = option.columnHeaderTexts;
+        /**
+         * 当 handsometable 首次初始化时（通常是刷新页面），其 data 从指定的数据源中读取，如果 cell value 為 Object，則 handsometable 會有無法修改 cell value 的 bug，所以這裏要把它的 value fix 為 text
+         * */
         var allCellTexts = [];
         for (var i = 0; i < allCellValues.length; i++) {
             var cells = allCellValues[i];
             var texts = allCellTexts[i] = [];
             for (var j = 0; j < cells.length; j++) {
                 // texts.push(this.getCellDisplayText2(null, cells[j], valueMaps));
-                texts[j] = (this.wrapCellValueJson(cells[j]));
+                texts[j] = (this.wrapCellValueJsonToTextExpr(cells[j]));
             }
         }
         var _that = this;
@@ -470,7 +500,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
                     var obj = this.getSourceDataAtRow(selection[0]);
                     // return obj;
                     // 'JSON::'+JSON.stringify(obj);
-                    var ret = _that.wrapCellValueJson(obj);
+                    var ret = _that.wrapCellValueJsonToTextExpr(obj);
                     return ret;
                     //var ret = <string><any>_that.getCellDisplayText2(null, obj, valueMaps);
                     //// console.log('getValue', ret);
@@ -579,31 +609,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
             var tableInstance = this;
             if (changes) {
                 //  debugger
-                //// 源数据？
-                // hot.getSourceData();
-                // 用户编辑修改后的数据？
-                var newData = tableInstance.getData();
-                //var allValues = _that.changedData.allCellValues;
-                ////  debugger
-                //changes.forEach(([row, col, oldValue, newValue]) => {
-                //    if (newValue) {
-                //        var obj;
-                //        // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
-                //        if (MnUtil.isJson(newValue)) {
-                //            // 无需更改
-                //            // array[j] = d;//parseCellValueIfIsJsonExpr(d);
-                //        }
-                //        else if (this.isCellValueJsonExpr(newValue)) {
-                //            // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
-                //            array[j] = this.parseCellValueIfIsJsonExpr(newValue);
-                //        }
-                //        else {
-                //            // 用户手动输入任意字符串
-                //            array[j] = { BindType: "StaticValue", StaticValue: newValue };
-                //        }
-                //    }
-                //});
-                _that.onTableValueChange(changes, newData);
+                _that.onBeforeTableValueChange(changes);
             }
         };
         this.bindTableEvent(uniqueId, tableCfg, ['afterMergeCells', 'afterUnmergeCells'], function (tableInstance) {
@@ -658,24 +664,11 @@ var HandsontableCustomHelper = /** @class */ (function () {
             mergeCells: mergedCells || [],
         };
         //https://handsontable.com/docs/7.0.0/Hooks.html#event:afterChange
-        tableCfg['afterChange'] = function (changes) {
+        tableCfg['beforeChange'] = function (changes) {
             var tableInstance = this;
             if (changes) {
-                //var allValues = _that.changedData.allCellValues;
-                ////  debugger
-                //changes.forEach(([row, col, oldValue, newValue]) => {
-                //    var sourceDef = allValues[row][col];
-                //    if (sourceDef == null) {
-                //    } else if (typeof sourceDef == 'undefined') {
-                //    } else {
-                //        if (sourceDef.BindType == 'Value') {
-                //            sourceDef.SetValue = newValue;
-                //            // _that.changedData.allCellValues[row][col]=
-                //        }
-                //    }
-                //});
-                var newData = tableInstance.getData();
-                _that.onTableValueChange(changes, newData);
+                // var newData = tableInstance.getData();
+                _that.onBeforeTableValueChange(changes);
             }
         };
         //this.bindTableChange(uniqueId, tableCfg, null, (tableInstance) => {
