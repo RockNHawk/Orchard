@@ -113,6 +113,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\grid.ts" />
     <TypeScriptCompile Include="Scripts\handsontable_custom.ts" />
     <Content Include="Scripts\common.js" />
     <Content Include="Scripts\handsontable\handsontable.css" />
@@ -353,6 +354,7 @@
     <Content Include="Scripts\Web.config" />
     <Content Include="Properties\AssemblyInfo.cs" />
     <Content Include="Module.txt" />
+    <TypeScriptCompile Include="Scripts\TempalteSupport\index.ts" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Orchard\Orchard.Framework.csproj">
@@ -373,15 +375,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Fields\" />
+    <Folder Include="NewFolder1\" />
     <Folder Include="Services\" />
     <Folder Include="Settings\" />
-    <Folder Include="Views\Admin\" />
     <Folder Include="Views\DefinitionTemplates\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdminMenu.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Drivers\Grouping.cs" />
     <Compile Include="Extensions\ContentDataMemberHelper.cs" />
     <Compile Include="Extensions\ContentFieldMemberAccessor.cs" />
     <Compile Include="Extensions\ContentItemExtensions.cs" />
@@ -396,6 +398,9 @@
     <Compile Include="Elements\ValueBindItemElement.cs" />
     <Compile Include="Extensions\HtmlHelper.cs" />
     <Compile Include="Extensions\ModelBindingUtility.cs" />
+    <Compile Include="Fields\IContentItem.cs" />
+    <Compile Include="Fields\TempalteSupportFieldDriver.cs" />
+    <Compile Include="Fields\TempalteSupportField.cs" />
     <Compile Include="Hooks\CustomElementDisplay.cs" />
     <Compile Include="Hooks\ElementEventHandler.cs" />
     <Compile Include="Hooks\VsdModule.cs" />
@@ -435,6 +440,12 @@
     <Content Include="Views\Elements.ValueBindGridElement.Design_Staticic.cshtml" />
     <Content Include="Views\Elements.ValueBindGridElement.cshtml" />
     <Content Include="tsconfig.json" />
+    <Content Include="Views\EditorTemplates\Fields_TempalteSupportField_Edit.cshtml" />
+    <Content Include="Views\Fields_TempalteSupportField.cshtml" />
+    <Content Include="Views\Admin\Edit.cshtml" />
+    <Content Include="Views\Admin\List.cshtml" />
+    <Content Include="Scripts\Test\1.less" />
+    <Content Include="Scripts\Test\2.scss" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
