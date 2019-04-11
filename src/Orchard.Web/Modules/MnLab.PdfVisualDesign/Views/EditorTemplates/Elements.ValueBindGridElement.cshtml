@@ -30,7 +30,8 @@
         x.ContentPartName,
         x.MemberExpression,
         x.Key,
-        DisplayName = T(x.Key),
+        x.DisplayName,
+      //  DisplayName = T(x.Key).Text,
         BindType = "DisplayName",
     });
     var bs2 = BindingDefSources?.Select(x => new
@@ -38,7 +39,8 @@
         x.ContentPartName,
         x.MemberExpression,
         x.Key,
-        DisplayName = T(x.Key),
+            x.DisplayName,
+      //  DisplayName = T(x.Key).Text,
         BindType = "Value",
     });
 

@@ -11,7 +11,7 @@ declare interface ValueBindingDef {
     Remark?: any;
     BindType: string;
     Key?: any;
-    DisplayName?:any;
+    DisplayName?: any;
 }
 
 
@@ -68,126 +68,107 @@ class HandsontableCustomHelper {
         //  return obj;
     };
 
-    /*
-@renderer is like   Handsontable.renderers.AutocompleteRenderer
-*/
-    createRender(mode, valueMaps, renderer) {
+    getCellDisplayText(mode, row, col, cellValueAccrssor: (row, col) => ValueBindingDef, valueMaps) {
+        var valueDef = cellValueAccrssor(row, col);
+        if (!valueDef) {
+            return;
+        }
+        return this.getCellDisplayText2(mode, valueDef, valueMaps);
+    }
 
-        /*
-
-   /*
-        https://github.com/valor-software/ng2-handsontable/issues/373
-        not work well
-
-
-        Native cell renderers
-        https://handsontable.com/docs/7.0.0/tutorial-cell-function.html
-
-       // $td= $(td);//.empty();//.addClass('htAutocomplete');
-    //if(value != null){
-    //var escaped = Handsontable.helper.stringify(value);
-        // value must be a string type
-       // var obj = JSON.parse(value);
-       // debugger
-       // $td.html(obj['Key']); //empty is needed because you are rendering to an existing cell
-   // }
-      //  $td.append('<div class="htAutocompleteArrow">▼</div>'); //empty is needed because you are rendering to an existing cell
-      //  $td.append('▼'); //empty is needed because you are rendering to an existing cell
-
-*/
-
-        var _that = this;
-        return function (instance, td, row, col, prop, value, cellProperties) {
-
-            //console.log('render [' + row + ',' + col + ']value', value);
-
-            //if (isNullOrUndefined(value) && valueMaps) {
-            //    debugger
-            //   // value = valueMaps[row][col];
-            //}
-
-            if (value) {
-                // debugger;
-
-                try {
-                    /*
-                    if the data is from server (server JSON SerializeObject , value type is Object)
-                    if the data is from local user inputed, calue type is string
-                    */
-                    var obj = value && (typeof value === 'string' ? _that.parseCellValueIfIsJsonExpr(value) : value);
-
-                    // 
-                    if (typeof (obj) == 'string') {
-                        //   arguments[5] = valueArgument;
-                        renderer.apply(instance, arguments);
-
-                    } else {
-
-                        var key = obj['Key'];
-                        var DisplayName = obj['DisplayName'];
-                        var _type = obj['BindType'];
-                        var valueArgument = value;
-                        var memberValue = valueMaps && valueMaps[key] && valueMaps[key].Value;
-
-                        //switch (mode) {
-                        //    case 'BindingEdit':
-                        //    default:
-                        if (key) {
-                            // arguments[5] is value argument, relace it will change the cell display text
-                            // arguments[5] = key;
-                            switch (_type) {
-                                case 'DisplayName':
-                                default:
-                                    valueArgument = DisplayName|| key;
-                                    break;
-                                case 'Value':
-                                    valueArgument = memberValue;
-                                    break;
-                            }
-                        } else {
-
-                            //  debugger
-                            // $(td).html(val);
-                            //return $("<th>"+value.Key+"</th>");
-                        }
-
-                        // some old value key is not null
-                        switch (_type) {
-                            default:
-                                break;
-                            /// 保存直接输入值，不绑定时的值，此时 BindType 为 "StaticValue"，其它字段为空
-                            case 'StaticValue':
-                                valueArgument = obj['StaticValue'];
-                                break;
-                        }
-
-                        // break;
-                        //    case 'ValueEdit':
-                        //        switch (_type) {
-                        //            case 'Value':
-                        //            default:
-                        //                valueArgument = memberValue;
-                        //                break;
-                        //            /// 保存直接输入值，不绑定时的值，此时 BindType 为 "StaticValue"，其它字段为空
-                        //            case 'StaticValue':
-                        //                valueArgument = obj['StaticValue'];
-                        //                break;
-                        //        }
-                        //        break;
-                        //}
+    getCellDisplayText2(mode, valueDef: ValueBindingDef, valueMaps): string {
+        if (!valueDef) {
+            return;
+        }
+        // debugger;
+        try {
 
 
-                        arguments[5] = valueArgument;
-                        renderer.apply(instance, arguments);
-                    }
+            var key = valueDef['Key'];
+            var DisplayName = valueDef['DisplayName'];
+            var _type = valueDef['BindType'];
+            var valueArgument = valueDef;
+            var memberValue = valueMaps && valueMaps[key] && valueMaps[key].Value;
 
-                } catch (e) {
-                    console.error(e);
+            //switch (mode) {
+            //    case 'BindingEdit':
+            //    default:
+            if (key) {
+                // arguments[5] is value argument, relace it will change the cell display text
+                // arguments[5] = key;
+                switch (_type) {
+                    case 'DisplayName':
+                    default:
+                        valueArgument = DisplayName || key;
+                        break;
+                    case 'Value':
+                        valueArgument = memberValue;
+                        break;
                 }
             } else {
-                renderer.apply(instance, arguments);
+
+                //  debugger
+                // $(td).html(val);
+                //return $("<th>"+value.Key+"</th>");
             }
-            //return td;
+
+            // some old value key is not null
+            switch (_type) {
+                default:
+                    break;
+                /// 保存直接输入值，不绑定时的值，此时 BindType 为 "StaticValue"，其它字段为空
+                case 'StaticValue':
+                    valueArgument = valueDef['StaticValue'];
+                    break;
+            }
+
+            // break;
+            //    case 'ValueEdit':
+            //        switch (_type) {
+            //            case 'Value':
+            //            default:
+            //                valueArgument = memberValue;
+            //                break;
+            //            /// 保存直接输入值，不绑定时的值，此时 BindType 为 "StaticValue"，其它字段为空
+            //            case 'StaticValue':
+            //                valueArgument = obj['StaticValue'];
+            //                break;
+            //        }
+            //        break;
+            //}
+
+            return <string><any>valueArgument;
+
+        } catch (e) {
+            console.error(e);
+            throw e;
+        }
+    }
+
+
+    /*
+     * @renderer is like   Handsontable.renderers.AutocompleteRenderer
+    // createRender(mode, cellValues: ValueBindingDef[][], valueMaps, renderer) {
+     * */
+    createRender(mode, cellValueAccrssor: (row, col) => ValueBindingDef, valueMaps, renderer) {
+        var _that = this;
+        return function (instance, td, row, col, prop, value, cellProperties) {
+            if (!value) return;
+            /*
+           if the data is from server (server JSON SerializeObject , value type is Object)
+           if the data is from local user inputed, calue type is string
+           */
+            var valueDef = value && (typeof value === 'string' ? _that.parseCellValueIfIsJsonExpr(value) : value);
+            var displayText;
+            if (typeof (valueDef) == 'string') {
+                displayText = value;
+            } else {
+                displayText = _that.getCellDisplayText2(mode, valueDef, valueMaps);
+            }
+            //var displayText = _that.getCellDisplayText(mode, row, col, cellValueAccrssor, valueMaps);
+            //debugger
+            arguments[5] = displayText;
+            renderer.apply(instance, arguments);
             return td;
         };
     };
@@ -268,14 +249,70 @@ class HandsontableCustomHelper {
         return ngController;
     }
 
-    onTableValueChange(changes, newData: Array<Array<ValueBindingDef>>, isDesignMode: boolean) {
+    onTableValueChange(changes: any[][], newData: Array<Array<ValueBindingDef>>) {
         var oldData = this.changedData.allCellValues;
-        this.fixNewData(changes, newData, oldData, isDesignMode);
-        this.changedData.allCellValues = newData;
-        //    var scope = scopeAccesser();
+
+        /**
+         *
+         * */
+        var changedItems = [];
+        changes.forEach((value, index) => {
+            var info = changes[index];
+            var [row, col, oldValue, newValue] = info;
+
+            var isValueChanged = oldValue != newValue;
+            if (isValueChanged) {
+                changedItems.push(info);
+            }
+            if (row > oldData.length) {
+                for (var i = oldData.length; i < row; i++) {
+                    oldData[i] = [];
+                }
+                //  oldData.length = row;
+            }
+            var oldColumns = oldData[row];
+            //if (!oldCells) {
+            //    oldCells = [];
+            //}
+            if (col > oldColumns.length) {
+                for (var i = oldColumns.length; i < col; i++) {
+                    oldColumns[i] = null;
+                }
+            }
+
+            // debugger
+            // 不管有沒有 change，都需要算一下 text ？
+            if (newValue) {
+                var obj: ValueBindingDef;
+                // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
+                if (MnUtil.isJson(newValue)) {
+                    obj = <any>newValue;
+                    // 无需更改
+                    // array[j] = d;//parseCellValueIfIsJsonExpr(d);
+                }
+                else if (this.isCellValueJsonExpr(newValue)) {
+                    // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
+                    obj = this.parseCellValueIfIsJsonExpr(newValue);
+                }
+                else {
+                    // 用户手动输入任意字符串
+                    obj = { BindType: "StaticValue", StaticValue: newValue };
+                }
+                var text = this.getCellDisplayText2(null, obj, this.changedData.valueMaps);
+                // [[row, prop, oldVal, newVal], ...]
+                changes[index][3] = text
+                oldColumns[col] = obj;
+            } else {
+                oldColumns[col] = newValue;
+            }
+        });
+
+        //debugger
+        //  this.fixNewData(changes, newData, oldData, this.scope && this.scope.mode == 'BindingEdit');
+        // this.changedData.allCellValues = newData;
 
         if (this.scope) {
-            this.scope.applyTableValueChange(newData);
+            this.scope.applyTableValueChange(oldData);
         }
     }
 
@@ -292,7 +329,7 @@ class HandsontableCustomHelper {
      * 所以下次 change 还需要 fix 上次的 change
      * @param newData
      */
-    private fixNewData(changes, newData: Array<Array<ValueBindingDef>>, oldData: Array<Array<ValueBindingDef>>, isDesignMode: boolean) {
+    private fixNewData(changes, newData: Array<Array<ValueBindingDef>>, oldData: Array<Array<ValueBindingDef>>, isBindingEditMode: boolean) {
         if (newData) {
             // debugger
             for (var row = 0; row < newData.length; row++) {
@@ -313,7 +350,7 @@ class HandsontableCustomHelper {
                             else {
                                 var sourceDef = oldData[row][col];
                                 if (sourceDef) {
-                                    if (!isDesignMode && sourceDef.BindType == 'Value') {
+                                    if (!isBindingEditMode && sourceDef.BindType == 'Value') {
                                         sourceDef.SetValue = value;
                                         // _that.changedData.allCellValues[row][col]=
                                     } else {
@@ -407,7 +444,7 @@ class HandsontableCustomHelper {
         });
     };
 
-    getColumns(columnDef,allowEdit?:boolean) {
+    getColumns(columnDef, allowEdit?: boolean) {
         var columns = [];
         var columnHeaderTexts = this.sourceData.columnHeaderTexts;
         var allCellValues = this.sourceData.allCellValues;
@@ -437,9 +474,22 @@ class HandsontableCustomHelper {
 
     }
 
-
+    autoRowSize = true;
+    autoColumnSize = true;
 
     createDesignTable(container) {
+        return this.creatBindingEditTable(container);
+    }
+
+    getCellValue(row, col) {
+        var cells = this.changedData.allCellValues[row];
+        return cells && cells[col];
+    }
+
+
+    syncDropdownValue() { }
+
+    creatBindingEditTable(container) {
         var option = this.sourceData;
 
         var uniqueId = option.uniqueId,
@@ -449,6 +499,15 @@ class HandsontableCustomHelper {
             cellDropdownData = option.cellDropdownData,
             columnHeaderTexts = option.columnHeaderTexts;
 
+        var allCellTexts = [];
+        for (var i = 0; i < allCellValues.length; i++) {
+            var cells = allCellValues[i];
+            var texts = allCellTexts[i] = [];
+            for (var j = 0; j < cells.length; j++) {
+                // texts.push(this.getCellDisplayText2(null, cells[j], valueMaps));
+                texts[j] = (this.wrapCellValueJson(cells[j]));
+            }
+        }
 
         var _that = this;
 
@@ -457,7 +516,7 @@ class HandsontableCustomHelper {
 
         var columnDef = {
             // renderer: Handsontable.renderers.AutocompleteRenderer,
-            renderer: this.createRender(null, valueMaps, Handsontable.renderers.AutocompleteRenderer),
+            renderer: this.createRender(null, (row, col) => this.getCellValue(row, col), valueMaps, Handsontable.renderers.AutocompleteRenderer),
             type: 'handsontable',
             //editor: 'text',
             handsontable: {
@@ -486,18 +545,28 @@ class HandsontableCustomHelper {
         },
                 */
                 getValue: function () {
-                    var selection = this.getSelectedLast();
                     // debugger
-                    // Get the row's data object, object is from BindingDefSources
+                    // 這是 handsontable 的回調，不是 column 的，因此如果用戶采用手動輸入的方式，不會觸發此方法
+                    var selection = this.getSelectedLast();
+                    //console.log("getValue", selection);
+                    //// debugger
+                    //// Get the row's data object, object is from BindingDefSources
                     var obj = this.getSourceDataAtRow(selection[0]);
-                    /*
-string ContentPartName { get; set; }
-string MemberExpression { get; set; }
-*/
+
+
+                    // return obj;
+
+                    // 'JSON::'+JSON.stringify(obj);
                     var ret = _that.wrapCellValueJson(obj);
-                   // console.log('getValue', ret);
                     return ret;
-                    //return 'JSON::'+JSON.stringify(obj);
+
+                    //var ret = <string><any>_that.getCellDisplayText2(null, obj, valueMaps);
+                    //// console.log('getValue', ret);
+                    //if (ret && ret.indexOf('Object') !== -1) {
+                    //    //debugger
+                    //}
+                    //return ret;
+
                     //return obj.ContentPartName + '.' + obj.MemberExpression;
 
                     // the value only accept plain type
@@ -513,11 +582,18 @@ string MemberExpression { get; set; }
         var _that = this;
 
         ///*
+        /*
+           *
+           * https://stackoverflow.com/questions/18348437/how-do-i-edit-the-header-text-of-a-handsontable
+           *
+           *
+    https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-being-selected-on-column-header-click
+    */
         var afterOnCellMouseDown = function (event, coords, th) {
 
             // 鼠标左键
             // if (event.button !== 0 || event.button !== 1) return;
-             //if (!event || event.button === 2) return;
+            //if (!event || event.button === 2) return;
             //  debugger;
 
             console.log("even.button:" + event.button + 'window.event.button:' + (<any>(window.event)).button);
@@ -541,109 +617,67 @@ string MemberExpression { get; set; }
             th.__fixafterOnCellMouseDown = 1;
 
 
-              $(th).click(() => {
-                  console.log("th click");
+            $(th).click(() => {
+                console.log("th click");
 
-            let input = document.createElement('input'),
-                rect = th.getBoundingClientRect(),
-                addListeners = (events, headers, index) => {
-                    events.split(' ').forEach(e => {
-                        input.addEventListener(e, () => {
-                            var newText = headers[index] = input.value;
-                            instance.updateSettings(isCol ? {
-                                colHeaders: headers
-                            } : {
-                                    rowHeaders: headers
+                let input = document.createElement('input'),
+                    rect = th.getBoundingClientRect(),
+                    addListeners = (events, headers, index) => {
+                        events.split(' ').forEach(e => {
+                            input.addEventListener(e, () => {
+                                var newText = headers[index] = input.value;
+                                instance.updateSettings(isCol ? {
+                                    colHeaders: headers
+                                } : {
+                                        rowHeaders: headers
+                                    });
+
+                                // debugger
+                                _that.onDesignTableHeaderChange(index, newText, headers);
+
+                                setTimeout(() => {
+                                    if (input.parentNode)
+                                        input.parentNode.removeChild(input)
                                 });
-
-                            // debugger
-                            _that.onDesignTableHeaderChange(index, newText, headers);
-
-                            setTimeout(() => {
-                                if (input.parentNode)
-                                    input.parentNode.removeChild(input)
-                            });
+                            })
                         })
-                    })
-                },
-                appendInput = () => {
-                    input.setAttribute('type', 'text');
-                    input.style.cssText = '' +
-                        'position:absolute;' +
-                        'left:' + rect.left + 'px;' +
-                        'top:' + rect.top + 'px;' +
-                        'width:' + (rect.width - 4) + 'px;' +
-                        'height:' + (rect.height - 4) + 'px;' +
-                        'z-index:1060;';
-                    document.body.appendChild(input);
-                };
-            input.value = th.querySelector(
-                isCol ? '.colHeader' : '.rowHeader'
-            ).innerText;
-            appendInput();
-            setTimeout(() => {
-                input.select();
-                addListeners('change blur', instance[
-                    isCol ? 'getColHeader' : 'getRowHeader'
-                ](), coords[isCol ? 'col' : 'row']);
+                    },
+                    appendInput = () => {
+                        input.setAttribute('type', 'text');
+                        input.style.cssText = '' +
+                            'position:absolute;' +
+                            'left:' + rect.left + 'px;' +
+                            'top:' + rect.top + 'px;' +
+                            'width:' + (rect.width - 4) + 'px;' +
+                            'height:' + (rect.height - 4) + 'px;' +
+                            'z-index:1060;';
+                        document.body.appendChild(input);
+                    };
+                input.value = th.querySelector(
+                    isCol ? '.colHeader' : '.rowHeader'
+                ).innerText;
+                appendInput();
+                setTimeout(() => {
+                    input.select();
+                    addListeners('change blur', instance[
+                        isCol ? 'getColHeader' : 'getRowHeader'
+                    ](), coords[isCol ? 'col' : 'row']);
+                });
+
             });
 
-             });
-
         };
-        //  tableCfg.afterOnCellMouseDown = afterOnCellMouseDown;
         //*/
 
         var tableCfg = {
             licenseKey: 'non-commercial-and-evaluation',
-            autoRowSize: false,
-            autoColumnSize: false,
+            autoRowSize: this.autoRowSize,
+            autoColumnSize: this.autoColumnSize,
             afterOnCellMouseDown: afterOnCellMouseDown,
-            //afterGetColHeader: function (col, TH) {
-
-            //   // debugger
-
-            //    // nothing for first column
-            //    if (col == -1) {
-            //        return;
-            //    }
-            //    var instance = this;
-
-            //    // create input element
-            //    var input = document.createElement('input');
-            //    input.type = 'text';
-            //    input.value = TH.firstChild.textContent;
-
-            //    TH.appendChild(input);
-
-            //    $(input).change(function (e) {
-            //        debugger
-            //        var headers = instance.getColHeader();
-            //        headers[col] = input.value;
-            //        instance.updateSettings({
-            //            colHeaders: headers
-            //        });
-            //    });
-
-            //    TH.style.position = 'relative';
-            //    TH.firstChild.style.display = 'none';
-            //},
-
-
-            /*
-             *
-             * https://stackoverflow.com/questions/18348437/how-do-i-edit-the-header-text-of-a-handsontable
-             *
-             * 
-https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-being-selected-on-column-header-click
-*/
-
-
-
             //data: allCellValues || Handsontable.helper.createSpreadsheetData(5, 2),
-            data: allCellValues,
+            data: allCellTexts,
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
-          //  rowHeaders: true,
+            //  rowHeaders: true,
             contextMenu: true,
             allowInsertColumn: true,
             allowInsertRow: true,
@@ -671,8 +705,8 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
 
 
         //https://handsontable.com/docs/7.0.0/Hooks.html#event:afterChange
-        tableCfg['afterChange'] = function (changes) {
-            console.log('afterChange',changes);
+        tableCfg['beforeChange'] = function (changes) {
+            console.log('beforeChange', changes);
             var tableInstance = this;
             if (changes) {
                 //  debugger
@@ -706,12 +740,10 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
                 //    }
                 //});
 
-                _that.onTableValueChange(changes, newData, true);
+                _that.onTableValueChange(changes, newData);
 
             }
         };
-
-
 
         this.bindTableEvent(uniqueId, tableCfg, ['afterMergeCells', 'afterUnmergeCells'], (tableInstance) => {
             var mc = tableInstance.getPlugin('mergeCells');
@@ -719,8 +751,6 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
             var mergedCellsNew = mergedCellsCollection && mergedCellsCollection.mergedCells;
             this.onDesignTableMergeChange(mergedCellsNew);
         });
-
-
 
 
         var girdTable;
@@ -765,7 +795,7 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
 
         var columnDef = {
             // renderer: Handsontable.renderers.AutocompleteRenderer,
-            renderer: this.createRender('ValueEdit', valueMaps, Handsontable.renderers.AutocompleteRenderer),
+            renderer: this.createRender('ValueEdit', (row, col) => this.getCellValue(row, col), valueMaps, Handsontable.renderers.AutocompleteRenderer),
         };
 
         var columns = this.getColumns(columnDef);
@@ -774,8 +804,8 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
 
         var tableCfg = {
             licenseKey: 'non-commercial-and-evaluation',
-            autoRowSize: false,
-            autoColumnSize: false,
+            autoRowSize: this.autoRowSize,
+            autoColumnSize: this.autoColumnSize,
 
             data: allCellValues,
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
@@ -810,7 +840,7 @@ https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-bei
                 //});
 
                 var newData = tableInstance.getData();
-                _that.onTableValueChange(changes, newData, false);
+                _that.onTableValueChange(changes, newData);
 
             }
         };

@@ -27,7 +27,7 @@ namespace MnLab.PdfVisualDesign.ViewModels {
         //public IEnumerable<DriverResult> FieldDrivers { get; set; }
         public IContentFieldDisplay FieldDisplay { get; set; }
 
-        public ValueBindingDef Binding { get; set; }
+        public ValueDef Binding { get; set; }
         public ElementEditorContext Context { get;  set; }
 
         //public object Value { get; set; }

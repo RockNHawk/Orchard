@@ -205,7 +205,7 @@ namespace MnLab.PdfVisualDesign.HtmlBlocks.Controllers {
 
             var contentItem = content.GetLatestVersion(_contentManager);
 
-            var bindingDefGroups = ValueBindGridElementDriver.GetBindingDefGroups(contentItem);
+            var bindingDefGroups = ValueBindGridElementDriver.GetBindingDefGroups(contentItem,T);
             Dictionary<string, object> valueMaps = ValueBindGridElementDriver.GetValueMaps(contentItem, bindingDefGroups);
 
             return Json(valueMaps, JsonRequestBehavior.AllowGet);

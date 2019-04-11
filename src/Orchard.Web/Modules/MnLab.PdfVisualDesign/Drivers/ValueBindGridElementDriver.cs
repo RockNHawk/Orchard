@@ -28,6 +28,8 @@ using System.Web.Mvc;
 using Orchard.Core.Title.Models;
 using Orchard.ContentManagement.MetaData.Models;
 using System.Collections;
+using Orchard.Localization;
+using Orchard.Logging;
 
 namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
@@ -73,6 +75,9 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
         readonly IWorkContextAccessor _workContextAccessor;
 
+        public Localizer T { get; set; }
+
+        public ILogger Logger { get; set; }
 
         public ValueBindGridElementDriver(IElementFilterProcessor processor, IContentFieldDisplay fieldDisplay,
             IShapeFactory shapeFactory,
@@ -92,6 +97,8 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             this._contentFieldDrivers = contentFieldDrivers;
             this._contentManager = contentManager;
             this._workContextAccessor = workContextAccessor;
+            T = NullLocalizer.Instance;
+            Logger = NullLogger.Instance;
         }
 
         /// <summary>
@@ -99,7 +106,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
         /// </summary>
         /// <param name="def"></param>
         /// <returns></returns>
-        static IList<IValueBindingDef> GetBindingItems(ContentPartDefinition def) {
+      static    IList<IValueBindingDef> GetBindingItems(ContentPartDefinition def, Localizer T) {
             // Fields Def, Field can dynamic added by user
             var fields = def.Fields;
             /*
@@ -114,19 +121,23 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             if (fields != null) {
                 foreach (var item in fields) {
                     // Field 之下还有子属性，这里只处理了它本身
-                    items.Add(new ValueBindingDef() {
+                    var dd = new ValueDef() {
                         ContentPartName = def.Name,
                         MemberExpression = item.Name,
-                    });
+                    };
+                    dd.DisplayName = T(dd.Key).Text;
+                    items.Add(dd);
                 }
             }
 
             if (properties != null) {
                 foreach (var item in properties) {
-                    items.Add(new ValueBindingDef() {
+                    var dd = new ValueDef() {
                         ContentPartName = def.Name,
                         MemberExpression = item.Name,
-                    });
+                    };
+                    dd.DisplayName = T(dd.Key).Text;
+                    items.Add(dd);
                 }
             }
 
@@ -141,7 +152,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             var contentItem = content.GetLatestVersion(_contentManager);
 
 
-            var bindingDefGroups = GetBindingDefGroups(contentItem);
+            var bindingDefGroups = GetBindingDefGroups(contentItem,T);
             Dictionary<string, object> valueMaps = GetValueMaps(contentItem, bindingDefGroups);
 
             var viewModel = Mapper.Map(element, new ValueBindGridViewModel() {
@@ -162,7 +173,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
                 var strAllCellValues = ((string[])context.ValueProvider.GetValue($"{nameof(viewModel.DesignData)}.{nameof(viewModel.DesignData.AllCellValues)}_JSON")?.RawValue)?[0];
                 if (!string.IsNullOrEmpty(strAllCellValues)) {
-                    design.AllCellValues = Newtonsoft.Json.JsonConvert.DeserializeObject<ValueBindingDef[][]>(strAllCellValues);
+                    design.AllCellValues = Newtonsoft.Json.JsonConvert.DeserializeObject<ValueDef[][]>(strAllCellValues);
                 }
                 {
                     var strMergedCells = ((string[])context.ValueProvider.GetValue($"{nameof(viewModel.DesignData)}.{nameof(viewModel.DesignData.MergedCells)}_JSON")?.RawValue)?[0];
@@ -196,13 +207,13 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             return Editor(context, editor);
         }
 
-        public static IEnumerable<Grouping<ContentPartDefinition, IValueBindingDef>> GetBindingDefGroups(ContentItem contentItem) {
+        public static IEnumerable<Grouping<ContentPartDefinition, IValueBindingDef>> GetBindingDefGroups(ContentItem contentItem, Localizer T) {
             // in 'Create' page, the content is empty
             return contentItem.TypeDefinition.Parts?
                 .Select(x => x.PartDefinition)
                 .GroupBy(x => x)
                 // the key is ContentPartDefinition
-                .Select(x => new Grouping<ContentPartDefinition, IValueBindingDef>(x.Key, GetBindingItems(x.Key)))
+                .Select(x => new Grouping<ContentPartDefinition, IValueBindingDef>(x.Key, GetBindingItems(x.Key,T)))
                 .Where(x => x.Count() > 0);
                 ;
         }
@@ -242,7 +253,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             //  var contentItem = context.Content.ContentItem;
             var contentItem = content.GetLatestVersion(_contentManager);
 
-            var bindingDefGroups = GetBindingDefGroups(contentItem);
+            var bindingDefGroups = GetBindingDefGroups(contentItem,T);
                 // the bind member key and value map
             Dictionary<string, object> valueMaps = GetValueMaps(contentItem, bindingDefGroups);
 

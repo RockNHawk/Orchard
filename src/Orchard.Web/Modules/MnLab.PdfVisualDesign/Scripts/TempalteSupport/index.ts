@@ -80,6 +80,7 @@ function mapPropertyNameToEditorInputName(field, baseKey, propName, propertyName
 }
 
 function syncContentPart(url, propertyNameToEditorInputNameMap, form) {
+    return;
     var dataExample = {
         "NHProductDescriptionPart.Description": {
             "Value": null,

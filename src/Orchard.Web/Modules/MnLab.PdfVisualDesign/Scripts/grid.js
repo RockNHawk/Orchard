@@ -13,8 +13,8 @@ var __assign = (this && this.__assign) || function () {
 //var aaaa = 11;
 //var handsontableHelper = {};
 //(function (helper) {
-var HandsontableCustomHelper = /** @class */ (function () {
-    function HandsontableCustomHelper() {
+var Grid = /** @class */ (function () {
+    function Grid() {
         this.autoRowSize = true;
         this.autoColumnSize = true;
         //helper.createDesignTable = createDesignTable;
@@ -24,7 +24,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
         //helper.parseCellValueIfIsJsonExpr = parseCellValueIfIsJsonExpr;
         //helper.wrapCellValueJson = wrapCellValueJson;
     }
-    HandsontableCustomHelper.prototype.isCellValueJsonExpr = function (d) {
+    Grid.prototype.isCellValueJsonExpr = function (d) {
         if (d && (typeof (d) === 'string' && d.indexOf('JSON::') === 0)) {
             return true;
         }
@@ -33,7 +33,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
         }
     };
     ;
-    HandsontableCustomHelper.prototype.parseCellValueIfIsJsonExpr = function (d) {
+    Grid.prototype.parseCellValueIfIsJsonExpr = function (d) {
         if (d && typeof (d) === 'string' && d.indexOf('JSON::') === 0) {
             try {
                 var obj = JSON.parse(d.substring('JSON::'.length));
@@ -48,7 +48,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
         }
     };
     ;
-    HandsontableCustomHelper.prototype.wrapCellValueJson = function (obj) {
+    Grid.prototype.wrapCellValueJson = function (obj) {
         if (!obj)
             return obj;
         // handsometable 的 cell value 除非首次通过 tableCfg.data 指定，否则不能为 object
@@ -56,19 +56,28 @@ var HandsontableCustomHelper = /** @class */ (function () {
         //  return obj;
     };
     ;
-    HandsontableCustomHelper.prototype.getCellDisplayText = function (mode, row, col, cellValueAccrssor, valueMaps) {
+    Grid.prototype.getCellDisplayText = function (mode, row, col, cellValueAccrssor, valueMaps) {
         var valueDef = cellValueAccrssor(row, col);
         if (!valueDef) {
             return;
         }
         return this.getCellDisplayText2(mode, valueDef, valueMaps);
     };
-    HandsontableCustomHelper.prototype.getCellDisplayText2 = function (mode, valueDef, valueMaps) {
+    Grid.prototype.getCellDisplayText2 = function (mode, valueDef, valueMaps) {
         if (!valueDef) {
             return;
         }
         // debugger;
         try {
+            /*
+            if the data is from server (server JSON SerializeObject , value type is Object)
+            if the data is from local user inputed, calue type is string
+            */
+            //var valueDef = value && (typeof value === 'string' ? _that.parseCellValueIfIsJsonExpr(value) : value);
+            //if (typeof (valueDef) == 'string') {
+            //    //   arguments[5] = valueArgument;
+            //    renderer.apply(instance, arguments);
+            //} else {
             var key = valueDef['Key'];
             var DisplayName = valueDef['DisplayName'];
             var _type = valueDef['BindType'];
@@ -129,24 +138,10 @@ var HandsontableCustomHelper = /** @class */ (function () {
      * @renderer is like   Handsontable.renderers.AutocompleteRenderer
     // createRender(mode, cellValues: ValueBindingDef[][], valueMaps, renderer) {
      * */
-    HandsontableCustomHelper.prototype.createRender = function (mode, cellValueAccrssor, valueMaps, renderer) {
+    Grid.prototype.createRender = function (mode, cellValueAccrssor, valueMaps, renderer) {
         var _that = this;
         return function (instance, td, row, col, prop, value, cellProperties) {
-            if (!value)
-                return;
-            /*
-           if the data is from server (server JSON SerializeObject , value type is Object)
-           if the data is from local user inputed, calue type is string
-           */
-            var valueDef = value && (typeof value === 'string' ? _that.parseCellValueIfIsJsonExpr(value) : value);
-            var displayText;
-            if (typeof (valueDef) == 'string') {
-                displayText = value;
-            }
-            else {
-                displayText = _that.getCellDisplayText2(mode, valueDef, valueMaps);
-            }
-            //var displayText = _that.getCellDisplayText(mode, row, col, cellValueAccrssor, valueMaps);
+            var displayText = _that.getCellDisplayText(mode, row, col, cellValueAccrssor, valueMaps);
             //debugger
             arguments[5] = displayText;
             renderer.apply(instance, arguments);
@@ -154,11 +149,11 @@ var HandsontableCustomHelper = /** @class */ (function () {
         };
     };
     ;
-    HandsontableCustomHelper.prototype.init = function (data) {
+    Grid.prototype.init = function (data) {
         this.sourceData = data;
         this.changedData = __assign({}, data);
     };
-    HandsontableCustomHelper.prototype.createController = function (option) {
+    Grid.prototype.createController = function (option) {
         var _this = this;
         var uniqueId = option.uniqueId, allCellValues = option.allCellValues, valueMaps = option.valueMaps, mergedCells = option.mergedCells, cellDropdownData = option.cellDropdownData, columnHeaderTexts = option.columnHeaderTexts;
         //  debugger
@@ -201,70 +196,34 @@ var HandsontableCustomHelper = /** @class */ (function () {
         });
         return ngController;
     };
-    HandsontableCustomHelper.prototype.onTableValueChange = function (changes, newData) {
-        var _this = this;
+    Grid.prototype.onTableValueChange = function (changes, newData) {
         var oldData = this.changedData.allCellValues;
-        /**
-         *
-         * */
-        var changedItems = [];
-        changes.forEach(function (value, index) {
-            var info = changes[index];
-            var row = info[0], col = info[1], oldValue = info[2], newValue = info[3];
-            var isValueChanged = oldValue != newValue;
-            if (isValueChanged) {
-                changedItems.push(info);
-            }
-            if (row > oldData.length) {
-                for (var i = oldData.length; i < row; i++) {
-                    oldData[i] = [];
-                }
-                //  oldData.length = row;
-            }
-            var oldColumns = oldData[row];
-            //if (!oldCells) {
-            //    oldCells = [];
-            //}
-            if (col > oldColumns.length) {
-                for (var i = oldColumns.length; i < col; i++) {
-                    oldColumns[i] = null;
-                }
-            }
-            // debugger
-            // 不管有沒有 change，都需要算一下 text ？
-            if (newValue) {
-                var obj;
-                // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
-                if (MnUtil.isJson(newValue)) {
-                    obj = newValue;
-                    // 无需更改
-                    // array[j] = d;//parseCellValueIfIsJsonExpr(d);
-                }
-                else if (_this.isCellValueJsonExpr(newValue)) {
-                    // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
-                    obj = _this.parseCellValueIfIsJsonExpr(newValue);
-                }
-                else {
-                    // 用户手动输入任意字符串
-                    obj = { BindType: "StaticValue", StaticValue: newValue };
-                }
-                var text = _this.getCellDisplayText2(null, obj, _this.changedData.valueMaps);
-                // [[row, prop, oldVal, newVal], ...]
-                changes[index][3] = text;
-                oldColumns[col] = obj;
-            }
-            else {
-                oldColumns[col] = newValue;
-            }
-        });
-        //debugger
-        //  this.fixNewData(changes, newData, oldData, this.scope && this.scope.mode == 'BindingEdit');
-        // this.changedData.allCellValues = newData;
+        //changes.forEach(([row, col, oldValue, newValue]) => {
+        //    if (newValue) {
+        //        var obj;
+        //        // 当 handsometable 首次初始化时（通常是刷新页面），其 cell value 从指定的数据源中读取（从数据库获取的数据序列号为 JSON Object），为对象
+        //        if (MnUtil.isJson(newValue)) {
+        //            // 无需更改
+        //            // array[j] = d;//parseCellValueIfIsJsonExpr(d);
+        //        }
+        //        else if (this.isCellValueJsonExpr(newValue)) {
+        //            // 用户下拉选择绑定 Expression 后，cell value 为 JSON Expr 
+        //            array[j] = this.parseCellValueIfIsJsonExpr(newValue);
+        //        }
+        //        else {
+        //            // 用户手动输入任意字符串
+        //            array[j] = { BindType: "StaticValue", StaticValue: newValue };
+        //        }
+        //    }
+        //});
+        //   debugger
+        this.fixNewData(changes, newData, oldData, this.scope && this.scope.mode == 'BindingEdit');
+        this.changedData.allCellValues = newData;
         if (this.scope) {
-            this.scope.applyTableValueChange(oldData);
+            this.scope.applyTableValueChange(newData);
         }
     };
-    HandsontableCustomHelper.prototype.onDesignTableMergeChange = function (mergedCellsNew) {
+    Grid.prototype.onDesignTableMergeChange = function (mergedCellsNew) {
         this.changedData.mergedCells = mergedCellsNew;
         if (this.scope) {
             this.scope.applyTableMergeChange(mergedCellsNew);
@@ -276,7 +235,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
      * 所以下次 change 还需要 fix 上次的 change
      * @param newData
      */
-    HandsontableCustomHelper.prototype.fixNewData = function (changes, newData, oldData, isBindingEditMode) {
+    Grid.prototype.fixNewData = function (changes, newData, oldData, isBindingEditMode) {
         if (newData) {
             // debugger
             for (var row = 0; row < newData.length; row++) {
@@ -355,12 +314,12 @@ var HandsontableCustomHelper = /** @class */ (function () {
     //        }
     //    }
     //}
-    HandsontableCustomHelper.prototype.onDesignTableHeaderChange = function (index, newText, headers) {
+    Grid.prototype.onDesignTableHeaderChange = function (index, newText, headers) {
         this.changedData.columnHeaderTexts = headers;
         if (this.scope)
             this.scope.appplyHeaderChange(index, newText, headers);
     };
-    HandsontableCustomHelper.prototype.bindTableEvent = function (uniqueId, tableCfg, eventNames, changeCallback) {
+    Grid.prototype.bindTableEvent = function (uniqueId, tableCfg, eventNames, changeCallback) {
         //['']
         //var hooks = Handsontable.hooks.getRegistered()
         //    .filter(x => x.indexOf('Mouse') != -1 || x.indexOf('Scroll') != -1);
@@ -381,7 +340,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
         });
     };
     ;
-    HandsontableCustomHelper.prototype.getColumns = function (columnDef, allowEdit) {
+    Grid.prototype.getColumns = function (columnDef, allowEdit) {
         var columns = [];
         var columnHeaderTexts = this.sourceData.columnHeaderTexts;
         var allCellValues = this.sourceData.allCellValues;
@@ -405,17 +364,16 @@ var HandsontableCustomHelper = /** @class */ (function () {
         }
         return columns;
     };
-    HandsontableCustomHelper.prototype.createTable = function (container) {
+    Grid.prototype.createTable = function (container) {
     };
-    HandsontableCustomHelper.prototype.createDesignTable = function (container) {
+    Grid.prototype.createDesignTable = function (container) {
         return this.creatBindingEditTable(container);
     };
-    HandsontableCustomHelper.prototype.getCellValue = function (row, col) {
+    Grid.prototype.getCellValue = function (row, col) {
         var cells = this.changedData.allCellValues[row];
         return cells && cells[col];
     };
-    HandsontableCustomHelper.prototype.syncDropdownValue = function () { };
-    HandsontableCustomHelper.prototype.creatBindingEditTable = function (container) {
+    Grid.prototype.creatBindingEditTable = function (container) {
         var _this = this;
         var option = this.sourceData;
         var uniqueId = option.uniqueId, allCellValues = option.allCellValues, valueMaps = option.valueMaps, mergedCells = option.mergedCells, cellDropdownData = option.cellDropdownData, columnHeaderTexts = option.columnHeaderTexts;
@@ -424,8 +382,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
             var cells = allCellValues[i];
             var texts = allCellTexts[i] = [];
             for (var j = 0; j < cells.length; j++) {
-                // texts.push(this.getCellDisplayText2(null, cells[j], valueMaps));
-                texts[j] = (this.wrapCellValueJson(cells[j]));
+                texts.push(this.getCellDisplayText2(null, cells[j], valueMaps));
             }
         }
         var _that = this;
@@ -461,23 +418,23 @@ var HandsontableCustomHelper = /** @class */ (function () {
         },
                 */
                 getValue: function () {
-                    // debugger
-                    // 這是 handsontable 的回調，不是 column 的，因此如果用戶采用手動輸入的方式，不會觸發此方法
                     var selection = this.getSelectedLast();
-                    //console.log("getValue", selection);
-                    //// debugger
-                    //// Get the row's data object, object is from BindingDefSources
+                    // debugger
+                    // Get the row's data object, object is from BindingDefSources
                     var obj = this.getSourceDataAtRow(selection[0]);
-                    // return obj;
-                    // 'JSON::'+JSON.stringify(obj);
-                    var ret = _that.wrapCellValueJson(obj);
+                    /*
+string ContentPartName { get; set; }
+string MemberExpression { get; set; }
+*/
+                    //  var ret = _that.wrapCellValueJson(obj);
+                    var ret = _that.getCellDisplayText2(null, obj, valueMaps);
+                    // console.log('getValue', ret);
+                    if (ret && ret.indexOf('Object')) {
+                        debugger;
+                    }
+                    //debugger
                     return ret;
-                    //var ret = <string><any>_that.getCellDisplayText2(null, obj, valueMaps);
-                    //// console.log('getValue', ret);
-                    //if (ret && ret.indexOf('Object') !== -1) {
-                    //    //debugger
-                    //}
-                    //return ret;
+                    //return 'JSON::'+JSON.stringify(obj);
                     //return obj.ContentPartName + '.' + obj.MemberExpression;
                     // the value only accept plain type
                     //return obj.Key;
@@ -489,13 +446,6 @@ var HandsontableCustomHelper = /** @class */ (function () {
         //  debugger
         var _that = this;
         ///*
-        /*
-           *
-           * https://stackoverflow.com/questions/18348437/how-do-i-edit-the-header-text-of-a-handsontable
-           *
-           *
-    https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-being-selected-on-column-header-click
-    */
         var afterOnCellMouseDown = function (event, coords, th) {
             // 鼠标左键
             // if (event.button !== 0 || event.button !== 1) return;
@@ -552,12 +502,43 @@ var HandsontableCustomHelper = /** @class */ (function () {
                 });
             });
         };
+        //  tableCfg.afterOnCellMouseDown = afterOnCellMouseDown;
         //*/
         var tableCfg = {
             licenseKey: 'non-commercial-and-evaluation',
             autoRowSize: this.autoRowSize,
             autoColumnSize: this.autoColumnSize,
             afterOnCellMouseDown: afterOnCellMouseDown,
+            //afterGetColHeader: function (col, TH) {
+            //   // debugger
+            //    // nothing for first column
+            //    if (col == -1) {
+            //        return;
+            //    }
+            //    var instance = this;
+            //    // create input element
+            //    var input = document.createElement('input');
+            //    input.type = 'text';
+            //    input.value = TH.firstChild.textContent;
+            //    TH.appendChild(input);
+            //    $(input).change(function (e) {
+            //        debugger
+            //        var headers = instance.getColHeader();
+            //        headers[col] = input.value;
+            //        instance.updateSettings({
+            //            colHeaders: headers
+            //        });
+            //    });
+            //    TH.style.position = 'relative';
+            //    TH.firstChild.style.display = 'none';
+            //},
+            /*
+             *
+             * https://stackoverflow.com/questions/18348437/how-do-i-edit-the-header-text-of-a-handsontable
+             *
+             *
+https://stackoverflow.com/questions/32212596/prevent-handsontable-cells-from-being-selected-on-column-header-click
+*/
             //data: allCellValues || Handsontable.helper.createSpreadsheetData(5, 2),
             data: allCellTexts,
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
@@ -574,8 +555,8 @@ var HandsontableCustomHelper = /** @class */ (function () {
         //v https://handsontable.com/docs/7.0.0/tutorial-using-callbacks.html
         //var hooks = ['afterChange', 'afterRemoveRow', 'afterRemoveCol', 'afterMergeCells',' afterUnmergeCells'];
         //https://handsontable.com/docs/7.0.0/Hooks.html#event:afterChange
-        tableCfg['beforeChange'] = function (changes) {
-            console.log('beforeChange', changes);
+        tableCfg['afterChange'] = function (changes) {
+            console.log('afterChange', changes);
             var tableInstance = this;
             if (changes) {
                 //  debugger
@@ -624,7 +605,7 @@ var HandsontableCustomHelper = /** @class */ (function () {
      * @param container
      * @param data
      */
-    HandsontableCustomHelper.prototype.createValueEditTable = function (container, data) {
+    Grid.prototype.createValueEditTable = function (container, data) {
         //var option = this.option;
         var _this = this;
         var exists = this.existsValueEditTable;
@@ -715,8 +696,8 @@ var HandsontableCustomHelper = /** @class */ (function () {
         return girdTable;
     };
     ;
-    return HandsontableCustomHelper;
+    return Grid;
 }());
 //})(handsontableHelper);
 var handsontableHelper = new HandsontableCustomHelper();
-//# sourceMappingURL=handsontable_custom.js.map
+//# sourceMappingURL=grid.js.map

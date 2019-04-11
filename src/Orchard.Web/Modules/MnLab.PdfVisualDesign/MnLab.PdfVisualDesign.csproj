@@ -343,6 +343,7 @@
     <Content Include="Scripts\handsontable\numbro\numbro.js" />
     <Content Include="Scripts\handsontable\pikaday\pikaday.css" />
     <Content Include="Scripts\handsontable\pikaday\pikaday.js" />
+    <Content Include="Scripts\Test\3.css" />
     <Content Include="Styles\Web.config" />
     <Content Include="Web.config" />
     <Content Include="Views\Web.config" />
@@ -440,6 +441,8 @@
     <Content Include="Views\Fields_TempalteSupportField.cshtml" />
     <Content Include="Views\Admin\Edit.cshtml" />
     <Content Include="Views\Admin\List.cshtml" />
+    <Content Include="Scripts\Test\1.less" />
+    <Content Include="Scripts\Test\2.scss" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

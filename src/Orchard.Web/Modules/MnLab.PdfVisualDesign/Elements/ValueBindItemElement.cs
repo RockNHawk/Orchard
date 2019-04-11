@@ -49,6 +49,10 @@ namespace MnLab.PdfVisualDesign.Binding.Elements {
 
         public string Key => ContentPartName + "." + MemberExpression;
 
+        public string DisplayName => throw new System.NotImplementedException();
+
+        public string BindType { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
         //LocalizedString IValueBindingInfo.Description { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
     }
 

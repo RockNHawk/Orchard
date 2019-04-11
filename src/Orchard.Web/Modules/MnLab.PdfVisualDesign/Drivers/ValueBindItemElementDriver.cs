@@ -124,7 +124,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             var updater = context.Updater;
 
-            var bindingInfo = Mapper.Map(element, new ValueBindingDef());
+            var bindingInfo = Mapper.Map(element, new ValueDef());
 
             var viewModel = new PropertyBindViewModel {
                 Binding = bindingInfo,
