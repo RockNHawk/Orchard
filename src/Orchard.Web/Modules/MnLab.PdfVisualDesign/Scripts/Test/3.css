@@ -1,0 +1,7 @@
+﻿body {
+    background: red;
+}
+
+th, td, .colHeader {
+    color: red !important;
+}

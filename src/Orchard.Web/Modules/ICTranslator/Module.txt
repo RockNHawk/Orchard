@@ -1,0 +1,11 @@
+Name: ICTranslator
+AntiForgery: enabled
+Author: Caleb Ho, Noel Wu
+Website:
+Version: 1.0.1
+OrchardVersion: 1.0
+Description: Content Translator based on Bing Translator.
+Features:
+    ICTranslator:
+        Description: Translates a content part.
+        Category: Languages

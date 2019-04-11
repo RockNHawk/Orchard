@@ -6,7 +6,7 @@ using System.Security;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Amba.HtmlBlocks")]
+[assembly: AssemblyTitle("MnLab.PdfVisualDesign")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("Orchard")]
@@ -20,7 +20,7 @@ using System.Security;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("e716588c-cbb0-4e49-8d3a-3fb353a0ff85")]
+[assembly: Guid("0916588c-6412-3457-1245-4fb353a0ff99")]
 
 // Version information for an assembly consists of the following four values:
 //

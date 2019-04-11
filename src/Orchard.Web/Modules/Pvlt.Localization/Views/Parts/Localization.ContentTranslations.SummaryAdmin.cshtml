@@ -1,0 +1,35 @@
+﻿@using Orchard.Core.Contents;
+@using Orchard.Localization.Services;
+@using Orchard.Localization.Models;
+@if (AuthorizedFor(Permissions.PublishContent)) {
+    Style.Require("LocalizationAdmin");
+    IEnumerable<LocalizationPart> localizations = Model.Localizations;
+    var localizationLinks = Html.UnorderedList(localizations, (c, i) => Html.ItemEditLink(c.Culture.Culture, c), "localizations");
+    var cultureManager = WorkContext.Resolve<ICultureManager>();
+    var defaultCulture = cultureManager.GetSiteCulture();
+    var masterLocalization = localizations.FirstOrDefault(x => x.Culture.Culture == defaultCulture);
+    <div class="content-localization">
+        @if (Model.Culture != null) {
+            <div class="content-culture">@T("Culture: {0}", Model.Culture)</div>
+        }
+        else {
+            <div class="content-culture">@T("Culture: {0}", T("Undefined"))</div>
+        }
+        @if (localizations.Count() > 0) {
+            <div class="content-localizations">
+                <h4>@T("Translations:")</h4>
+                @localizationLinks
+            </div>
+        }
+        @if (Model.Culture != null && !((IEnumerable<string>)Model.SiteCultures).All(c => c == Model.Culture || localizations.Any(l => c == l.Culture.Culture))) {
+            <div class="add-localization">
+                @if (masterLocalization != null) {
+                    @Html.ActionLink(T("+ New translation").Text, "Translate", "Admin", new { area = "Pvlt.Localization", id = masterLocalization.ContentItem.Id }, null)
+                }
+                else {
+                    @Html.ActionLink(T("+ New translation").Text, "Translate", "Admin", new { area = "Pvlt.Localization", id = Model.Id }, null)
+                }
+            </div>
+        }
+    </div>
+}

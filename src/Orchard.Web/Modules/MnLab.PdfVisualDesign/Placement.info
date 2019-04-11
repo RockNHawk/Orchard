@@ -1,7 +1,7 @@
 ﻿<Placement>
-  <Place Fields_HtmlBlockField_Edit="Content:2.5"/>
-  <Place Fields_HtmlBlockField="Content:before" />
+  <Place Fields_TempalteSupportField_Edit="Content:2.5"/>
+  <Place Fields_TempalteSupportField="Content:before" />
   <Match DisplayType="SummaryAdmin">
-    <Place Fields_HtmlBlockField="-" />
+    <Place Fields_TempalteSupportField="-" />
   </Match>
 </Placement>

@@ -303,6 +303,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadioSystems.BootstrapEleme
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchard.InlineEditing", "Orchard.Web\Modules\Orchard.InlineEditing\Orchard.InlineEditing.csproj", "{05EFF462-4258-4850-8583-E60F8F3063F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MnLab.Approval", "Orchard.Web\Modules\MnLab.Approval\MnLab.Approval.csproj", "{54162F30-2D6C-63F9-0288-123690F26791}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeCoverage|Any CPU = CodeCoverage|Any CPU
@@ -1432,6 +1434,18 @@ Global
 		{05EFF462-4258-4850-8583-E60F8F3063F4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{05EFF462-4258-4850-8583-E60F8F3063F4}.Stage|Any CPU.ActiveCfg = Release|Any CPU
 		{05EFF462-4258-4850-8583-E60F8F3063F4}.Stage|Any CPU.Build.0 = Release|Any CPU
+		{54162F30-2D6C-63F9-0288-123690F26791}.CodeCoverage|Any CPU.ActiveCfg = Stage|Any CPU
+		{54162F30-2D6C-63F9-0288-123690F26791}.CodeCoverage|Any CPU.Build.0 = Stage|Any CPU
+		{54162F30-2D6C-63F9-0288-123690F26791}.Coverage|Any CPU.ActiveCfg = Stage|Any CPU
+		{54162F30-2D6C-63F9-0288-123690F26791}.Coverage|Any CPU.Build.0 = Stage|Any CPU
+		{54162F30-2D6C-63F9-0288-123690F26791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54162F30-2D6C-63F9-0288-123690F26791}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54162F30-2D6C-63F9-0288-123690F26791}.FxCop|Any CPU.ActiveCfg = Stage|Any CPU
+		{54162F30-2D6C-63F9-0288-123690F26791}.FxCop|Any CPU.Build.0 = Stage|Any CPU
+		{54162F30-2D6C-63F9-0288-123690F26791}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54162F30-2D6C-63F9-0288-123690F26791}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54162F30-2D6C-63F9-0288-123690F26791}.Stage|Any CPU.ActiveCfg = Stage|Any CPU
+		{54162F30-2D6C-63F9-0288-123690F26791}.Stage|Any CPU.Build.0 = Stage|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1530,9 +1544,10 @@ Global
 		{15C4F6B4-E383-4187-8529-737BE67DBFF2} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
 		{298F8B28-B344-4B5C-9951-50B5C2824E1B} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
 		{05EFF462-4258-4850-8583-E60F8F3063F4} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
+		{54162F30-2D6C-63F9-0288-123690F26791} = {BD190832-BC8B-4112-847C-5263BED2B065}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {3585D970-275B-4363-9F61-CD37CFC9DCD3}
 		EnterpriseLibraryConfigurationToolBinariesPath = packages\TransientFaultHandling.Core.5.1.1209.1\lib\NET4
+		SolutionGuid = {3585D970-275B-4363-9F61-CD37CFC9DCD3}
 	EndGlobalSection
 EndGlobal

@@ -124,7 +124,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             var updater = context.Updater;
 
-            var bindingInfo = Mapper.Map(element, new ValueBindingDef());
+            var bindingInfo = Mapper.Map(element, new ValueDef());
 
             var viewModel = new PropertyBindViewModel {
                 Binding = bindingInfo,
@@ -132,6 +132,8 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
                 //Field = field,
                 FieldDisplay = _fieldDisplay,
             };
+
+            viewModel.Context = context;
 
             //var viewModel = new PropertyBindViewModel {
             //    ContentPartFieldExpression = element.ContentPartFieldExpression,
@@ -156,7 +158,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             // var contentItem = content.ContentItem;
             var contentItem = content.GetLatestVersion(_contentManager);//  _contentManager.Get(content.Id, VersionOptions.Latest);
 
-            var member = string.IsNullOrEmpty(partName) || string.IsNullOrEmpty(partPropertyName) ? null : ContentDataMemberHelper.FindFromContentItem(contentItem, bindingInfo);
+            var member = string.IsNullOrEmpty(partName) || string.IsNullOrEmpty(partPropertyName) ? null : ContentPartDataMemberHelper.FindFromContentItem(contentItem, bindingInfo);
             var part = member?.Part;
             /*
                https://docs.orchardproject.net/en/latest/Documentation/Creating-a-custom-field-type/
@@ -336,7 +338,7 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             //}
 
 
-            var member = ContentDataMemberHelper.FindFromContentItem(contentItem, element);
+            var member = ContentPartDataMemberHelper.FindFromContentItem(contentItem, element);
 
             //if (context.DisplayType == "Design") {
                 context.ElementShape.Member = member;

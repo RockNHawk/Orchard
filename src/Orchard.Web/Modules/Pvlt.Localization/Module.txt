@@ -1,0 +1,13 @@
+﻿Name: Pvlt Localization
+AntiForgery: enabled
+Author: Pierre Vanlinthout
+Website: http://orchardproject.net
+Version: 1.1
+OrchardVersion: 1.10
+Description: Override Orchard translation to copy title, body and layout content. Also provide Culture picker widget that redirect directly to translated page.
+Category: Localization
+Features:
+    Pvlt.Localization:
+		Name: Pvlt Localization
+        Description: Override Orchard translation to copy title, body and layout content. Also provide Culture picker widget that redirect directly to translated page.
+		Dependencies: Orchard.Localization, Orchard.Layouts, Orchard.Alias, Orchard.Widgets, Orchard.Localization.CultureSelector, Orchard.Autoroute

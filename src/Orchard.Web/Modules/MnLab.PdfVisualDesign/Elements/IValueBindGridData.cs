@@ -2,7 +2,7 @@
 {
     public interface IValueBindGridData
     {
-        ValueBindingDef[][] AllCellValues { get; set; }
+        ValueDef[][] AllCellValues { get; set; }
         string DisplayType { get; set; }
         string GridType { get; set; }
         MergedCell[] MergedCells { get; set; }

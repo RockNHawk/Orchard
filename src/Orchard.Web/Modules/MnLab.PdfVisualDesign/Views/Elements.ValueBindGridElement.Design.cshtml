@@ -72,7 +72,7 @@
                 uniqueId, allCellValues, valueMaps, mergedCells, columnHeaderTexts
             });
             var columns = handsontableHelper.getColumns({
-                renderer: handsontableHelper.createRender(null, valueMaps, Handsontable.renderers.TextRenderer),
+                renderer: handsontableHelper.createRender(null, (row, col) =>handsontableHelper. getCellValue(row,col), valueMaps, Handsontable.renderers.TextRenderer),
             });
 
             /*
@@ -89,6 +89,8 @@
                 rowHeaders: false,
                 colHeaders: true,
                 contextMenu: false,
+                    autoRowSize: false,
+            autoColumnSize: false,
                 // header 分为：属性名字列 和 属性值列，列头在设计页面要可以自定义
                 //colHeaders: ['Data Member (First Column)', 'Data Member (Second Column)'],
                 colHeaders: columnHeaderTexts,//['Data Member (Name)', '', 'Data Member (Second Column)', ''],

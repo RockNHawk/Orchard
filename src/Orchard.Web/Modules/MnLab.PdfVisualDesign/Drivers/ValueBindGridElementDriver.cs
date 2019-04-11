@@ -12,7 +12,6 @@ using System;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web.Routing;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
@@ -27,29 +26,10 @@ using System.Reflection;
 using System.Web.Mvc;
 using Orchard.Core.Title.Models;
 using Orchard.ContentManagement.MetaData.Models;
-using System.Collections;
+using Orchard.Localization;
+using Orchard.Logging;
 
 namespace MnLab.PdfVisualDesign.Binding.Drivers {
-
-
-
-    public class Grouping<TKey, TElement> : IGrouping<TKey, TElement> {
-
-        IEnumerable<TElement> elements;
-        public Grouping(TKey key, IEnumerable<TElement> elements) {
-            this.Key = key;
-            this.elements = elements;
-        }
-        public TKey Key { get; set; }
-
-        public IEnumerator<TElement> GetEnumerator() {
-            return elements.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() {
-            return this.GetEnumerator();
-        }
-    }
 
 
     public class ValueBindGridElementDriver : ElementDriver<ValueBindGridElement> {
@@ -73,6 +53,9 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
         readonly IWorkContextAccessor _workContextAccessor;
 
+        // public Localizer T { get; set; }
+
+        //  public ILogger Logger { get; set; }
 
         public ValueBindGridElementDriver(IElementFilterProcessor processor, IContentFieldDisplay fieldDisplay,
             IShapeFactory shapeFactory,
@@ -92,28 +75,47 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             this._contentFieldDrivers = contentFieldDrivers;
             this._contentManager = contentManager;
             this._workContextAccessor = workContextAccessor;
+            // T = NullLocalizer.Instance;
+            // Logger = NullLogger.Instance;
         }
 
-
-        static IList<IValueBindingDef> GetBindingItems(ContentPartDefinition def) {
+        /// <summary>
+        /// Get ContentPart's IValueBindingDef from ContentPartDefinition
+        /// </summary>
+        /// <param name="def"></param>
+        /// <returns></returns>
+        static IList<IValueBindingDef> GetBindingItems(ContentPartDefinition def, Localizer T) {
+            // Fields Def, Field can dynamic added by user
             var fields = def.Fields;
+            /*
+            Property is a .NET Property , it's hard-code in the ContentPart,sucha as TitlePart.Title is definded as:
+            public class TitlePart : ContentPart{
+                public string Title {get..., set...}
+            }
+             */
             var properties = def.GetType().GetProperties(BindingFlags.Public);
 
             var items = new List<IValueBindingDef>((fields?.Count() ?? 0) + properties.Count());
             if (fields != null) {
                 foreach (var item in fields) {
-                    items.Add(new ValueBindingDef() {
+                    // Field 之下还有子属性，这里只处理了它本身
+                    var dd = new ValueDef() {
                         ContentPartName = def.Name,
                         MemberExpression = item.Name,
-                    });
+                    };
+                    dd.DisplayName = T(dd.Key).Text;
+                    items.Add(dd);
                 }
             }
+
             if (properties != null) {
                 foreach (var item in properties) {
-                    items.Add(new ValueBindingDef() {
+                    var dd = new ValueDef() {
                         ContentPartName = def.Name,
                         MemberExpression = item.Name,
-                    });
+                    };
+                    dd.DisplayName = T(dd.Key).Text;
+                    items.Add(dd);
                 }
             }
 
@@ -124,11 +126,11 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             var updater = context.Updater;
 
             var content = context.Content;
-          //  var contentItem = context.Content.ContentItem;
+            //  var contentItem = context.Content.ContentItem;
             var contentItem = content.GetLatestVersion(_contentManager);
 
 
-            var bindingDefGroups = GetBindingDefGroups(contentItem);
+            var bindingDefGroups = GetBindingDefGroups(contentItem, T);
             Dictionary<string, object> valueMaps = GetValueMaps(contentItem, bindingDefGroups);
 
             var viewModel = Mapper.Map(element, new ValueBindGridViewModel() {
@@ -145,11 +147,26 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
                 var design = new ValueBindGridData();
 
-                updater.TryUpdateModel(design, GetPrefix(context, $"{nameof(viewModel.DesignData)}"),null,null);
+                updater.TryUpdateModel(design, GetPrefix(context, $"{nameof(viewModel.DesignData)}"), null, null);
 
                 var strAllCellValues = ((string[])context.ValueProvider.GetValue($"{nameof(viewModel.DesignData)}.{nameof(viewModel.DesignData.AllCellValues)}_JSON")?.RawValue)?[0];
                 if (!string.IsNullOrEmpty(strAllCellValues)) {
-                    design.AllCellValues = Newtonsoft.Json.JsonConvert.DeserializeObject<ValueBindingDef[][]>(strAllCellValues);
+                    var AllCellValues = design.AllCellValues = Newtonsoft.Json.JsonConvert.DeserializeObject<ValueDef[][]>(strAllCellValues);
+                    if (AllCellValues != null) {
+                        var setValues = AllCellValues.SelectMany(x => x).Where(x => x.SetValue != null).ToArray();
+                        if (setValues != null && setValues.Length > 0) {
+
+                            foreach (var item in setValues) {
+                                var member = ContentPartDataMemberHelper.FindFromContentItem(contentItem, item);
+                                if (member != null) {
+                                    // TODO: convert value type
+                                    member.GetAccessor().SetValue(item.SetValue);
+                                    item.SetValue = null;
+                                }
+                            }
+
+                        }
+                    }
                 }
                 {
                     var strMergedCells = ((string[])context.ValueProvider.GetValue($"{nameof(viewModel.DesignData)}.{nameof(viewModel.DesignData.MergedCells)}_JSON")?.RawValue)?[0];
@@ -177,32 +194,40 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
 
             }
 
-            ret:
+        ret:
 
             var editor = context.ShapeFactory.EditorTemplate(TemplateName: $"Elements.{nameof(ValueBindGridElement)}", Model: viewModel);
             return Editor(context, editor);
         }
 
-        private static IEnumerable<Grouping<ContentPartDefinition, IValueBindingDef>> GetBindingDefGroups(ContentItem contentItem) {
+        public static IEnumerable<Grouping<ContentPartDefinition, IValueBindingDef>> GetBindingDefGroups(ContentItem contentItem, Localizer T) {
             // in 'Create' page, the content is empty
             return contentItem.TypeDefinition.Parts?
                 .Select(x => x.PartDefinition)
                 .GroupBy(x => x)
-                .Select(x => new Grouping<ContentPartDefinition, IValueBindingDef>(x.Key, GetBindingItems(x.Key)))
+                // the key is ContentPartDefinition
+                .Select(x => new Grouping<ContentPartDefinition, IValueBindingDef>(x.Key, GetBindingItems(x.Key, T)))
                 .Where(x => x.Count() > 0);
-                ;
+            ;
         }
 
-        private static Dictionary<string, object> GetValueMaps(ContentItem contentItem, IEnumerable<Grouping<ContentPartDefinition, IValueBindingDef>> bindingDefGroups) {
+        /// <summary>
+        /// 根据 bindingDefGroups 获取所有 Field/Property 的值
+        /// </summary>
+        /// <param name="contentItem"></param>
+        /// <param name="bindingDefGroups"></param>
+        /// <returns></returns>
+        public static Dictionary<string, object> GetValueMaps(ContentItem contentItem, IEnumerable<Grouping<ContentPartDefinition, IValueBindingDef>> bindingDefGroups) {
             var valueMaps = new Dictionary<string, object>();
             foreach (var group in bindingDefGroups) {
                 var partDef = group.Key;
                 var part = contentItem.Parts.First(x => x.PartDefinition == partDef);
                 foreach (var item in group) {
-                    var helper = ContentDataMemberHelper.FindFromContentPart(part, item);
+                    var helper = ContentPartDataMemberHelper.FindFromContentPart(part, item);
                     //var helper = new ContentDataMemberHelper(part, item);
                     try {
-                        var value = helper.GetAccessor().GetValue();
+                        var value = helper.GetAccessor().GetObject();
+                        //var value = helper.GetAccessor().GetValue();
                         valueMaps[item.Key] = value;
                     }
                     catch (Exception ex) {
@@ -221,8 +246,8 @@ namespace MnLab.PdfVisualDesign.Binding.Drivers {
             //  var contentItem = context.Content.ContentItem;
             var contentItem = content.GetLatestVersion(_contentManager);
 
-            var bindingDefGroups = GetBindingDefGroups(contentItem);
-                // the bind member key and value map
+            var bindingDefGroups = GetBindingDefGroups(contentItem, T);
+            // the bind member key and value map
             Dictionary<string, object> valueMaps = GetValueMaps(contentItem, bindingDefGroups);
 
             var viewModel = Mapper.Map(element, new ValueBindGridViewModel() {

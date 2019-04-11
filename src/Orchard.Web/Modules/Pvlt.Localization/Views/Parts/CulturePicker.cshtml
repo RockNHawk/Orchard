@@ -1,0 +1,22 @@
+﻿@using Pvlt.Localization.Models
+@{
+    Style.Require("PvltLocalization");
+    var viewModel = Model.ViewModel as CulturePickerWidgetViewModel;
+}
+@if (viewModel != null) {
+    var currentCulture = viewModel.CurrentCulture.TwoLetterISOLanguageName.ToUpper();
+    <div class="language-switcher">
+        @*<span>@currentCulture</span>*@
+        <ul>
+            @foreach (var link in viewModel.Links) {
+                var linkCulture = link.Culture.TwoLetterISOLanguageName.ToUpper();
+                <li class="@(link.Url == "#" ? "disabled" : "")">
+                    <a href="@link.Url" class="@(linkCulture == currentCulture ? "current" : "")" data-lang="@linkCulture">@linkCulture</a>
+                </li>
+            }
+        </ul>
+    </div>
+}
+else {
+    <span style="display:none;">@Model.Log</span>
+}

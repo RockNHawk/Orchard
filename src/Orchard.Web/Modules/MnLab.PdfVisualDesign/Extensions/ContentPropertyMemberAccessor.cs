@@ -26,19 +26,24 @@ using System.Reflection;
 using System.Web.Mvc;
 using Orchard.Core.Title.Models;
 
-namespace MnLab.PdfVisualDesign.Binding.Drivers
-{
-public class ContentPropertyMemberAccessor : IContentMemberAccessor {
+namespace MnLab.PdfVisualDesign.Binding.Drivers {
+    public class ContenttPartPropertyMemberAccessor : IContentPartMemberAccessor {
         string _memberName;
         PropertyInfo _field;
         ContentPart _contentItem;
-        public ContentPropertyMemberAccessor(ContentPart contentItem, PropertyInfo field, string memberName) {
+        public ContenttPartPropertyMemberAccessor(ContentPart contentItem, PropertyInfo field, string memberName) {
             this._contentItem = contentItem;
             this._field = field;
             this._memberName = memberName;
+            //            this.IsSimply = field.GetType().GetProperty("Value") != null;
         }
 
-        public object GetValue() {
+        public bool IsSimply { get; set; }
+
+        public object GetObject() {
+            return _field.GetValue(_contentItem);
+        }
+        public object GetValue(string name = null) {
             return _field.GetValue(_contentItem);
         }
 

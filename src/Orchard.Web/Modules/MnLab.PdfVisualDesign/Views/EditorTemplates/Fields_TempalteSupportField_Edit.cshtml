@@ -1,0 +1,30 @@
+﻿@using MnLab.PdfVisualDesign
+@using MnLab.PdfVisualDesign.ViewModels
+@using MnLab.PdfVisualDesign.Fields
+@using MnLab.PdfVisualDesign.Binding
+@using MnLab.PdfVisualDesign.Binding.Elements
+
+@model TemplateSupportViewModel
+@{
+    var model = Model;
+}
+@{
+
+    var contentId = model.ContentItem?.Id;
+    @contentId
+
+}
+Edit for TempalteSupportField
+
+@using (Script.Foot())
+{
+    <script src="~/Modules/MnLab.PdfVisualDesign/Scripts/TempalteSupport/index.js"></script>
+    if (contentId!=null&&contentId>0)
+    {
+        <script>
+    var url = '@(base.WorkContext.CurrentSite.BaseUrl)/Admin/MnLab.PdfVisualDesign/GetContentValueMap/@(contentId)';
+    syncContentPart(url,null,$("form[action='/Admin/Contents/Edit/@contentId']"));
+        </script>
+    }
+
+}
