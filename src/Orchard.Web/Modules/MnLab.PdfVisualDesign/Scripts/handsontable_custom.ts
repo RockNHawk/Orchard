@@ -87,7 +87,7 @@ class HandsontableCustomHelper {
             var key = valueDef['Key'];
             var DisplayName = valueDef['DisplayName'];
             var _type = valueDef['BindType'];
-            var valueArgument = valueDef;
+            var valueArgument: string;
             var memberValue = valueMaps && valueMaps[key] && valueMaps[key].Value;
 
             //switch (mode) {
@@ -102,17 +102,26 @@ class HandsontableCustomHelper {
                         valueArgument = DisplayName || key;
                         break;
                     case 'Value':
-                        valueArgument = memberValue;
+                        if (memberValue || this.mode == 'ValueEdit') {
+                            valueArgument = memberValue;
+                        } else {
+                           // debugger
+                            valueArgument = `(${DisplayName})`;
+                        }
                         break;
                 }
             } else {
-
-                //  debugger
-                // $(td).html(val);
-                //return $("<th>"+value.Key+"</th>");
+                switch (_type) {
+                    default:
+                        break;
+                    /// 保存直接输入值，不绑定时的值，此时 BindType 为 "StaticValue"，其它字段为空
+                    case 'StaticValue':
+                        valueArgument = valueDef['StaticValue'];
+                        break;
+                }
             }
 
-            // some old value key is not null
+            // legacy fix: some old value key is not null
             switch (_type) {
                 default:
                     break;
@@ -160,18 +169,21 @@ class HandsontableCustomHelper {
            */
             var valueDef = value && (typeof value === 'string' ? _that.parseCellValueIfIsTextExpr(value) : value);
             var displayText;
-            if (typeof (valueDef) == 'string') {
-                displayText = value;
-            } else {
+            if (MnUtil.isJson(valueDef)) {
                 displayText = _that.getCellDisplayText2(mode, valueDef, valueMaps);
+            } else {
+                // if (typeof (valueDef) == 'string') {
+                displayText = value;
             }
             //var displayText = _that.getCellDisplayText(mode, row, col, cellValueAccrssor, valueMaps);
             //debugger
-            arguments[5] = displayText;
+            arguments[5] = displayText;//|| ' ';
             renderer.apply(instance, arguments);
             return td;
         };
     };
+
+    mode: string;
 
     private scope: any;
     sourceData: HandsontableData;
@@ -228,19 +240,19 @@ class HandsontableCustomHelper {
             };
 
 
-            $scope.mode = 'BindingEdit';
+            _that.mode = $scope.mode = 'BindingEdit';
             $scope.switchMode = (mode?: string) => {
                 var newMode = $scope.mode = mode || ($scope.mode == 'ValueEdit' ? 'BindingEdit' : 'ValueEdit');
-
-                switch (newMode) {
-                    case 'ValueEdit':
-                        var valueEditTableContainer = this.valueEditTableContainer;
-                        _that.createValueEditTable(valueEditTableContainer, this.changedData || this.sourceData);
-                    default:
-                        break;
-                    case 'BindingEdit':
-                        break;
-                }
+                _that.mode = newMode;
+                //switch (newMode) {
+                //    case 'ValueEdit':
+                //        var valueEditTableContainer = this.valueEditTableContainer;
+                //        _that.createValueEditTable(valueEditTableContainer, this.changedData || this.sourceData);
+                //    default:
+                //        break;
+                //    case 'BindingEdit':
+                //        break;
+                //}
             };
 
         });
@@ -249,7 +261,7 @@ class HandsontableCustomHelper {
         return ngController;
     }
 
-    onBeforeTableValueChange(changes: any[][]) {
+    processTableValueChange(changes: any[][]) {
         var scope = this.scope;
         var isBindingEdit = scope && scope.mode == 'BindingEdit';
         var isValueEdit = !isBindingEdit;
@@ -345,10 +357,12 @@ class HandsontableCustomHelper {
         //  this.fixNewData(changes, newData, oldData, this.scope && this.scope.mode == 'BindingEdit');
         // this.changedData.allCellValues = newData;
 
-        if (this.scope) {
+        if (scope && changedItems.length > 0) {
             // angular 更新
-            this.scope.applyTableValueChange(oldData);
+            scope.applyTableValueChange(oldData);
         }
+
+        return changedItems;
     }
 
     onDesignTableMergeChange(mergedCellsNew) {
@@ -457,6 +471,17 @@ class HandsontableCustomHelper {
         if (this.scope) this.scope.appplyHeaderChange(index, newText, headers);
     }
 
+    /**
+     *
+     *
+        //v https://handsontable.com/docs/7.0.0/tutorial-using-callbacks.html
+        //var hooks = ['afterChange', 'afterRemoveRow', 'afterRemoveCol', 'afterMergeCells',' afterUnmergeCells'];
+
+     * @param uniqueId
+     * @param tableCfg
+     * @param eventNames
+     * @param changeCallback
+     */
     private bindTableEvent(uniqueId, tableCfg, eventNames: Array<string>, changeCallback) {
 
         //['']
@@ -512,8 +537,14 @@ class HandsontableCustomHelper {
     autoRowSize = true;
     autoColumnSize = true;
 
-    createDesignTable(container) {
-        return this.creatBindingEditTable(container);
+
+    bindingEditTable;
+    valueEditTable;
+    createEditTable(bindingEditContainer, valueEditContainer) {
+        var option = this.sourceData;
+        var scopeAccesser = this.createController(option);
+        this.bindingEditTable = this.createBindingEditTable(bindingEditContainer);
+        this.valueEditTable = this.createValueEditTable(valueEditContainer, this.changedData);
     }
 
     getCellValue(row, col) {
@@ -522,34 +553,47 @@ class HandsontableCustomHelper {
     }
 
 
-    syncDropdownValue() { }
 
-    creatBindingEditTable(container) {
-        var option = this.sourceData;
+    getTableDataAndColumnConfig(data: HandsontableData, columnDef) {
+        var uniqueId = data.uniqueId,
+            allCellValues = data.allCellValues,
+            valueMaps = data.valueMaps,
+            mergedCells = data.mergedCells,
+            cellDropdownData = data.cellDropdownData,
+            columnHeaderTexts = data.columnHeaderTexts;
 
-        var uniqueId = option.uniqueId,
-            allCellValues = option.allCellValues,
-            valueMaps = option.valueMaps,
-            mergedCells = option.mergedCells,
-            cellDropdownData = option.cellDropdownData,
-            columnHeaderTexts = option.columnHeaderTexts;
+        var allCellTexts = this.getCellTexts(allCellValues);
 
-        /**
-         * 当 handsometable 首次初始化时（通常是刷新页面），其 data 从指定的数据源中读取，如果 cell value 為 Object，則 handsometable 會有無法修改 cell value 的 bug，所以這裏要把它的 value fix 為 text
-         * */
-        var allCellTexts = [];
-        for (var i = 0; i < allCellValues.length; i++) {
-            var cells = allCellValues[i];
-            var texts = allCellTexts[i] = [];
-            for (var j = 0; j < cells.length; j++) {
-                // texts.push(this.getCellDisplayText2(null, cells[j], valueMaps));
-                texts[j] = (this.wrapCellValueJsonToTextExpr(cells[j]));
-            }
+        var obj = {
+            autoRowSize: this.autoRowSize,
+            autoColumnSize: this.autoColumnSize,
+            data: allCellTexts,
+            colHeaders: columnHeaderTexts,//['Data Member (First Column)', '', 'Data Member (Second Column)', ''],
+            // columns: columns,
+            //  columns: [columnDef, columnDef, columnDef, columnDef],
+            mergeCells: mergedCells || [],
+        };
+
+        if (columnDef) {
+            var columns = this.getColumns(columnDef);
+            obj['columns'] = columns;
         }
+        return obj;
+    }
+
+    createBindingEditTable(container) {
+        var data = this.sourceData;
+
+        var uniqueId = data.uniqueId,
+            allCellValues = data.allCellValues,
+            valueMaps = data.valueMaps,
+            mergedCells = data.mergedCells,
+            cellDropdownData = data.cellDropdownData,
+            columnHeaderTexts = data.columnHeaderTexts;
+
 
         var _that = this;
 
-        var scopeAccesser = this.createController(option);
         //   var scopeAccesser = createNgBindController(uniqueId, tableCfg, () => girdTable, allCellValues, mergedCells);
 
         var columnDef = {
@@ -614,7 +658,6 @@ class HandsontableCustomHelper {
             }
         };
 
-        var columns = this.getColumns(columnDef);
         //  debugger
 
         var _that = this;
@@ -707,23 +750,31 @@ class HandsontableCustomHelper {
         };
         //*/
 
+        var cfg = this.getTableDataAndColumnConfig(data, columnDef);
+
         var tableCfg = {
+            ...cfg,
+
             licenseKey: 'non-commercial-and-evaluation',
-            autoRowSize: this.autoRowSize,
-            autoColumnSize: this.autoColumnSize,
+
             afterOnCellMouseDown: afterOnCellMouseDown,
             //data: allCellValues || Handsontable.helper.createSpreadsheetData(5, 2),
-            data: allCellTexts,
+
+            //autoRowSize: this.autoRowSize,
+            //autoColumnSize: this.autoColumnSize,
+            //data: allCellTexts,
+            //colHeaders: columnHeaderTexts,//['Data Member (First Column)', '', 'Data Member (Second Column)', ''],
+            //columns: columns,
+            ////  columns: [columnDef, columnDef, columnDef, columnDef],
+            //mergeCells: mergedCells || [],
+
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
             //  rowHeaders: true,
             contextMenu: true,
             allowInsertColumn: true,
             allowInsertRow: true,
             // colHeaders: true,
-            colHeaders: columnHeaderTexts,//['Data Member (First Column)', '', 'Data Member (Second Column)', ''],
-            columns: columns,
-            //  columns: [columnDef, columnDef, columnDef, columnDef],
-            mergeCells: mergedCells || [],
+
             //mergeCells: [
             //    { row: 1, col: 1, rowspan: 3, colspan: 3 },
             //    { row: 3, col: 4, rowspan: 2, colspan: 2 },
@@ -737,20 +788,8 @@ class HandsontableCustomHelper {
             //}
         };
 
-        //v https://handsontable.com/docs/7.0.0/tutorial-using-callbacks.html
-        //var hooks = ['afterChange', 'afterRemoveRow', 'afterRemoveCol', 'afterMergeCells',' afterUnmergeCells'];
+        this.bindTableValueChange(tableCfg);
 
-
-
-        //https://handsontable.com/docs/7.0.0/Hooks.html#event:afterChange
-        tableCfg['beforeChange'] = function (changes) {
-            console.log('beforeChange', changes);
-            var tableInstance = this;
-            if (changes) {
-                //  debugger
-                _that.onBeforeTableValueChange(changes);
-            }
-        };
 
         this.bindTableEvent(uniqueId, tableCfg, ['afterMergeCells', 'afterUnmergeCells'], (tableInstance) => {
             var mc = tableInstance.getPlugin('mergeCells');
@@ -771,6 +810,23 @@ class HandsontableCustomHelper {
 
 
     valueEditTableContainer: any;
+
+    /**
+     * 当 handsometable 首次初始化时（通常是刷新页面），其 data 从指定的数据源中读取，如果 cell value 為 Object，則 handsometable 會有無法修改 cell value 的 bug，所以這裏要把它的 value fix 為 text
+     * */
+    private getCellTexts(allCellValues: ValueBindingDef[][]) {
+        if (!allCellValues) return [];
+        var allCellTexts = [];
+        for (var i = 0; i < allCellValues.length; i++) {
+            var cells = allCellValues[i];
+            var texts = allCellTexts[i] = [];
+            for (var j = 0; j < cells.length; j++) {
+                // texts.push(this.getCellDisplayText2(null, cells[j], valueMaps));
+                texts[j] = (this.wrapCellValueJsonToTextExpr(cells[j]));
+            }
+        }
+        return allCellTexts;
+    }
 
     /**
      *
@@ -802,42 +858,33 @@ class HandsontableCustomHelper {
 
         var columnDef = {
             // renderer: Handsontable.renderers.AutocompleteRenderer,
-            renderer: this.createRender('ValueEdit', (row, col) => this.getCellValue(row, col), valueMaps, Handsontable.renderers.AutocompleteRenderer),
+            renderer: this.createRender('ValueEdit', (row, col) => this.getCellValue(row, col), valueMaps, Handsontable.renderers.TextRenderer),
         };
 
-        var columns = this.getColumns(columnDef);
+        //   var columns = this.getColumns(columnDef);
 
-        //  debugger
+        var cfg = this.getTableDataAndColumnConfig(data, columnDef);
 
         var tableCfg = {
+            ...cfg,
             licenseKey: 'non-commercial-and-evaluation',
-            autoRowSize: this.autoRowSize,
-            autoColumnSize: this.autoColumnSize,
 
-            data: allCellValues,
+            //autoRowSize: this.autoRowSize,
+            //autoColumnSize: this.autoColumnSize,
+            //columns: columns,
+            //mergeCells: mergedCells || [],
+            //data: allCellValues,
+
             //  colWidths: [47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47],
             rowHeaders: false,
             contextMenu: false,
             allowInsertColumn: false,
             allowInsertRow: false,
             colHeaders: columnHeaderTexts,
-            columns: columns,
-            mergeCells: mergedCells || [],
         };
 
 
-        //https://handsontable.com/docs/7.0.0/Hooks.html#event:afterChange
-        tableCfg['beforeChange'] = function (changes) {
-            var tableInstance = this;
-            if (changes) {
-
-                // var newData = tableInstance.getData();
-                _that.onBeforeTableValueChange(changes);
-
-            }
-        };
-
-
+        this.bindTableValueChange(tableCfg);
 
         //this.bindTableChange(uniqueId, tableCfg, null, (tableInstance) => {
         //    // 源数据
@@ -886,6 +933,37 @@ class HandsontableCustomHelper {
 
         return girdTable;
     };
+
+
+    private bindTableValueChange(tableCfg) {
+        var _that = this;
+
+        //https://handsontable.com/docs/7.0.0/Hooks.html#event:beforeChange
+        tableCfg['beforeChange'] = function (changes) {
+            var tableInstance = this;
+            if (changes) {
+                // var newData = tableInstance.getData();
+                var changedItems = _that.processTableValueChange(changes);
+                if (changedItems && changedItems.length) {
+                    var mode = _that.mode;
+                    if (mode) {
+                        var table;
+                        switch (mode) {
+                            case 'ValueEdit':
+                                table = _that.bindingEditTable;
+                                break;
+                            case 'BindingEdit':
+                                table = _that.valueEditTable;
+                                break;
+                        }
+                        table.updateSettings(_that.getTableDataAndColumnConfig(_that.changedData, null))
+                    }
+                }
+            }
+
+
+        };
+    }
 
     //helper.createDesignTable = createDesignTable;
     //helper.createNgBindController = createNgBindController;

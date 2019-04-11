@@ -85,13 +85,30 @@
 
         <div ng-show="mode=='ValueEdit'" id="handsontable-valueedit-@(uniqueId)" class="hot handsontable htRowHeaders htColumnHeaders">@T("ValueEdit")</div>
 
-        <input style="width:100%" name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="columnHeaderTexts_JSON" />
-        @*<textarea name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="columnHeaderTexts_JSON"></textarea>*@
+        @*<input style="width:100%" name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="columnHeaderTexts_JSON" />
         <textarea name="@(Html.NameFor(x => x.DesignData.AllCellValues))_JSON" ng-model="allCellValues_JSON"></textarea>
-        <textarea name="@(Html.NameFor(x => x.DesignData.MergedCells))_JSON" ng-model="mergedCells_JSON"></textarea>
-        @*<input name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="columnHeaderTexts_JSON" />
-        <input name="@(Html.NameFor(x => x.DesignData.AllCellValues))_JSON" ng-model="allCellValues_JSON" />
-        <input name="@(Html.NameFor(x => x.DesignData.MergedCells))_JSON" ng-model="mergedCells_JSON" />*@
+        <textarea name="@(Html.NameFor(x => x.DesignData.MergedCells))_JSON" ng-model="mergedCells_JSON"></textarea>*@
+
+        <fieldset>
+            <legend>columnHeaderTexts_JSON</legend>
+            <code>{{columnHeaderTexts_JSON}}</code>
+        </fieldset>
+
+        <fieldset>
+            <legend>allCellValues_JSON</legend>
+            <code>{{allCellValues_JSON}}</code>
+        </fieldset>
+
+        <fieldset>
+            <legend>mergedCells_JSON</legend>
+            <code>{{mergedCells_JSON}}</code>
+        </fieldset>
+
+        <input type="hidden" name="@(Html.NameFor(x => x.DesignData.HeaderTexts))_JSON" ng-model="columnHeaderTexts_JSON" />
+        <input type="hidden" name="@(Html.NameFor(x => x.DesignData.AllCellValues))_JSON" ng-model="allCellValues_JSON" />
+        <input type="hidden" name="@(Html.NameFor(x => x.DesignData.MergedCells))_JSON" ng-model="mergedCells_JSON" />
+
+
     </div>
 </div>
 
@@ -134,20 +151,21 @@
         var cellDropdownData = [@(Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(bs)))][0];
 
         var uniqueId = ['@(uniqueId)'][0];
-        var container = document.getElementById('handsontable-bindingedit-@(uniqueId)');
 
 
         var handsontableHelper = new HandsontableCustomHelper();
         handsontableHelper.init( {
             uniqueId,allCellValues, valueMaps,mergedCells ,columnHeaderTexts,cellDropdownData
         });
-       // var girdTable = handsontableHelper.createDesignTable(container,uniqueId,AllCellValues, ValueMaps,mergedCells ,manufacturerData,headerTexts);
-        var girdTable = handsontableHelper.createDesignTable(container);
 
+        var container = document.getElementById('handsontable-bindingedit-@(uniqueId)');
         var valueEditContainer = document.getElementById('handsontable-valueedit-@(uniqueId)');
-        handsontableHelper.valueEditTableContainer = valueEditContainer;
+       // var girdTable = handsontableHelper.createDesignTable(container,uniqueId,AllCellValues, ValueMaps,mergedCells ,manufacturerData,headerTexts);
+        var girdTable = handsontableHelper.createEditTable(container,valueEditContainer);
 
-        girdTable.hot = girdTable;
+        //handsontableHelper.valueEditTableContainer = valueEditContainer;
+
+      //  girdTable.hot = girdTable;
 
     })();
 </script>
