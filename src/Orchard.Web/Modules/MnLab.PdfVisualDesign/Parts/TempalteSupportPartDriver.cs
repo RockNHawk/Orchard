@@ -39,8 +39,9 @@ namespace MnLab.PdfVisualDesign.Fields {
 
 
         protected override DriverResult Display(TempalteSupportPart part, string displayType, dynamic shapeHelper) {
-            if (displayType != "Design") {
-                _workContextAccessor.GetContext().CurrentTheme = _extensionManager.GetExtension("NHVSD");
+            if (displayType == "Detail") {
+                var workContext = _workContextAccessor.GetContext();
+                workContext.CurrentTheme = _extensionManager.GetExtension("NHVSD");
             }
             return ContentShape(TemplateName, () => shapeHelper.Parts_TempalteSupport(Model: new TemplateSupportPartViewModel {
                 Field = part,
