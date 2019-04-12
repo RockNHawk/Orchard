@@ -43,15 +43,23 @@ namespace MnLab.PdfVisualDesign.Fields {
                 var workContext = _workContextAccessor.GetContext();
                 workContext.CurrentTheme = _extensionManager.GetExtension("NHVSD");
             }
-            return ContentShape(TemplateName, () => shapeHelper.Parts_TempalteSupport(Model: new TemplateSupportPartViewModel {
+            var model = new TemplateSupportPartViewModel {
                 Field = part,
                 ContentItem = part.ContentItem,
-            }));
+            };
+            return Combined(
+             ContentShape("Parts_TempalteSupport",
+                 () => shapeHelper.Parts_TempalteSupport(Model: model)),
+             ContentShape("Parts_TempalteSupport_Summary",
+                 () => shapeHelper.Parts_TempalteSupport_Summary(Model: model)),
+             ContentShape("Parts_TempalteSupport_SummaryAdmin",
+                 () => shapeHelper.Parts_TempalteSupport_SummaryAdmin(Model: model))
+             );
         }
 
         protected override DriverResult Editor(TempalteSupportPart part, dynamic shapeHelper) {
-            return ContentShape($"{TemplateName}",
-                () => shapeHelper.EditorTemplate(TemplateName: TemplateName, Model: part, Prefix: Prefix));
+            return ContentShape($"Parts_TempalteSupport_Edit",
+                () => shapeHelper.EditorTemplate(TemplateName: $"Parts.TempalteSupportPart", Model: part, Prefix: Prefix));
         }
 
         protected override DriverResult Editor(TempalteSupportPart part, IUpdateModel updater, dynamic shapeHelper) {
