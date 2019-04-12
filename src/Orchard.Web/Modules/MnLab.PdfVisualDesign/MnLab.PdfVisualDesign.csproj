@@ -375,7 +375,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="NewFolder1\" />
+    <Folder Include="Drivers\" />
     <Folder Include="Services\" />
     <Folder Include="Settings\" />
     <Folder Include="Views\DefinitionTemplates\" />
@@ -383,22 +383,21 @@
   <ItemGroup>
     <Compile Include="AdminMenu.cs" />
     <Compile Include="Controllers\AdminController.cs" />
-    <Compile Include="Drivers\Grouping.cs" />
+    <Compile Include="Extensions\Grouping.cs" />
     <Compile Include="Extensions\ContentDataMemberHelper.cs" />
     <Compile Include="Extensions\ContentFieldMemberAccessor.cs" />
     <Compile Include="Extensions\ContentItemExtensions.cs" />
     <Compile Include="Extensions\ContentPartPropertyEditViewModel.cs" />
     <Compile Include="Extensions\ContentPropertyMemberAccessor.cs" />
-    <Compile Include="Drivers\FieldDriverBase.cs" />
+    <Compile Include="Fields\FieldDriverBase.cs" />
     <Compile Include="Extensions\IContentMemberAccessor.cs" />
-    <Compile Include="Drivers\ValueBindGridElementDriver.cs" />
-    <Compile Include="Drivers\ValueBindItemElementDriver.cs" />
+    <Compile Include="Elements\ValueBindGridElementDriver.cs" />
+    <Compile Include="Elements\ValueBindItemElementDriver.cs" />
     <Compile Include="Elements\IValueBindGridData.cs" />
     <Compile Include="Elements\ValueBindGridElement.cs" />
     <Compile Include="Elements\ValueBindItemElement.cs" />
     <Compile Include="Extensions\HtmlHelper.cs" />
     <Compile Include="Extensions\ModelBindingUtility.cs" />
-    <Compile Include="Fields\IContentItem.cs" />
     <Compile Include="Fields\TempalteSupportFieldDriver.cs" />
     <Compile Include="Fields\TempalteSupportField.cs" />
     <Compile Include="Hooks\CustomElementDisplay.cs" />
@@ -408,6 +407,9 @@
     <Compile Include="Models\ValueBindingInfo.cs" />
     <Compile Include="Migrations.cs" />
     <Compile Include="OrchardShellEvents.cs" />
+    <Compile Include="Parts\TempalteSupportPart.cs" />
+    <Compile Include="Parts\TempalteSupportPartDriver.cs" />
+    <Compile Include="Parts\TempalteSupportPartRecord.cs" />
     <Compile Include="ResourceManifest.cs" />
     <Compile Include="ViewModels\PropertyBindViewModel.cs" />
   </ItemGroup>
@@ -446,6 +448,8 @@
     <Content Include="Views\Admin\List.cshtml" />
     <Content Include="Scripts\Test\1.less" />
     <Content Include="Scripts\Test\2.scss" />
+    <Content Include="Views\EditorTemplates\Parts_TempalteSupport.cshtml" />
+    <Content Include="Views\Parts_TempalteSupport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

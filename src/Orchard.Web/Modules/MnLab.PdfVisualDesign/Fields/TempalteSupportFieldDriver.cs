@@ -7,10 +7,10 @@ using Orchard;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
 using Orchard.ContentManagement.Handlers;
+using Orchard.Environment.Extensions;
 using Orchard.Localization;
 
-namespace MnLab.PdfVisualDesign.Fields
-{
+namespace MnLab.PdfVisualDesign.Fields {
 
 
     public class TemplateSupportViewModel {
@@ -21,72 +21,67 @@ namespace MnLab.PdfVisualDesign.Fields
     }
 
 
-    public class TempalteSupportFieldDriver : FieldDriverBase<TempalteSupportField> 
-    {
+    public class TempalteSupportFieldDriver : FieldDriverBase<TempalteSupportField> {
         public Localizer T { get; set; }
         private IOrchardServices _services { get; set; }
+        private readonly IExtensionManager _extensionManager;
+        IWorkContextAccessor _workContextAccessor;
 
-        public TempalteSupportFieldDriver(IOrchardServices services)
-        {
+        public TempalteSupportFieldDriver(IExtensionManager extensionManager, IWorkContextAccessor workContextAccessor, IOrchardServices services) {
             T = NullLocalizer.Instance;
             _services = services;
+            this._extensionManager = extensionManager;
+            this._workContextAccessor = workContextAccessor;
         }
 
-        protected override DriverResult Display(ContentPart part, TempalteSupportField field, string displayType, dynamic shapeHelper)
-        {
+        protected override DriverResult Display(ContentPart part, TempalteSupportField field, string displayType, dynamic shapeHelper) {
+            if (displayType != "Design") {
+                _workContextAccessor.GetContext().CurrentTheme = _extensionManager.GetExtension("TheThemeMachine");
+            }
             return ContentShape("Fields_TempalteSupportField", GetDifferentiator(field, part),
-                () =>
-                {
+                () => {
                     return shapeHelper.Fields_TempalteSupportField(Name: field.Name, Field: field);
                 });
         }
 
-        protected override DriverResult Editor(ContentPart part, TempalteSupportField field, dynamic shapeHelper)
-        {
-            
+        protected override DriverResult Editor(ContentPart part, TempalteSupportField field, dynamic shapeHelper) {
+
             return ContentShape("Fields_TempalteSupportField_Edit", GetDifferentiator(field, part),
                 () => shapeHelper.EditorTemplate(
-                    TemplateName: "Fields_TempalteSupportField_Edit", 
+                    TemplateName: "Fields_TempalteSupportField_Edit",
                     Model: new TemplateSupportViewModel {
-                        Field =field,
-                        ContentItem= part.ContentItem,
-                    }, 
+                        Field = field,
+                        ContentItem = part.ContentItem,
+                    },
                     Prefix: GetPrefix(field, part)));
         }
 
-        protected override DriverResult Editor(ContentPart part, TempalteSupportField field, IUpdateModel updater, dynamic shapeHelper)
-        {
-            if (updater.TryUpdateModel(field, GetPrefix(field, part), null, null))
-            {
+        protected override DriverResult Editor(ContentPart part, TempalteSupportField field, IUpdateModel updater, dynamic shapeHelper) {
+            if (updater.TryUpdateModel(field, GetPrefix(field, part), null, null)) {
             }
             return Editor(part, field, shapeHelper);
         }
 
-        protected override void Importing(ContentPart part, TempalteSupportField field, ImportContentContext context)
-        {
+        protected override void Importing(ContentPart part, TempalteSupportField field, ImportContentContext context) {
             var imageElement = context.Data.Element(field.FieldDefinition.Name + "." + field.Name);
-            if (imageElement == null)
-            {
+            if (imageElement == null) {
                 return;
             }
 
             var dataElement = imageElement.Element("HTML");
-            if (dataElement != null)
-            {
+            if (dataElement != null) {
                 field.HTML = dataElement.Value;
             }
         }
 
-        protected override void Exporting(ContentPart part, TempalteSupportField field, ExportContentContext context)
-        {
+        protected override void Exporting(ContentPart part, TempalteSupportField field, ExportContentContext context) {
             var imageElement = context.Element(field.FieldDefinition.Name + "." + field.Name);
             imageElement.Add(new XElement("HTML", new XCData(field.HTML)));
         }
 
         private static Regex RemoveTagsRegex = new Regex(@"<[^>]*>|&[a-zA-Z]+;|&#[0-9]+;|<!--(.*?)-->", RegexOptions.Compiled | RegexOptions.Singleline);
 
-        protected override void Describe(DescribeMembersContext context)
-        {
+        protected override void Describe(DescribeMembersContext context) {
             context
                 .Member(null, typeof(string), T("HTML"), T("The HTML value of the field."))
                 .Enumerate<TempalteSupportField>(() => field => new[] { RemoveTagsRegex.Replace(field.HTML, " ") });
