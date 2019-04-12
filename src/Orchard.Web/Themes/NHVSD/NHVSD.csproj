@@ -98,32 +98,13 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets.json" />
-    <Content Include="Assets\Styles.less" />
-    <Content Include="fonts\opensans.js" />
-    <Content Include="gulpfile.js" />
     <Content Include="img\src\logo.png" />
-    <Content Include="js\src\cookiebar.js" />
-    <Content Include="js\src\custom.js" />
-    <Content Include="Styles\Styles.css" />
-    <Content Include="Styles\Styles.min.css" />
-    <Content Include="tasks\task.compress.js" />
-    <Content Include="tasks\task.concat.js" />
-    <Content Include="tasks\task.favicon.js" />
-    <Content Include="tasks\task.fonts.js" />
-    <Content Include="tasks\task.initialize.js" />
-    <Content Include="tasks\task.minify-css.js" />
-    <Content Include="tasks\task.minify-img.js" />
-    <Content Include="tasks\task.prefix.js" />
-    <Content Include="tasks\task.sass.js" />
-    <Content Include="tasks\task.watch.js" />
     <Content Include="ThemeZonePreview.png" />
     <Content Include="Views\Elements\AuthenticatedUserSnippet.txt" />
     <Content Include="Views\Elements\iFrameSnippet.txt" />
     <Content Include="Web.config" />
     <Content Include="Scripts\Web.config" />
     <Content Include="Styles\Web.config" />
-    <Content Include="Content\Web.config" />
     <Content Include="Theme.txt" />
     <Content Include="Theme.png" />
     <Content Include="Placement.info" />
@@ -142,100 +123,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Items\Content-Page1.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="fonts\Web.config" />
+    <Content Include="Views\Items\Content-Page.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="img\Web.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="js\Web.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\components\_blog.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\components\_cookie-bar.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\components\_loader.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\components\_menu.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\components\_pager.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\components\_search.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\components\_tags.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\layout\_basic.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\layout\_footer.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\layout\_grid.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\main.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\reusable\_animations.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\reusable\_buttons.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\reusable\_classes.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\reusable\_colors.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\reusable\_fonts.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\reusable\_forms.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\reusable\_mixins.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\reusable\_variables.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\snippets\_share-btn.scss" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="scss\Web.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="tasks\Web.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\BlogPost.Body.Summary.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\BlogPost.CreatedDate.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\BlogPost.Tags.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\BlogPost.Title.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\BlogPost.Title.Summary.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Document.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Dropdown.cshtml" />
@@ -287,9 +178,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\NotFound.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Orchard.Search\Search\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Pager.cshtml" />

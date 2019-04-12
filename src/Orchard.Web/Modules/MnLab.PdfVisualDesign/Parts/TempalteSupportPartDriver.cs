@@ -36,13 +36,12 @@ namespace MnLab.PdfVisualDesign.Fields {
             this._workContextAccessor = workContextAccessor;
         }
 
-        /*
-          if (displayType != "Design") {
-                _workContextAccessor.GetContext().CurrentTheme = _extensionManager.GetExtension("TheThemeMachine");
-            }
-             */
+
 
         protected override DriverResult Display(TempalteSupportPart part, string displayType, dynamic shapeHelper) {
+            if (displayType != "Design") {
+                _workContextAccessor.GetContext().CurrentTheme = _extensionManager.GetExtension("NHVSD");
+            }
             return ContentShape(TemplateName, () => shapeHelper.Parts_TempalteSupport(Model: new TemplateSupportPartViewModel {
                 Field = part,
                 ContentItem = part.ContentItem,

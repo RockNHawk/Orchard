@@ -35,9 +35,9 @@ namespace MnLab.PdfVisualDesign.Fields {
         }
 
         protected override DriverResult Display(ContentPart part, TempalteSupportField field, string displayType, dynamic shapeHelper) {
-            if (displayType != "Design") {
-                _workContextAccessor.GetContext().CurrentTheme = _extensionManager.GetExtension("TheThemeMachine");
-            }
+            //if (displayType != "Design") {
+            //    _workContextAccessor.GetContext().CurrentTheme = _extensionManager.GetExtension("TheThemeMachine");
+            //}
             return ContentShape("Fields_TempalteSupportField", GetDifferentiator(field, part),
                 () => {
                     return shapeHelper.Fields_TempalteSupportField(Name: field.Name, Field: field);
