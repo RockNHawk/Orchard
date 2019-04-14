@@ -117,6 +117,16 @@ namespace Bitlab.Enterprise
         {
             return approval.NewContentVersion;
         }
+ 
+
+        public static ContentItemVersionRecord GetDraftVersion(this ContentItem content,IContentManager _contentManager) {
+         var con=    _contentManager.Get(content.Id,VersionOptions.Draft);
+            return con.VersionRecord;
+        }
+
+        public static ContentItemVersionRecord GetCurrentVersion(this ContentItem content) {
+            return content.VersionRecord;
+        }
 
 
         //static System.Reflection.PropertyInfo GetContentProperty(IApproval approval)

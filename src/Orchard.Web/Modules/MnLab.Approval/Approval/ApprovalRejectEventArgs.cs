@@ -8,6 +8,7 @@
        Author: 
        Modification:  
 *************************************************/
+using Orchard.Security;
 using Rhythm;
 
 namespace Bitlab.Enterprise
@@ -16,13 +17,13 @@ namespace Bitlab.Enterprise
     /// 定义审批驳回事件
     /// </summary>
     [TypeDisplay(Name = "审批驳回")]
-    public class ApprovalRejectEvent<TContentPart> : Event, IApprovalRejectEvent
-        where TContentPart : class, IContentPart<TContentPart>, new()
+    public class ApprovalRejectEvent : Event //, IApprovalRejectEvent
+       // where TContentPart : class, IContentPart<TContentPart>, new()
     {
         /// <summary>
         /// 审批信息
         /// </summary>
-        public Approval<TContentPart> Approval { get; set; }
+        public Approval Approval { get; set; }
         /// <summary>
         /// 审批开关
         /// </summary>
@@ -30,11 +31,11 @@ namespace Bitlab.Enterprise
         /// <summary>
         /// 此审批的提交者
         /// </summary>
-        public User CommitUser { get; set; }
+        public IUser CommitUser { get; set; }
         /// <summary>
         /// 此审批的审批者
         /// </summary>
-        public User ApprovalUser { get; set; }
+        public IUser ApprovalUser { get; set; }
         /// <summary>
         /// 审批意见
         /// </summary>
@@ -51,17 +52,17 @@ namespace Bitlab.Enterprise
             }
         }
 
-        IApproval IApprovalRejectEvent.Approval
-        {
-            get
-            {
-                return this.Approval;
-            }
-            set
-            {
-                this.Approval = (Approval<TContentPart>)value;
-            }
-        }
+        //IApproval IApprovalRejectEvent.Approval
+        //{
+        //    get
+        //    {
+        //        return this.Approval;
+        //    }
+        //    set
+        //    {
+        //        this.Approval = (Approval<TContentPart>)value;
+        //    }
+        //}
 
 
         public ApprovalStep Step { get; set; }

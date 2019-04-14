@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Web.Mvc;
-using MnLab.PdfVisualDesign.Binding.Drivers;
+//using MnLab.PdfVisualDesign.Binding.Drivers;
 using Orchard;
 using Orchard.Mvc;
 using Orchard.ContentManagement;
@@ -34,11 +34,12 @@ using Orchard.Settings;
 using Orchard.Utility.Extensions;
 using Orchard.Localization.Services;
 using Orchard.Core.Contents;
+using MnLab.Approval.Models;
 
-namespace MnLab.PdfVisualDesign.Controllers {
+namespace MnLab.Approval.Controllers {
     //[Admin]
     [ValidateInput(false)]
-    public class AdminController : Controller,IUpdateModel {
+    public class AdminController : Controller, IUpdateModel {
 
 
         //public ILogger Logger { get; set; }
@@ -118,11 +119,17 @@ namespace MnLab.PdfVisualDesign.Controllers {
 
         [HttpPost, ActionName("Commit")]
         [Orchard.Mvc.FormValueRequired("submit.Commit")]
-        public ActionResult EditPOST(int id, string returnUrl) {
+        public ActionResult CommitPOST(int id, string returnUrl) {
 
             return EditPOST(id, returnUrl, contentItem => {
+
                 //if (!contentItem.Has<IPublishingControlAspect>() && !contentItem.TypeDefinition.Settings.GetModel<ContentTypeSettings>().Draftable)
                 //    _contentManager.Publish(contentItem);
+
+               var approvalSupportPart =  contentItem.As<ApprovalSupportPart>();
+
+                //approvalSupportPart.ApprovalType
+
 
 
             });
@@ -205,7 +212,7 @@ namespace MnLab.PdfVisualDesign.Controllers {
 
             var contentItem = content.GetLatestVersion(_contentManager);
 
-            var bindingDefGroups = ValueBindGridElementDriver.GetBindingDefGroups(contentItem,T);
+            var bindingDefGroups = ValueBindGridElementDriver.GetBindingDefGroups(contentItem, T);
             Dictionary<string, object> valueMaps = ValueBindGridElementDriver.GetValueMaps(contentItem, bindingDefGroups);
 
             return Json(valueMaps, JsonRequestBehavior.AllowGet);
