@@ -8,8 +8,8 @@ namespace MnLab.Approval.Models {
         //[Required]
 
         public string UserCommit {
-            get { return Retrieve(x => x.Title); }
-            set { Store(x => x.Title, value); }
+            get { return Retrieve(x => x.UserCommit); }
+            set { Store(x => x.UserCommit, value); }
         }
 
 

@@ -5,9 +5,9 @@
 //using Orchard.Data;
 
 //namespace MnLab.Approval.Handlers {
-//    public class ApprovalPartHandler : ContentHandler {
+//    public class ApprovalSupportPartHandler : ContentHandler {
 
-//        public ApprovalPartHandler(IRepository<ApprovalPartRecord> repository) {
+//        public ApprovalSupportPartHandler(IRepository<ApprovalSupportPartRecord> repository) {
 //            Filters.Add(StorageFilter.For(repository));
 //        //    OnIndexing<ITitleAspect>((context, part) => context.DocumentIndex.Add("title", part.Title).RemoveTags().Analyze());
 //        }

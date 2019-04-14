@@ -7,28 +7,28 @@ using Orchard.Localization;
 namespace MnLab.Approval.Drivers {
     public class ApprovalPartDriver : ContentPartDriver<ApprovalPart> {
 
-        private const string TemplateName = "Parts.Title.ApprovalPart";
+        private const string TemplateName = "Parts.ApprovalPart";
 
         public Localizer T { get; set; }
 
         protected override string Prefix {
-            get { return "Title"; }
+            get { return "Approval"; }
         }
 
         protected override DriverResult Display(ApprovalPart part, string displayType, dynamic shapeHelper) {
             return Combined(
-                ContentShape("Parts_Title",
-                    () => shapeHelper.Parts_Title(Title: part.UserCommit)),
-                ContentShape("Parts_Title_Summary",
-                    () => shapeHelper.Parts_Title_Summary(Title: part.UserCommit)),
-                ContentShape("Parts_Title_SummaryAdmin",
-                    () => shapeHelper.Parts_Title_SummaryAdmin(Title: part.UserCommit))
+                ContentShape("Parts_ApprovalPart",
+                    () => shapeHelper.Parts_ApprovalPart(Approval: part.UserCommit)),
+                ContentShape("Parts_ApprovalPart_Summary",
+                    () => shapeHelper.Parts_ApprovalPart_Summary(Approval: part.UserCommit)),
+                ContentShape("Parts_ApprovalPart_SummaryAdmin",
+                    () => shapeHelper.Parts_ApprovalPart_SummaryAdmin(Approval: part.UserCommit))
                 );
         }
 
         protected override DriverResult Editor(ApprovalPart part, dynamic shapeHelper) {
 
-            return ContentShape("Parts_Title_Edit",
+            return ContentShape("Parts_ApprovalPart_Edit",
                 () => shapeHelper.EditorTemplate(TemplateName: TemplateName, Model: part, Prefix: Prefix));
         }
 
@@ -44,13 +44,13 @@ namespace MnLab.Approval.Drivers {
                 return;
             }
 
-            context.ImportAttribute(part.PartDefinition.Name, "Title", title =>
-                part.UserCommit = title
+            context.ImportAttribute(part.PartDefinition.Name, "Approval", Approval =>
+                part.UserCommit = Approval
             );
         }
 
         protected override void Exporting(ApprovalPart part, ExportContentContext context) {
-            context.Element(part.PartDefinition.Name).SetAttributeValue("Title", part.UserCommit);
+            context.Element(part.PartDefinition.Name).SetAttributeValue("Approval", part.UserCommit);
         }
     }
 }

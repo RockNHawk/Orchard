@@ -6,13 +6,13 @@ namespace MnLab.Approval {
     public class Migrations : DataMigrationImpl {
 
         public int Create() {
-            SchemaBuilder.CreateTable("ApprovalPartRecord",
+            SchemaBuilder.CreateTable("ApprovalSupportPartRecord",
                 table => table
                     .ContentPartVersionRecord()
                     .Column<string>("Title", column => column.WithLength(1024))
                 );
 
-            ContentDefinitionManager.AlterPartDefinition("ApprovalPart", builder => builder
+            ContentDefinitionManager.AlterPartDefinition("ApprovalSupportPart", builder => builder
                 .Attachable()
                 .WithDescription("Provides a Title for your content item."));
 
@@ -20,7 +20,7 @@ namespace MnLab.Approval {
         }
 
         public int UpdateFrom1() {
-            ContentDefinitionManager.AlterPartDefinition("ApprovalPart", builder => builder
+            ContentDefinitionManager.AlterPartDefinition("ApprovalSupportPart", builder => builder
                 .WithDescription("Provides a Title for your content item."));
             return 2;
         }

@@ -129,9 +129,6 @@
     <Content Include="img\Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Dropdown.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\Elements\AuthenticatedUserSnippet.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -171,31 +168,7 @@
     <Content Include="Views\LogOn.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Menu-main-menu.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\MenuItem-main-menu.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\NotFound.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Pager.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Pager.CurrentPage.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Pager.Gap.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Register.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\SiteFooter.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Widget.Wrapper.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
@@ -208,6 +181,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Parts.Title.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Parts.Common.Metadata.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -148,20 +148,38 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdminMenu.cs" />
+    <Compile Include="Approval\Approval.cs" />
+    <Compile Include="Approval\ApprovalExtensions.cs" />
+    <Compile Include="Approval\ApprovalStep.cs" />
+    <Compile Include="Approval\ApprovalStatus.cs" />
+    <Compile Include="Approval\ApprovalSwitch.cs" />
+    <Compile Include="Approval\ApprovalSwitchExntnsions.cs" />
+    <Compile Include="Approval\ApprovalTypes.cs" />
+    <Compile Include="Approval\ContentStatus.cs" />
+    <Compile Include="Approval\CreationApprovalType.cs" />
+    <Compile Include="Approval\DeletionApprovalType.cs" />
+    <Compile Include="Approval\IApproval.cs" />
+    <Compile Include="Approval\ModificationApprovalType.cs" />
+    <Compile Include="Approval\NoneApprovalType.cs" />
+    <Compile Include="Core\Formats.cs" />
+    <Compile Include="Department\Department.cs" />
+    <Compile Include="Drivers\ApprovalPartDriver.cs" />
     <Compile Include="Migrations.cs" />
+    <Compile Include="Models\ApprovalPart.cs" />
+    <Compile Include="Models\ApprovalPartRecord.cs" />
     <Compile Include="OrchardShellEvents.cs" />
     <Compile Include="ResourceManifest.cs" />
-    <Compile Include="Drivers\TitlePartDriver.cs" />
+    <Compile Include="Drivers\ApprovalSupportPartDriver.cs" />
     <Compile Include="Handlers\TitlePartHandler.cs" />
-    <Compile Include="Models\TitlePart.cs" />
-    <Compile Include="Models\TitlePartRecord.cs" />
+    <Compile Include="Models\ApprovalSupportPart.cs" />
+    <Compile Include="Models\ApprovalSupportPartRecord.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <Content Include="Views\EditorTemplates\Parts.Title.TitlePart.cshtml" />
-    <Content Include="Views\Parts.Title.cshtml" />
-    <Content Include="Views\Parts.Title_Summary.cshtml" />
-    <Content Include="Views\Parts.Title_SummaryAdmin.cshtml" />
+    <Content Include="Views\EditorTemplates\Parts.ApprovalSupport.cshtml" />
+    <Content Include="Views\Parts.ApprovalSupport.cshtml" />
+    <Content Include="Views\Parts.ApprovalSupport_Summary.cshtml" />
+    <Content Include="Views\Parts.ApprovalSupport_SummaryAdmin.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
