@@ -59,19 +59,10 @@
       <HintPath>..\..\..\packages\AutoMapper.7.0.1\lib\net45\AutoMapper.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\lib\newtonsoft.json\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhythm.Core">
-      <HintPath>lib\Rhythm.Core.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Runtime, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\System.Runtime.4.3.1\lib\net462\System.Runtime.dll</HintPath>
-      <Private>True</Private>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
       <Private>True</Private>
@@ -390,6 +381,8 @@
   <ItemGroup>
     <Compile Include="AdminMenu.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Elements\Placeholder.cs" />
+    <Compile Include="Elements\PlaceholderElementDriver.cs" />
     <Compile Include="Extensions\Grouping.cs" />
     <Compile Include="Extensions\ContentDataMemberHelper.cs" />
     <Compile Include="Extensions\ContentFieldMemberAccessor.cs" />
@@ -459,6 +452,9 @@
     <Content Include="Views\Parts.TempalteSupport.cshtml" />
     <Content Include="Views\Parts.TempalteSupport_Summary.cshtml" />
     <Content Include="Views\Parts.TempalteSupport_SummaryAdmin.cshtml" />
+    <Content Include="Views\Elements\Placeholder.cshtml" />
+    <Content Include="Views\Elements\Placeholder.Design.cshtml" />
+    <Content Include="Views\LayoutEditor.Template.Placeholder.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

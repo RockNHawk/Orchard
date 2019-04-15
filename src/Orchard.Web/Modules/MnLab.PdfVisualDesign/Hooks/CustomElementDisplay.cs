@@ -38,7 +38,7 @@ namespace MnLab.PdfVisualDesign {
         public dynamic DisplayElements(IEnumerable<Element> elements, IContent content, string displayType = null, IUpdateModel updater = null) {
             if (displayType == "Design") {
                 displayType = null;
-            }
+            } 
             return _original.DisplayElements(elements, content, displayType, updater);
         }
 

@@ -1,0 +1,16 @@
+﻿@using MnLab.PdfVisualDesign.ViewModels
+@using MnLab.PdfVisualDesign
+@using MnLab.PdfVisualDesign.Binding
+@using MnLab.PdfVisualDesign.Binding.Drivers
+@*@model ContentDataMemberHelper*@
+@using Orchard.Layouts.Helpers
+@{
+    var tagBuilder = TagBuilderExtensions.CreateElementTagBuilder(Model);
+    tagBuilder.AddCssClass("placeholder");
+}
+@if (!Model.Collapsed)
+{
+    @tagBuilder.StartElement
+    @DisplayChildren(Model)
+    @tagBuilder.EndElement
+}
