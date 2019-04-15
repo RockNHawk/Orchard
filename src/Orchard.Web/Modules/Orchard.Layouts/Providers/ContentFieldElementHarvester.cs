@@ -22,10 +22,10 @@ namespace Orchard.Layouts.Providers {
         private readonly Work<IElementFactory> _elementFactory;
 
         public ContentFieldElementHarvester(
-            Work<IContentDefinitionManager> contentDefinitionManager, 
+            Work<IContentDefinitionManager> contentDefinitionManager,
             Work<ITransactionManager> transactionManager,
             Work<ICultureAccessor> cultureAccessor,
-            Work<IContentFieldDisplay> contentFieldDisplay, 
+            Work<IContentFieldDisplay> contentFieldDisplay,
             Work<IElementFactory> elementFactory) {
 
             _contentDefinitionManager = contentDefinitionManager;
@@ -60,7 +60,7 @@ namespace Orchard.Layouts.Providers {
             var contentTypeDefinition = _contentDefinitionManager.Value.GetTypeDefinition(context.Content.ContentItem.ContentType);
             var parts = contentTypeDefinition.Parts.Select(x => x.PartDefinition);
             var fields = parts.SelectMany(part => part.Fields.Select(field => Tuple.Create(part, field)));
-    
+
             // TODO: Each module should be able to tell which fields are supported as droppable elements.
             var blackList = new string[0];
 
@@ -71,20 +71,22 @@ namespace Orchard.Layouts.Providers {
             var contentItem = context.Content.ContentItem;
             var typeName = context.Element.Descriptor.TypeName;
             var contentField = contentItem.GetContentField(typeName);
+            if (contentField != null) {
 
-            if ((contentItem.Id == 0 || context.DisplayType == "Design") && context.Updater != null) {
-                // The content item hasn't been stored yet, so bind form values with the content field to represent actual Data.
-                var controller = (Controller)context.Updater;
-                var oldValueProvider = controller.ValueProvider;
+                if ((contentItem.Id == 0 || context.DisplayType == "Design") && context.Updater != null) {
+                    // The content item hasn't been stored yet, so bind form values with the content field to represent actual Data.
+                    var controller = (Controller)context.Updater;
+                    var oldValueProvider = controller.ValueProvider;
 
-                controller.ValueProvider = context.Element.Data.ToValueProvider(_cultureAccessor.Value.CurrentCulture);
-                _contentFieldDisplay.Value.UpdateEditor(contentItem, contentField, context.Updater);
-                _transactionManager.Value.Cancel();
-                controller.ValueProvider = oldValueProvider;
+                    controller.ValueProvider = context.Element.Data.ToValueProvider(_cultureAccessor.Value.CurrentCulture);
+                    _contentFieldDisplay.Value.UpdateEditor(contentItem, contentField, context.Updater);
+                    _transactionManager.Value.Cancel();
+                    controller.ValueProvider = oldValueProvider;
+                }
+
+                var contentFieldShape = _contentFieldDisplay.Value.BuildDisplay(contentItem, contentField, displayType: "Layout");
+                context.ElementShape.ContentField = contentFieldShape;
             }
-
-            var contentFieldShape = _contentFieldDisplay.Value.BuildDisplay(contentItem, contentField, displayType: "Layout");
-            context.ElementShape.ContentField = contentFieldShape;
         }
     }
 }
