@@ -20,6 +20,8 @@ namespace MnLab.PdfVisualDesign.Elements {
             get { return "Layout"; }
         }
 
+        public override bool HasEditor => false;
+
         public virtual string PlaceId {
             get { return this.Retrieve(x => x.PlaceId); }
             set { this.Store(x => x.PlaceId, value); }
