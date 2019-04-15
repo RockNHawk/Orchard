@@ -94,13 +94,13 @@ namespace MnLab.PdfVisualDesign.Drivers {
         }
  
 
-        protected override EditorResult OnBuildEditor(Placeholder element, ElementEditorContext context) {
-            var updater = context.Updater;
+        //protected override EditorResult OnBuildEditor(Placeholder element, ElementEditorContext context) {
+        //    var updater = context.Updater;
            
 
-            var editor = context.ShapeFactory.EditorTemplate(TemplateName: $"Elements/{nameof(Placeholder)}", Model: null);
-            return Editor(context, editor);
-        }
+        //    var editor = context.ShapeFactory.EditorTemplate(TemplateName: $"Elements/{nameof(Placeholder)}", Model: null);
+        //    return Editor(context, editor);
+        //}
   
         protected override void OnDisplaying(Placeholder element, ElementDisplayingContext context) {
 

@@ -8,9 +8,6 @@
     var tagBuilder = TagBuilderExtensions.CreateElementTagBuilder(Model);
     tagBuilder.AddCssClass("placeholder");
 }
-@if (!Model.Collapsed)
-{
     @tagBuilder.StartElement
     @DisplayChildren(Model)
     @tagBuilder.EndElement
-}

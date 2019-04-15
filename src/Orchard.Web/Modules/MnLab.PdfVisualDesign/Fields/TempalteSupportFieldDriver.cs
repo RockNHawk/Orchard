@@ -62,29 +62,29 @@ namespace MnLab.PdfVisualDesign.Fields {
             return Editor(part, field, shapeHelper);
         }
 
-        protected override void Importing(ContentPart part, TempalteSupportField field, ImportContentContext context) {
-            var imageElement = context.Data.Element(field.FieldDefinition.Name + "." + field.Name);
-            if (imageElement == null) {
-                return;
-            }
+        //protected override void Importing(ContentPart part, TempalteSupportField field, ImportContentContext context) {
+        //    var imageElement = context.Data.Element(field.FieldDefinition.Name + "." + field.Name);
+        //    if (imageElement == null) {
+        //        return;
+        //    }
 
-            var dataElement = imageElement.Element("HTML");
-            if (dataElement != null) {
-                field.HTML = dataElement.Value;
-            }
-        }
+        //    var dataElement = imageElement.Element("HTML");
+        //    if (dataElement != null) {
+        //        field.HTML = dataElement.Value;
+        //    }
+        //}
 
-        protected override void Exporting(ContentPart part, TempalteSupportField field, ExportContentContext context) {
-            var imageElement = context.Element(field.FieldDefinition.Name + "." + field.Name);
-            imageElement.Add(new XElement("HTML", new XCData(field.HTML)));
-        }
+        //protected override void Exporting(ContentPart part, TempalteSupportField field, ExportContentContext context) {
+        //    var imageElement = context.Element(field.FieldDefinition.Name + "." + field.Name);
+        //    imageElement.Add(new XElement("HTML", new XCData(field.HTML)));
+        //}
 
-        private static Regex RemoveTagsRegex = new Regex(@"<[^>]*>|&[a-zA-Z]+;|&#[0-9]+;|<!--(.*?)-->", RegexOptions.Compiled | RegexOptions.Singleline);
+        //private static Regex RemoveTagsRegex = new Regex(@"<[^>]*>|&[a-zA-Z]+;|&#[0-9]+;|<!--(.*?)-->", RegexOptions.Compiled | RegexOptions.Singleline);
 
-        protected override void Describe(DescribeMembersContext context) {
-            context
-                .Member(null, typeof(string), T("HTML"), T("The HTML value of the field."))
-                .Enumerate<TempalteSupportField>(() => field => new[] { RemoveTagsRegex.Replace(field.HTML, " ") });
-        }
+        //protected override void Describe(DescribeMembersContext context) {
+        //    context
+        //        .Member(null, typeof(string), T("HTML"), T("The HTML value of the field."))
+        //        .Enumerate<TempalteSupportField>(() => field => new[] { RemoveTagsRegex.Replace(field.HTML, " ") });
+        //}
     }
 }
