@@ -4,20 +4,20 @@ using Bitlab.Enterprise;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Aspects;
 
-namespace MnLab.Approval.Models {
-    public class ApprovalSupportPart : ContentPart<ApprovalSupportPartRecord> {
+namespace MnLab.Enterprise.Approval.Models {
+    public class ApprovalSupportPart : ContentPart<ApprovalSupportPartRecord>, IApprovalInfo {
 
-        //[Required]
+        public string CommitOpinion { get { return Record.CommitOpinion; } set { Record.CommitOpinion = value; } }
+        public string AuditOpinion { get { return Record.AuditOpinion; } set { Record.AuditOpinion = value; } }
+        public ApprovalStatus Status { get { return Record.Status; } set { Record.Status = value; } }
+        public Type ApprovalType { get { return Record.ApprovalType; } set { Record.ApprovalType = value; } }
+        public IApproval CurrentApproval { get { return Record.CurrentApproval; } set { Record.CurrentApproval = value; } }
 
-        public string UserCommit {
-            get { return Retrieve(x => x.UserCommit); }
-            set { Store(x => x.UserCommit, value); }
-        }
 
-        public virtual string ApprovalComments { get; set; }
-        public virtual ApprovalStatus ApprovalStatus { get; set; }
-        public virtual Type ApprovalType { get; set; }
-        public virtual IApproval CurrentApproval { get; set; }
+        //public virtual string ApprovalComments { get; set; }
+        //public virtual ApprovalStatus ApprovalStatus { get; set; }
+        //public virtual Type ApprovalType { get; set; }
+        //public virtual IApproval CurrentApproval { get; set; }
 
     }
 }

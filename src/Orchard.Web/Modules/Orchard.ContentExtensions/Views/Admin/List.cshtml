@@ -1,0 +1,20 @@
+@model Orchard.ContentTypes.ViewModels.ListContentTypesViewModel
+@{
+    Style.Require("ContentTypesAdmin");
+    Script.Require("jQuery");
+    Layout.Title = T("Manage Content Type Extensions").ToString();
+}
+
+<fieldset class="bulk-actions">
+    <label for="search-box">@T("Filter:")</label>
+    <input id="search-box" class="text-box" type="text" />
+</fieldset>
+<ul class="contentItems">
+    @foreach (var type in Model.Types)
+    {
+        <li data-record-text="@type.DisplayName">
+            <div>@type.DisplayName</div>
+            <a href="@Url.Action("Edit", "Admin", new { id = type._Definition.Name })">@T("Edit")</a>
+        </li>
+    }
+</ul>

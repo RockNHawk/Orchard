@@ -1,0 +1,33 @@
+﻿.box {
+    border: 1px solid black;
+    border-radius: 2px;
+    margin: 4px 4px 8px 4px;
+    padding:4px;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.clear {
+    clear: both;
+}
+
+/*small field*/
+.sf {
+    width: 200px;
+}
+
+/*large field*/
+.mf {
+    width: 50%;
+}
+
+/*large field*/
+.lf {
+    width: 90%;
+}

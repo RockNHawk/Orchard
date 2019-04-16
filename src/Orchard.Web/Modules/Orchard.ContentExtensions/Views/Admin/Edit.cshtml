@@ -1,0 +1,57 @@
+﻿@using System.Globalization;
+@using Orchard.ContentExtensions.ViewModels;
+@model Orchard.ContentExtensions.ViewModels.EditTypeExtensionModel
+@{
+    Style.Require("ContentTypesAdmin");
+    Script.Require("jQuery");
+    Layout.Title = T("Manage Content Type Extensions").ToString();
+}
+
+@using (Html.BeginFormAntiForgeryPost())
+{
+     <input type="hidden" name="id" value="@Model.Name" />
+   <h1>@Model.DisplayName</h1>
+    <ul>
+        @{
+    int counter = 0;
+    foreach (ContentPartExtensionModel item in Model.PartExtensions)
+    {
+        string prefix = string.Format(CultureInfo.InvariantCulture, "PartExtensions[{0}].", counter.ToString(CultureInfo.InvariantCulture));
+        counter++;
+        
+        string showAsDisplayInEditModeName = prefix + "ShowAsDisplayInEditMode";
+        string showAsDisplayInEditModeChecked = item.ShowAsDisplayInEditMode ? "checked" : string.Empty;
+
+        string hideInAjaxDisplayModeName = prefix + "HideInAjaxDisplayMode";
+        string hideInAjaxDisplayModeChecked = item.HideInAjaxDisplayMode ? "checked" : string.Empty;
+
+        string hideInAjaxEditModeName = prefix + "HideInAjaxEditMode";
+        string hideInAjaxEditModeChecked = item.HideInAjaxEditMode ? "checked" : string.Empty;
+
+        string hideInDisplayModeName = prefix + "HideInDisplayMode";
+        string hideInDisplayModeChecked = item.HideInDisplayMode ? "checked" : string.Empty;
+
+        string hideInEditModeName = prefix + "HideInEditMode";
+        string hideInEditModeChecked = item.HideInEditMode ? "checked" : string.Empty;
+
+        string zoneLocationName = prefix + "ZoneLocation";
+        string partName = prefix + "PartName";
+        <li>
+            <input type="hidden" name="@partName" value="@item.PartName" />
+           <h3>@item.PartDisplayName</h3>
+            <span><input type="checkbox" @showAsDisplayInEditModeChecked value="True" name="@showAsDisplayInEditModeName" />@T("Show As Display In Edit Mode")</span>
+            <span><input type="checkbox" @hideInAjaxDisplayModeChecked value="True" name="@hideInAjaxDisplayModeName" />@T("Hide In Ajax Display Mode")</span>
+            <span><input type="checkbox" @hideInAjaxEditModeChecked value="True" name="@hideInAjaxEditModeName" />@T("Hide In Ajax Edit Mode")</span>
+            <span><input type="checkbox" @hideInDisplayModeChecked value="True" name="@hideInDisplayModeName" />@T("Hide In Display Mode")</span>
+            <span><input type="checkbox" @hideInEditModeChecked value="True" name="@hideInEditModeName" />@T("Hide In Edit Mode")</span>
+            <br />
+            <span><span>@T("Zone Location:")</span><input type="text" value="@item.ZoneLocation" name="@zoneLocationName" /></span>
+            <br />
+        </li>
+    }
+        }
+    </ul>
+   <fieldset class="action">
+        <button class="primaryAction" type="submit" name="submit.Save" value="Save">@T("Save")</button>
+    </fieldset>
+}

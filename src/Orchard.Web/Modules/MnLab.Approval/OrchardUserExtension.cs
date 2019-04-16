@@ -19,7 +19,7 @@ namespace Rhythm {
             return null; 
         }
 
-        public static Department Department(this IUser user1) {
+        public static DepartmentRecord Department(this IUser user1) {
             return null;
         }
 

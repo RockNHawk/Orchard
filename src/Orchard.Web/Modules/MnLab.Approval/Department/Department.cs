@@ -1,15 +1,4 @@
-﻿/*************************************************
-  Author:   张新      
-  CreatedDate:  2014/02/21
-  function:  定义 Department 实体类
- 
-  Modified History:        
-    1. Date: 
-       Author: 
-       Modification: 
-*************************************************/
-
-using Rhythm;
+﻿using Rhythm;
 //using Rhythm.Data;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -20,7 +9,7 @@ namespace Bitlab.Enterprise
     /// 部室实体
     /// </summary>
    // [TypeDisplay(Name = "部室")]
-    public class Department // : EntityBase<HierarchyId>, IFormattable
+    public class DepartmentRecord // : EntityBase<HierarchyId>, IFormattable
     {
         ///// <summary>
         ///// 部室iD
@@ -43,8 +32,8 @@ namespace Bitlab.Enterprise
         /// <summary>
         /// 名称
         /// </summary>
-        [Display(Name = "部室名称")]
-        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "请输入部室名称")]
+        [Display(Name = "部门名称")]
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "请输入部门名称")]
         [System.ComponentModel.DataAnnotations.StringLength(20)]
 
         public virtual string Name { get; set; }

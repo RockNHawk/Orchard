@@ -23,7 +23,7 @@ namespace Bitlab.Enterprise
         /// <summary>
         /// 审批信息
         /// </summary>
-        public Approval Approval { get; set; }
+        public ApprovalPart Approval { get; set; }
         /// <summary>
         /// 审批开关
         /// </summary>
@@ -65,6 +65,6 @@ namespace Bitlab.Enterprise
         //}
 
 
-        public ApprovalStep Step { get; set; }
+        public ApprovalStepRecord Step { get; set; }
     }
 }

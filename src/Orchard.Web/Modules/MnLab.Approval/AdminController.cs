@@ -34,9 +34,9 @@ using Orchard.Settings;
 using Orchard.Utility.Extensions;
 using Orchard.Localization.Services;
 using Orchard.Core.Contents;
-using MnLab.Approval.Models;
+using MnLab.Enterprise.Approval.Models;
 
-namespace MnLab.Approval.Controllers {
+namespace MnLab.Enterprise.Approval.Controllers {
     //[Admin]
     [ValidateInput(false)]
     public class AdminController : Controller, IUpdateModel {

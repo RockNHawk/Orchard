@@ -184,14 +184,15 @@
     <Compile Include="Fw\ServiceBase.cs" />
     <Compile Include="Migrations.cs" />
     <Compile Include="Models\ApprovalPart.cs" />
-    <Compile Include="Models\ApprovalPartRecord.cs" />
+    <Compile Include="Models\ApprovalSupportPartRecord.cs" />
+    <Compile Include="Models\IApprovalInfo.cs" />
     <Compile Include="OrchardShellEvents.cs" />
     <Compile Include="OrchardUserExtension.cs" />
     <Compile Include="ResourceManifest.cs" />
     <Compile Include="Drivers\ApprovalSupportPartDriver.cs" />
     <Compile Include="Handlers\TitlePartHandler.cs" />
     <Compile Include="Models\ApprovalSupportPart.cs" />
-    <Compile Include="Models\ApprovalSupportPartRecord.cs" />
+    <Compile Include="Models\ApprovalPartRecord.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

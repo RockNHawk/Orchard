@@ -9,8 +9,9 @@
        Modification:  
 *************************************************/
 using Rhythm;
-using MnLab.Approval;
+using MnLab.Enterprise.Approval;
 using System;
+using MnLab.Enterprise.Approval.Models;
 
 namespace Bitlab.Enterprise {
     /// <summary>
@@ -23,9 +24,9 @@ namespace Bitlab.Enterprise {
         /// <summary>
         /// 审批信息
         /// </summary>
-        public Approval/*<TContentPart>*/ Approval { get; set; }
+        public ApprovalPart/*<TContentPart>*/ Approval { get; set; }
 
-        public ApprovalStep Step { get; set; }
+        public ApprovalStepRecord Step { get; set; }
 
         public bool IsCompleted { get; set; }
 
@@ -60,7 +61,7 @@ namespace Bitlab.Enterprise {
                 return this.Approval;
             }
             set {
-                this.Approval = (Approval/*<TContentPart>*/)value;
+                this.Approval = (ApprovalPart/*<TContentPart>*/)value;
             }
         }
 

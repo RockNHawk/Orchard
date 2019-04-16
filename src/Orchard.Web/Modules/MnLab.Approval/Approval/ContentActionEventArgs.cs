@@ -8,6 +8,7 @@
        Author: Aska Li
        Modification:  内容事件抽象基类
 *************************************************/
+using MnLab.Enterprise.Approval.Models;
 using Orchard.ContentManagement;
 using Orchard.Security;
 using Rhythm;
@@ -42,7 +43,7 @@ namespace Bitlab.Enterprise {
         /// <summary>
         /// 审批对象
         /// </summary>
-        public Approval Approval { get; set; }
+        public ApprovalPart Approval { get; set; }
         /// <summary>
         /// 获取此事件的详细信息（描述此事件所发生事情）
         /// </summary>

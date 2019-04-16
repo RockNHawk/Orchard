@@ -1,0 +1,8 @@
+﻿Name: Orchard.ContentExtensions
+AntiForgery: enabled
+Author: Siyamand Ayubi
+Website: https://orchardcontentextension.codeplex.com/
+Version: 1.0.0
+OrchardVersion: 1.7.2
+Description: The module improves the performance of the Orchard. Provides the feature of Partial rendering for AJAX requests. Provides a mechanism for JSON serialization.
+Dependencies: Orchard.ContentTypes, Orchard.ContentPicker

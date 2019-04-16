@@ -1,10 +1,10 @@
 ﻿using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
 using Orchard.ContentManagement.Handlers;
-using MnLab.Approval.Models;
+using MnLab.Enterprise.Approval.Models;
 using Orchard.Localization;
 
-namespace MnLab.Approval.Drivers {
+namespace MnLab.Enterprise.Approval.Drivers {
     public class ApprovalPartDriver : ContentPartDriver<ApprovalPart> {
 
         private const string TemplateName = "Parts.ApprovalPart";
@@ -18,11 +18,11 @@ namespace MnLab.Approval.Drivers {
         protected override DriverResult Display(ApprovalPart part, string displayType, dynamic shapeHelper) {
             return Combined(
                 ContentShape("Parts_ApprovalPart",
-                    () => shapeHelper.Parts_ApprovalPart(Approval: part.UserCommit)),
+                    () => shapeHelper.Parts_ApprovalPart(Approval: part.CommitOpinion)),
                 ContentShape("Parts_ApprovalPart_Summary",
-                    () => shapeHelper.Parts_ApprovalPart_Summary(Approval: part.UserCommit)),
+                    () => shapeHelper.Parts_ApprovalPart_Summary(Approval: part.CommitOpinion)),
                 ContentShape("Parts_ApprovalPart_SummaryAdmin",
-                    () => shapeHelper.Parts_ApprovalPart_SummaryAdmin(Approval: part.UserCommit))
+                    () => shapeHelper.Parts_ApprovalPart_SummaryAdmin(Approval: part.CommitOpinion))
                 );
         }
 
@@ -45,12 +45,12 @@ namespace MnLab.Approval.Drivers {
             }
 
             context.ImportAttribute(part.PartDefinition.Name, "Approval", Approval =>
-                part.UserCommit = Approval
+                part.CommitOpinion = Approval
             );
         }
 
         protected override void Exporting(ApprovalPart part, ExportContentContext context) {
-            context.Element(part.PartDefinition.Name).SetAttributeValue("Approval", part.UserCommit);
+            context.Element(part.PartDefinition.Name).SetAttributeValue("Approval", part.CommitOpinion);
         }
     }
 }
