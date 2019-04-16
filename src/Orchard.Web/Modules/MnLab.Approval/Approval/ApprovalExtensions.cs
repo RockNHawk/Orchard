@@ -20,6 +20,11 @@ namespace Bitlab.Enterprise
     {
         static readonly System.Type approvalType = typeof(IApproval);
 
+
+        public static string GetDisplayName(this ApprovalStatus obj) {
+            return obj.ToString();
+        }
+
         /// <summary>
         /// 
         /// </summary>

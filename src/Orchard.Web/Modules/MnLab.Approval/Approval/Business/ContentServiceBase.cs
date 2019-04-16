@@ -44,6 +44,9 @@ using Orchard.Utility.Extensions;
 using Orchard.Localization.Services;
 using Orchard.Core.Contents;
 using MnLab.Approval.Models;
+using MnLab.Approval;
+
+using Rhythm;
 
 namespace Bitlab.Enterprise {
     /// <summary>
@@ -58,9 +61,9 @@ namespace Bitlab.Enterprise {
     /// <typeparam name="TContentPart">内容的类型（如 Article 文章、File 文件）</typeparam>
     /// <typeparam name="TService">Service 的类型，子类继承时传子类的类型即可</typeparam>
     public class ContentVersioningServiceBase : ServiceBase
-        //, IContentVersioningService, IApprovalService
-       // where TContentPart : class, IContentPart, new()
-        //where TService : class
+    //, IContentVersioningService, IApprovalService
+    // where TContentPart : class, IContentPart, new()
+    //where TService : class
     {
         //protected static System.Type contentType = TypeTable.Type;
         //protected static string contentTypeName = contentType.Name;
@@ -360,7 +363,7 @@ namespace Bitlab.Enterprise {
                 return;
             }
             foreach (var contentId in contentIds.Distinct()) {
-               // Delete(wc, new ContentDeleteEvent { ContentId = contentId });
+                // Delete(wc, new ContentDeleteEvent { ContentId = contentId });
             }
         }
 
@@ -368,7 +371,7 @@ namespace Bitlab.Enterprise {
         /// 批量提交审批
         /// </summary>
         /// <param name="contentIds">审批 Id 集合</param>
-        public virtual void BatchCommitApproval(Orchard.WorkContext wc, string[] contentIds) {
+        public virtual void BatchCommitApproval(Orchard.WorkContext wc, int[] contentIds) {
             if (contentIds == null || contentIds.Length == 0) {
                 return;
             }
@@ -387,7 +390,7 @@ namespace Bitlab.Enterprise {
         public Approval CommmitApproval(Orchard.WorkContext wc, int contentId, System.Type actionType = null, bool isThrownIfValidateFail = true) {
             var content = _contentManager.Get(contentId);
             if (content == null) {
-                throw ValidationEntityNotExistsError(contentId);
+                throw ValidationEntityNotExistsError<ContentItem>(contentId);
             }
             //// 让 lazy load 的字段立即加载。否则，后面 content.Content = value 会无效，这不合理呀？
             //contentRecordRepository.Update(content);
@@ -486,7 +489,6 @@ namespace Bitlab.Enterprise {
             if (content == null) {
                 throw new ArgumentNullException(nameof(content));
             }
-
 
             var commitUser = content.As<CommonPart>().Owner;
             //var commitUser = content.As<CommonPart>().Owner;
@@ -646,18 +648,19 @@ namespace Bitlab.Enterprise {
                 Comments = comments
             };
 
-           // using (var trace = wc.BeginTrace(@event))
-                {
-                NUnit.Framework.Assert.AreNotEqual(0, approval.ApprovalId);
+            using (var trace = wc.BeginTrace(@event)) {
+                var steps = approval.Steps;
+                var currentStep = approval.CurrentStep;
 
+                // validate
+                NUnit.Framework.Assert.AreNotEqual(0, approval.ApprovalId);
                 if (approval.Status != ApprovalStatus.WaitingApproval) {
                     throw ValidationApprovalCommentsTypeIncorrectError(ApprovalStatus.WaitingApproval, approval.Status);
                 }
-
-                var steps = approval.Steps;
-                var currentStep = approval.CurrentStep;
                 ValidateCurrentStep(currentStep);
                 ValidateDepartment(@event, trace, approvalUser.Department(), currentStep.Department);
+
+
                 @event.Step = currentStep;
                 currentStep.Status = ApprovalStatus.Rejected;
                 ApprovalStepRepository.Update(currentStep);
@@ -670,14 +673,18 @@ namespace Bitlab.Enterprise {
                 {
                     var contentReflectedType = approval.ContentType;
                     NUnit.Framework.Assert.IsNotNull(contentReflectedType, StringUtility.Format("the Approval#{0}.ContentType is null.", approval.ApprovalId));
-                    var contentRepository = RepositoryManager.Default.Of(approval.GetContentRecordType());
+                    // var contentRepository = RepositoryManager.Default.Of(approval.GetContentRecordType());
                     var content = approval.ContentRecord;
+                    var contentApproval = approval.ContentRecord.As<ApprovalSupportPart>();
                     NUnit.Framework.Assert.IsNotNull(content);
-                    content.ApprovalStatus = ApprovalStatus.Rejected;
-                    content.ApprovalType = approval.ApprovalType;
-                    content.ApprovalComments = comments;
+                    contentApproval.ApprovalStatus = ApprovalStatus.Rejected;
+                    contentApproval.ApprovalType = approval.ApprovalType;
+                    contentApproval.ApprovalComments = comments;
                     RejectContentChange(content, approval.ApprovalType);
-                    contentRepository.Update(content);
+
+                    // Orchard auto update content Object change to Dataabse?
+                    //contentRepository.Update(content);
+                    // _contentManager.u
                 }
 
                 approvalRepository.Update(approval);
@@ -694,7 +701,7 @@ namespace Bitlab.Enterprise {
         /// </summary>
         /// <param name="content"></param>
         /// <param name="actionType"></param>
-        internal static void RejectContentChange(ContentRecord content, System.Type actionType) {
+        internal static void RejectContentChange(ContentItem content, System.Type actionType) {
         }
 
         /// <summary>
@@ -714,7 +721,7 @@ namespace Bitlab.Enterprise {
             approval.Status = ApprovalStatus.WaitingApproval;
 
             approvalRepository.Save(approval);
-            approval.ContentRecord.CurrentApproval = approval;// flush update
+            approval.ContentRecord.As<ApprovalSupportPart>().CurrentApproval = approval;// flush update
 
             OnCreateApproval(approval);
             var steps = approval.Steps;
@@ -913,7 +920,7 @@ namespace Bitlab.Enterprise {
 
             // ================================ 审批通过直接结束审批
 
-            var contentRepository = RepositoryManager.Default.Of(approval.GetContentRecordType());
+            //var contentRepository = RepositoryManager.Default.Of(approval.GetContentRecordType());
             //var contentId = approval.GetContentId();
             var content = approval.ContentRecord;
             var contentNewVersion = approval.NewContentVersion;
@@ -922,26 +929,35 @@ namespace Bitlab.Enterprise {
             //IContent content = (IContent)contentRepository.Get(contentId);
             NUnit.Framework.Assert.IsNotNull(content != null);
 
+            var contentApproval = content.As<ApprovalSupportPart>();
+
             var approvalType = approval.ApprovalType;
             if (ApprovalType.Creation.IsAssignableFrom(approvalType) || ApprovalType.Modification.IsAssignableFrom(approvalType)) {
                 NUnit.Framework.Assert.IsNotNull(contentNewVersion, "Assert:approval.GetContentNewVersion()!=null");
                 //content.Value = contentNewVersion.Value;
-                content.GetCurrentVersion() = contentNewVersion;
-                content.GetDraftVersion(_contentManager) = null;
+                // !!Check
+                _contentManager.Publish(content);
+                //content.GetCurrentVersion() = contentNewVersion;
+                //content.GetDraftVersion(_contentManager) = null;
             }
             else if (ApprovalType.Deletion.IsAssignableFrom(approvalType)) {
                 //content.Draft = null;
+            }
+            else if (ApprovalType.Deletion.IsAssignableFrom(approvalType)) {
+                // !!Check
                 content.IsDeleted = true;
             }
             else {
                 throw new InvalidOperationException("unsupported ApprovalType#" + approval.ApprovalType);
             }
 
-            content.CurrentApproval = null;
-            content.ApprovalStatus = ApprovalStatus.Approved;
-            content.ApprovalType = approval.ApprovalType;
+            contentApproval.CurrentApproval = null;
+            contentApproval.ApprovalStatus = ApprovalStatus.Approved;
+            contentApproval.ApprovalType = approval.ApprovalType;
 
-            contentRepository.Update(content);
+            // !!Check
+            //contentRepository.Update(content);
+
             approval.Comments = comments;
             approval.CommentsDate = DateTime.Now;
             approval.CommentsBy = approvalByUser;
@@ -966,16 +982,22 @@ namespace Bitlab.Enterprise {
         static void SetContentWaitingApproval(Orchard.WorkContext wc, ContentItem content, System.Type actionType) {
             NUnit.Framework.Assert.IsNotNull(content.As<CommonPart>().Owner, "content.CreatedByUser is null");
             NUnit.Framework.Assert.IsNotNull(wc.User(), "Orchard.WorkContext.User is null");
+
+
+            var contentApproval = content.As<ApprovalSupportPart>();
+
             //if (content.ApprovalStatus == ApprovalStatus.Deleted)
             if (content.IsDeleted) {
                 throw ValidationError("该内容已被删除，不能提交审批。");
             }
-            if (content.ApprovalStatus == ApprovalStatus.WaitingApproval) {
+            if (contentApproval.ApprovalStatus == ApprovalStatus.WaitingApproval) {
                 throw ValidationError("该内容已经提交审批，不能重复提交。");
             }
-            content.ApprovalStatus = ApprovalStatus.WaitingApproval;
-            content.ApprovalType = actionType;
-            RepositoryManager.Default.Of(content.GetContentRecordType()).Update(content);
+            contentApproval.ApprovalStatus = ApprovalStatus.WaitingApproval;
+            contentApproval.ApprovalType = actionType;
+
+            // !!Check
+            //RepositoryManager.Default.Of(content.GetContentRecordType()).Update(content);
         }
 
         /// <summary>
@@ -987,6 +1009,7 @@ namespace Bitlab.Enterprise {
         static System.Exception ValidationApprovalCommentsTypeIncorrectError(ApprovalStatus excepted, ApprovalStatus actual) {
             return ValidationError(StringUtility.Format("审批状态不正确，为“{0}”，理应为“{1}”。", actual.GetDisplayName(), excepted.GetDisplayName()));
         }
+
 
         /// <summary>
         /// 获取系统配置的上级审批开关和当前分行的本级审批开关信息

@@ -18,7 +18,7 @@ namespace Bitlab.Enterprise
     /// </summary>
     [TypeDisplay(Name = "审批驳回")]
     public class ApprovalRejectEvent : Event //, IApprovalRejectEvent
-       // where TContentPart : class, IContentPart<TContentPart>, new()
+       // where TContentPart : class, IContentPart/*<TContentPart>*/, new()
     {
         /// <summary>
         /// 审批信息
@@ -60,7 +60,7 @@ namespace Bitlab.Enterprise
         //    }
         //    set
         //    {
-        //        this.Approval = (Approval<TContentPart>)value;
+        //        this.Approval = (Approval/*<TContentPart>*/)value;
         //    }
         //}
 

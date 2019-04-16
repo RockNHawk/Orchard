@@ -23,7 +23,25 @@ namespace MnLab.PdfVisualDesign {
         protected override void Load(ContainerBuilder moduleBuilder) {
             moduleBuilder.RegisterType<CustomElementDisplay >().As<IElementDisplay>();
             //moduleBuilder.RegisterType<ShellRoute>().InstancePerDependency();
+
+         //   moduleBuilder.RegisterType<SimpleInterceptor>();
         }
- 
+
     }
+
+
+
+
+    //public class SimpleInterceptor : IInterceptor {
+    //    public void Intercept(IInvocation invocation) {
+    //        if (invocation.Method.Name == "SimpleMethod") {
+    //            invocation.ReturnValue = "different return value";
+    //        }
+    //        else {
+    //            invocation.Proceed();
+    //        }
+    //    }
+    //}
+
+
 }

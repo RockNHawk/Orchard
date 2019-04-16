@@ -26,6 +26,9 @@ namespace Bitlab.Enterprise
         ///// 部室iD
         ///// </summary>
         //public virtual HierarchyId Id { get; set; }
+
+        public virtual int Id { get; set; }
+
         /// <summary>
         /// 分行id
         /// </summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Bitlab.Enterprise;
 using Orchard.ContentManagement;
 using Orchard.Security;
 
@@ -10,6 +11,17 @@ namespace Rhythm {
     /// </summary>
     public static class OrchardUserExtension {
 
+        public static IUser User(this Orchard.WorkContext wc) {
+            return wc.CurrentUser;
+        }
+
+        public static IEventTrace BeginTrace(this Orchard.WorkContext wc,IEvent @event) {
+            return null; 
+        }
+
+        public static Department Department(this IUser user1) {
+            return null;
+        }
 
         public static string Username(this IUser user1) {
             var userContent = user1.ContentItem;

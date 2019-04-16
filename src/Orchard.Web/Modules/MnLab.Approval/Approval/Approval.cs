@@ -19,7 +19,7 @@ namespace Bitlab.Enterprise {
     using Rhythm;
 
     public class Approval : IApproval
-    //<TContentPart> : IApproval where TContentPart : IContentPart<TContentPart>
+    ///*<TContentPart>*/ : IApproval where TContentPart : IContentPart/*<TContentPart>*/
     {
         /// <summary>
         /// 此审批的 Id
@@ -39,6 +39,7 @@ namespace Bitlab.Enterprise {
         public virtual string ContentType {
             get { return contentType; }
             set {
+                // call ContentType beacuse maybe has lazy load
                 if (value != null && value != ContentType) {
                     throw new InvalidOperationException("您不能更改 ContentType，它是由 Approval<`1> 的 class 类型自行决定的");
                 }
@@ -101,9 +102,9 @@ namespace Bitlab.Enterprise {
         /// </summary>
         public virtual string Comments { get; set; }
 
-        //IContentRecord IApproval.ContentRecord { get { return this.ContentRecord; } set { this.ContentRecord = (ContentRecord<TContentPart>)value; } }
-        //IContentVersion IApproval.OldContentVersion { get { return this.OldContentVersion; } set { this.OldContentVersion = (ContentVersion<TContentPart>)value; } }
-        //IContentVersion IApproval.NewContentVersion { get { return this.NewContentVersion; } set { this.NewContentVersion = (ContentVersion<TContentPart>)value; } }
+        //IContentRecord IApproval.ContentRecord { get { return this.ContentRecord; } set { this.ContentRecord = (ContentRecord/*<TContentPart>*/)value; } }
+        //IContentVersion IApproval.OldContentVersion { get { return this.OldContentVersion; } set { this.OldContentVersion = (ContentVersion/*<TContentPart>*/)value; } }
+        //IContentVersion IApproval.NewContentVersion { get { return this.NewContentVersion; } set { this.NewContentVersion = (ContentVersion/*<TContentPart>*/)value; } }
 
         /// <summary>
         /// 被审批的文章（如果是文章类型的审批，即 ContentType 是 IllustratedTopic） 
@@ -167,11 +168,12 @@ namespace Bitlab.Enterprise {
             //            }
 
             //        }
+            //}
+
         }
+
+
+
     }
-
-
-
-}
 
 }

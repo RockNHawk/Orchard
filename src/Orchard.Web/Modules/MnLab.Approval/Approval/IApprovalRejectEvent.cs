@@ -1,12 +1,10 @@
-﻿namespace Bitlab.Enterprise
-{
-    public interface IApprovalRejectEvent
-    {
-     IApproval Approval { get; set; }
+﻿namespace Bitlab.Enterprise {
+    public interface IApprovalRejectEvent {
+        IApproval Approval { get; set; }
         ApprovalSwitch ApprovalSwitch { get; set; }
-        Rhythm.User ApprovalUser { get; set; }
+        Orchard.Security.IUser ApprovalUser { get; set; }
         string Comments { get; set; }
-        Rhythm.User CommitUser { get; set; }
+        Orchard.Security.IUser CommitUser { get; set; }
         string Message { get; }
     }
 }

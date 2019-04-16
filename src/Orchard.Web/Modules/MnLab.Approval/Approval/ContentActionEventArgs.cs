@@ -12,15 +12,12 @@ using Orchard.ContentManagement;
 using Orchard.Security;
 using Rhythm;
 
-namespace Bitlab.Enterprise
-{
-  
-
+namespace Bitlab.Enterprise {
     /// <summary>
     /// 内容事件接口
     /// </summary>
     public class ContentEvent /*<TContentPart>*/ : Event
-       // where TContentPart : class, IContentPart/*<TContentPart>*///, new()
+    // where TContentPart : class, IContentPart/*<TContentPart>*///, new()
     {
         /// <summary>
         /// 用户对象
@@ -87,7 +84,7 @@ namespace Bitlab.Enterprise
     /// </summary>
     /// <typeparam name="TContent">内容的类型</typeparam>
     public class ContentCommitApprovalEvent/*<TContentPart>*/ : ContentEvent/*<TContentPart>*/
-       // where TContentPart : class, IContentPart/*<TContentPart>*/, new()
+                                                                            // where TContentPart : class, IContentPart/*<TContentPart>*/, new()
     {
     }
 

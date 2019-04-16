@@ -9,20 +9,21 @@
        Modification:  
 *************************************************/
 using Rhythm;
+using MnLab.Approval;
+using System;
 
-namespace Bitlab.Enterprise
-{
+namespace Bitlab.Enterprise {
     /// <summary>
     /// 定义审批通过事件
     /// </summary>
     [TypeDisplay(Name = "审批通过")]
-    public class ApprovalApprove<TContentPart> : Event, IApprovalApproveEvent
-        where TContentPart : class, IContentPart<TContentPart>, new()
+    public class ApprovalApprove/*<TContentPart>*/ : Event, IApprovalApproveEvent
+    // where TContentPart : class, IContentPart/*<TContentPart>*/, new()
     {
         /// <summary>
         /// 审批信息
         /// </summary>
-        public Approval<TContentPart> Approval { get; set; }
+        public Approval/*<TContentPart>*/ Approval { get; set; }
 
         public ApprovalStep Step { get; set; }
 
@@ -35,33 +36,31 @@ namespace Bitlab.Enterprise
         /// <summary>
         /// 此审批的提交者
         /// </summary>
-        public User CommitUser { get; set; }
+        public Orchard.Security.IUser CommitUser { get; set; }
         /// <summary>
         /// 此审批的审批者
         /// </summary>
-        public User ApprovalUser { get; set; }
+        public Orchard.Security.IUser ApprovalUser { get; set; }
 
 
         /// <summary>
         /// 获取此事件的详细信息（描述此事件所发生事情）
         /// </summary>
-        public override string Message
-        {
-            get
-            {
+        public override string Message {
+            get {
                 return StringUtility.Format("审批#{0} -> 被审批员 {1} 通过 ", Approval.ToString(Formats.EventTitle, null), ApprovalUser.Username());
             }
         }
 
-        IApproval IApprovalApproveEvent.Approval
-        {
-            get
-            {
+        public DateTime Date { get; set; }
+
+
+        IApproval IApprovalApproveEvent.Approval {
+            get {
                 return this.Approval;
             }
-            set
-            {
-                this.Approval = (Approval<TContentPart>)value;
+            set {
+                this.Approval = (Approval/*<TContentPart>*/)value;
             }
         }
 

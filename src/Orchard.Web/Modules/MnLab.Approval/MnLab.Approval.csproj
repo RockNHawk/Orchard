@@ -158,7 +158,9 @@
   <ItemGroup>
     <Compile Include="AdminController.cs" />
     <Compile Include="AdminMenu.cs" />
+    <Compile Include="ApprovalSupportExtensions.cs" />
     <Compile Include="Approval\Approval.cs" />
+    <Compile Include="Approval\ApprovalApproveEvent.cs" />
     <Compile Include="Approval\ApprovalExtensions.cs" />
     <Compile Include="Approval\ApprovalRejectEventArgs.cs" />
     <Compile Include="Approval\ApprovalStep.cs" />
@@ -172,6 +174,8 @@
     <Compile Include="Approval\CreationApprovalType.cs" />
     <Compile Include="Approval\DeletionApprovalType.cs" />
     <Compile Include="Approval\IApproval.cs" />
+    <Compile Include="Approval\IApprovalApproveEvent.cs" />
+    <Compile Include="Approval\IApprovalRejectEvent.cs" />
     <Compile Include="Approval\ModificationApprovalType.cs" />
     <Compile Include="Approval\NoneApprovalType.cs" />
     <Compile Include="Core\Formats.cs" />
