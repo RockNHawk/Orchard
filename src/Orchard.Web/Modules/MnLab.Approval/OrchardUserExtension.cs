@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using Bitlab.Enterprise;
 using Orchard.ContentManagement;
+using Orchard.ContentManagement.Records;
 using Orchard.Security;
 
 namespace Rhythm {
@@ -11,12 +12,16 @@ namespace Rhythm {
     /// </summary>
     public static class OrchardUserExtension {
 
+        public static ContentItem GetContentItem(this ContentItemRecord record, IContentManager contentManager) {
+            return contentManager.Get(record.Id);
+        }
+
         public static IUser User(this Orchard.WorkContext wc) {
             return wc.CurrentUser;
         }
 
-        public static IEventTrace BeginTrace(this Orchard.WorkContext wc,IEvent @event) {
-            return null; 
+        public static IEventTrace BeginTrace(this Orchard.WorkContext wc, IEvent @event) {
+            return null;
         }
 
         public static DepartmentRecord Department(this IUser user1) {

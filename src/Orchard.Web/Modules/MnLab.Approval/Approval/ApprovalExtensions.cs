@@ -45,14 +45,14 @@ namespace Bitlab.Enterprise
             approval.NewContentVersion = version;
         }
 
-        public static ContentItem GetContent(this IApproval approval)
-        {
-            if (approval.ContentType == null)
-            {
-                throw new ArgumentException("approval.ContentType 不应为 null", "approval.ContentType");
-            }
-            return approval.ContentRecord;
-        }
+        //public static ContentItem GetContent(this IApproval approval)
+        //{
+        //    if (approval.ContentType == null)
+        //    {
+        //        throw new ArgumentException("approval.ContentType 不应为 null", "approval.ContentType");
+        //    }
+        //    return approval.ContentRecord;
+        //}
 
         /// <summary>
         /// SetContent
@@ -61,7 +61,7 @@ namespace Bitlab.Enterprise
         /// <param name="content"></param>
         public static void SetContent(this IApproval approval, ContentItem content)
         {
-            approval.ContentRecord = content;
+            approval.ContentRecord = content.Record;
         }
 
         ///// <summary>

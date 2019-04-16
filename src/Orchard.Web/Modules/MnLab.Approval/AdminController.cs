@@ -126,7 +126,7 @@ namespace MnLab.Enterprise.Approval.Controllers {
                 //if (!contentItem.Has<IPublishingControlAspect>() && !contentItem.TypeDefinition.Settings.GetModel<ContentTypeSettings>().Draftable)
                 //    _contentManager.Publish(contentItem);
 
-               var approvalSupportPart =  contentItem.As<ApprovalSupportPart>();
+                var approvalSupportPart = contentItem.As<ApprovalSupportPart>();
 
                 //approvalSupportPart.ApprovalType
 
@@ -202,20 +202,6 @@ namespace MnLab.Enterprise.Approval.Controllers {
                 : T("Your {0} has been saved.", contentItem.TypeDefinition.DisplayName));
 
             return this.RedirectLocal(returnUrl, () => RedirectToAction("Edit", new RouteValueDictionary { { "Id", contentItem.Id } }));
-        }
-
-
-
-        public ActionResult GetContentValueMap(int id) {
-
-            var content = this._contentManager.GetLatest(id);
-
-            var contentItem = content.GetLatestVersion(_contentManager);
-
-            var bindingDefGroups = ValueBindGridElementDriver.GetBindingDefGroups(contentItem, T);
-            Dictionary<string, object> valueMaps = ValueBindGridElementDriver.GetValueMaps(contentItem, bindingDefGroups);
-
-            return Json(valueMaps, JsonRequestBehavior.AllowGet);
         }
 
 

@@ -722,8 +722,10 @@ namespace Bitlab.Enterprise {
                     var contentReflectedType = approval.ContentType;
                     NUnit.Framework.Assert.IsNotNull(contentReflectedType, StringUtility.Format("the Approval#{0}.ContentType is null.", approval.Id));
                     // var contentRepository = RepositoryManager.Default.Of(approval.GetContentRecordType());
-                    var content = approval.ContentRecord;
-                    var contentApproval = approval.ContentRecord.As<ApprovalSupportPart>();
+                    //var content = approval.ContentRecord;
+                    var ContentRecord = approval.ContentRecord;
+                    var content = ContentRecord.GetContentItem(_contentManager);
+                    var contentApproval = content.As<ApprovalSupportPart>();
                     NUnit.Framework.Assert.IsNotNull(content);
                     contentApproval.Status = ApprovalStatus.Rejected;
                     contentApproval.ApprovalType = approval.ApprovalType;
@@ -770,7 +772,9 @@ namespace Bitlab.Enterprise {
 
             approvalRepository.Save(approval);
 
-            approval.ContentRecord.As<ApprovalSupportPart>().CurrentApproval = approval;// flush update
+            var ContentRecord = approval.ContentRecord;
+            var content = ContentRecord.GetContentItem(_contentManager);
+            content.As<ApprovalSupportPart>().CurrentApproval = approval;// flush update
 
             OnCreateApproval(approval);
             var steps = approval.Steps;
@@ -971,7 +975,8 @@ namespace Bitlab.Enterprise {
 
             //var contentRepository = RepositoryManager.Default.Of(approval.GetContentRecordType());
             //var contentId = approval.GetContentId();
-            var content = approval.ContentRecord;
+            var ContentRecord = approval.ContentRecord;
+            var content = ContentRecord.GetContentItem(_contentManager);
             var contentNewVersion = approval.NewContentVersion;
             //var contentOldVersion = approval.GetContentOldVersion();
             NUnit.Framework.Assert.IsNotNull(content, "Assert:approval.GetContent()!=null");

@@ -8,6 +8,7 @@
        Author: 
        Modification:  
 *************************************************/
+using MnLab.Enterprise.Approval.Models;
 using Orchard.Security;
 using Rhythm;
 

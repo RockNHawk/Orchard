@@ -4,6 +4,7 @@ using Orchard.Data.Migration;
 using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;
 using MnLab.Enterprise.Approval.Models;
+using System;
 
 namespace MnLab.Enterprise.Approval {
     public class Migrations : DataMigrationImpl {

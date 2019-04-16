@@ -7,7 +7,7 @@ using Orchard.Security;
 
 namespace Bitlab.Enterprise {
     public interface IApproval : IApprovalInfo {
-        int Id { get; set; }
+        int Id { get; }
 
         //ApprovalStatus Status { get; set; }
         //Type ApprovalType { get; set; }
