@@ -1,4 +1,4 @@
-﻿namespace Bitlab.Enterprise {
+﻿namespace MnLab.Enterprise.Approval {
     /// <summary>
     /// 审批开关
     /// </summary>

@@ -1,23 +1,11 @@
-﻿/*************************************************
-  Author: Aska Li     
-  CreatedDate:  2014/02/21
-  function:  内容的操作类型
- 
-  Modified History:        
-    1. Date:  2014/02/21
-       Author: Aska Li
-       Modification:  内容的操作类型
-*************************************************/
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace Bitlab.Enterprise
-{
+namespace MnLab.Enterprise.Approval {
     /// <summary>
     /// 内容的操作类型：新增、编辑、删除
     /// </summary>
-    public class ApprovalType
-    {
+    public class ApprovalType {
         public virtual Dictionary<string, object> LockedProperties { get; set; }
 
         //= new Dictionary<string, bool>()
@@ -25,8 +13,7 @@ namespace Bitlab.Enterprise
         //    {"Value.Name",true},
         //};
 
-        public bool IsLocked(string propertyName)
-        {
+        public bool IsLocked(string propertyName) {
             var ps = LockedProperties;
             return ps == null ? false : ps.ContainsKey(propertyName);
         }
@@ -55,44 +42,36 @@ namespace Bitlab.Enterprise
 
         static readonly Dictionary<System.Type, ApprovalType> approvalTypes = new Dictionary<Type, ApprovalType>();
 
-        public static ApprovalType Of(System.Type approvalType)
-        {
+        public static ApprovalType Of(System.Type approvalType) {
             ApprovalType value;
-            if (!approvalTypes.TryGetValue(approvalType, out value))
-            {
+            if (!approvalTypes.TryGetValue(approvalType, out value)) {
                 value = (ApprovalType)Activator.CreateInstance(approvalType);
                 approvalTypes[approvalType] = value;
             }
             return value;
         }
 
-        public static ApprovalType Of(System.Type approvalType, System.Type contentType)
-        {
-            if (approvalType == null)
-            {
+        public static ApprovalType Of(System.Type approvalType, System.Type contentType) {
+            if (approvalType == null) {
                 throw new ArgumentNullException(nameof(approvalType));
             }
-            if (contentType == null)
-            {
+            if (contentType == null) {
                 throw new ArgumentNullException(nameof(contentType));
             }
             var key = typeof(Tuple<,>).MakeGenericType(approvalType, contentType);
             ApprovalType value;
-            if (!approvalTypes.TryGetValue(key, out value))
-            {
+            if (!approvalTypes.TryGetValue(key, out value)) {
                 return null;
             }
             return value;
         }
 
-        public static ApprovalType Of<T>() where T : ApprovalType
-        {
+        public static ApprovalType Of<T>() where T : ApprovalType {
             return Of(typeof(T));
         }
 
 
-        public static void Set(System.Type approvalType, System.Type contentType, ApprovalType at)
-        {
+        public static void Set(System.Type approvalType, System.Type contentType, ApprovalType at) {
             approvalTypes[typeof(Tuple<,>).MakeGenericType(approvalType, contentType)] = at;
         }
 

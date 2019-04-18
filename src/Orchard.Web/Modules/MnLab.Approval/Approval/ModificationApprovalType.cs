@@ -9,7 +9,7 @@
        Modification:  内容的操作类型
 *************************************************/
 
-namespace Bitlab.Enterprise
+namespace MnLab.Enterprise.Approval
 {
     /// <summary>
     /// 内容的操作类型：新增、编辑、删除

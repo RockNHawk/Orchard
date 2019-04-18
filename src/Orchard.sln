@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28729.10
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{E9C9F120-07BA-4DFB-B9C3-3AFB9D44C9D5}"
 EndProject
@@ -302,8 +302,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RadioSystems.BootstrapElements", "Orchard.Web\Modules\RadioSystems.BootstrapElements\RadioSystems.BootstrapElements.csproj", "{298F8B28-B344-4B5C-9951-50B5C2824E1B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchard.InlineEditing", "Orchard.Web\Modules\Orchard.InlineEditing\Orchard.InlineEditing.csproj", "{05EFF462-4258-4850-8583-E60F8F3063F4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MnLab.Approval", "Orchard.Web\Modules\MnLab.Approval\MnLab.Approval.csproj", "{54162F30-2D6C-63F9-0288-123690F26791}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHVSD", "Orchard.Web\Themes\NHVSD\NHVSD.csproj", "{76A6AB0C-4088-475B-965D-B3B89DAAF6A8}"
 EndProject
@@ -1438,18 +1436,6 @@ Global
 		{05EFF462-4258-4850-8583-E60F8F3063F4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{05EFF462-4258-4850-8583-E60F8F3063F4}.Stage|Any CPU.ActiveCfg = Release|Any CPU
 		{05EFF462-4258-4850-8583-E60F8F3063F4}.Stage|Any CPU.Build.0 = Release|Any CPU
-		{54162F30-2D6C-63F9-0288-123690F26791}.CodeCoverage|Any CPU.ActiveCfg = Stage|Any CPU
-		{54162F30-2D6C-63F9-0288-123690F26791}.CodeCoverage|Any CPU.Build.0 = Stage|Any CPU
-		{54162F30-2D6C-63F9-0288-123690F26791}.Coverage|Any CPU.ActiveCfg = Stage|Any CPU
-		{54162F30-2D6C-63F9-0288-123690F26791}.Coverage|Any CPU.Build.0 = Stage|Any CPU
-		{54162F30-2D6C-63F9-0288-123690F26791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54162F30-2D6C-63F9-0288-123690F26791}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54162F30-2D6C-63F9-0288-123690F26791}.FxCop|Any CPU.ActiveCfg = Stage|Any CPU
-		{54162F30-2D6C-63F9-0288-123690F26791}.FxCop|Any CPU.Build.0 = Stage|Any CPU
-		{54162F30-2D6C-63F9-0288-123690F26791}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54162F30-2D6C-63F9-0288-123690F26791}.Release|Any CPU.Build.0 = Release|Any CPU
-		{54162F30-2D6C-63F9-0288-123690F26791}.Stage|Any CPU.ActiveCfg = Stage|Any CPU
-		{54162F30-2D6C-63F9-0288-123690F26791}.Stage|Any CPU.Build.0 = Stage|Any CPU
 		{76A6AB0C-4088-475B-965D-B3B89DAAF6A8}.CodeCoverage|Any CPU.ActiveCfg = Release|Any CPU
 		{76A6AB0C-4088-475B-965D-B3B89DAAF6A8}.CodeCoverage|Any CPU.Build.0 = Release|Any CPU
 		{76A6AB0C-4088-475B-965D-B3B89DAAF6A8}.Coverage|Any CPU.ActiveCfg = Release|Any CPU
@@ -1572,12 +1558,11 @@ Global
 		{15C4F6B4-E383-4187-8529-737BE67DBFF2} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
 		{298F8B28-B344-4B5C-9951-50B5C2824E1B} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
 		{05EFF462-4258-4850-8583-E60F8F3063F4} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
-		{54162F30-2D6C-63F9-0288-123690F26791} = {BD190832-BC8B-4112-847C-5263BED2B065}
 		{76A6AB0C-4088-475B-965D-B3B89DAAF6A8} = {BD190832-BC8B-4112-847C-5263BED2B065}
 		{C3F932D4-0179-4CE3-905F-B9FD8ABCF956} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {3585D970-275B-4363-9F61-CD37CFC9DCD3}
 		EnterpriseLibraryConfigurationToolBinariesPath = packages\TransientFaultHandling.Core.5.1.1209.1\lib\NET4
+		SolutionGuid = {3585D970-275B-4363-9F61-CD37CFC9DCD3}
 	EndGlobalSection
 EndGlobal

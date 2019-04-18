@@ -1,7 +1,7 @@
 ﻿using System;
-using Bitlab.Enterprise;
+using MnLab.Enterprise;
 
-namespace MnLab.Enterprise.Approval.Models {
+namespace MnLab.Enterprise.Approval {
     public interface IApprovalInfo {
         Type ApprovalType { get; set; }
         string AuditOpinion { get; set; }

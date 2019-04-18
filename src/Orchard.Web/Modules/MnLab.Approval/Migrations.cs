@@ -3,7 +3,7 @@ using Orchard.Core.Contents.Extensions;
 using Orchard.Data.Migration;
 using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;
-using MnLab.Enterprise.Approval.Models;
+using MnLab.Enterprise.Approval;
 using System;
 
 namespace MnLab.Enterprise.Approval {
@@ -11,11 +11,6 @@ namespace MnLab.Enterprise.Approval {
 
         public int Create() {
 
-            base.SchemaBuilder.CreateTable(nameof(ApprovalSupportPartRecord),
-                table =>
-                MapApprovalInfo(table)
-                .Column<int>(nameof(ApprovalSupportPartRecord.CurrentApproval) + "_Id")
-                );
 
             base.SchemaBuilder.CreateTable(nameof(ApprovalPartRecord),
               table =>
@@ -26,13 +21,25 @@ namespace MnLab.Enterprise.Approval {
               .Column<int>(nameof(ApprovalPartRecord.ContentRecord) + "_Id")
               .Column<int>(nameof(ApprovalPartRecord.OldContentVersion) + "_Id")
               .Column<int>(nameof(ApprovalPartRecord.NewContentVersion) + "_Id")
+              .Column<string>(nameof(ApprovalPartRecord.ContentType))
               .Column<DateTime>(nameof(ApprovalPartRecord.AuditDate))
               .Column<DateTime>(nameof(ApprovalPartRecord.CommitDate))
-              .Column<string>(nameof(ApprovalPartRecord.ContentType))
-              .Column<string>(nameof(ApprovalPartRecord.CommitDate))
+              .Column<DateTime>(nameof(ApprovalPartRecord.CommitDate))
               );
 
 
+            base.SchemaBuilder.CreateTable(nameof(ApprovalSupportPartRecord),
+             table =>
+             MapApprovalInfo(table)
+             .Column<int>(nameof(ApprovalSupportPartRecord.Latest) + "_Id")
+             );
+
+            SchemaBuilder.CreateTable(nameof(RelationshipApprovalStepsRecord),
+                table => table
+                    .Column<int>("Id", column => column.PrimaryKey().Identity())
+                    .Column<int>($"{nameof(RelationshipApprovalStepsRecord.ApprovalPartRecord)}_Id")
+                    .Column<int>($"{nameof(RelationshipApprovalStepsRecord.ApprovalStepRecord)}_Id")
+                );
 
             ContentDefinitionManager.AlterPartDefinition(nameof(ApprovalSupportPart), builder => builder
                 .Attachable()

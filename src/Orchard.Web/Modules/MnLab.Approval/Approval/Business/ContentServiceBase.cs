@@ -23,7 +23,6 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Orchard.ContentManagement;
 using Orchard.ContentManagement.Aspects;
 using Orchard.ContentManagement.MetaData;
 using Orchard.ContentManagement.MetaData.Models;
@@ -43,34 +42,18 @@ using Orchard.Settings;
 using Orchard.Utility.Extensions;
 using Orchard.Localization.Services;
 using Orchard.Core.Contents;
-using MnLab.Enterprise.Approval.Models;
+using MnLab.Enterprise.Approval;
 using MnLab.Enterprise.Approval;
 
 using Rhythm;
-
-
+using MnLab.Enterprise;
+using MnLab.Enterprise.Approval;
 
 namespace Rhythm {
 
 }
 
-namespace Bitlab.Enterprise {
-    public class ContentRepository<T> : IDependency where T : IContent {
-        IContentManager _contentManager;
-        public ContentRepository(IContentManager contentManager) {
-            this._contentManager = contentManager;
-        }
-
-        public T Get(int id) {
-            return _contentManager.Get(id).As<T>();
-        }
-
-        public void Update(T obj) {
-        }
-
-        public void Save(T obj) {
-        }
-    }
+namespace MnLab.Enterprise.Approval {
 
 
     //public class ApprovalPartContentRepository : ContentRepository<MnLab.Approval.Models.ApprovalPart> {
@@ -93,7 +76,9 @@ namespace Bitlab.Enterprise {
     /// </summary>
     /// <typeparam name="TContentPart">内容的类型（如 Article 文章、File 文件）</typeparam>
     /// <typeparam name="TService">Service 的类型，子类继承时传子类的类型即可</typeparam>
-    public class ContentVersioningServiceBase : ServiceBase
+
+    // [Depedency]
+    public class ContentApprovalService : ServiceBase, Orchard.IDependency
 //, IContentVersioningService, IApprovalService
 // where TContentPart : class, IContentPart, new()
 //where TService : class
@@ -106,7 +91,7 @@ namespace Bitlab.Enterprise {
         //protected readonly NHibernateRepository<ContentVersion> contentVersionRepository = (NHibernateRepository<ContentVersion>)RepositoryManager.Default.Of<ContentVersion>();
         //protected readonly NHibernateRepository<IApproval> approvalRepository = (NHibernateRepository<IApproval>)Repository.Current.Of<IApproval>();
 
-        ContentVersioningServiceBase approvalService;
+        ContentApprovalService approvalService;
         static int idSequence = 1000;
 
 
@@ -121,8 +106,8 @@ namespace Bitlab.Enterprise {
         //readonly ContentRepository<ApprovalPart> approvalRepository;
         //readonly ContentRepository<ApprovalStepPart> ApprovalStepRepository;
 
-        public ContentVersioningServiceBase(
-            ContentRepository<MnLab.Enterprise.Approval.Models.ApprovalPart> approvalRepository,
+        public ContentApprovalService(
+            ContentRepository<MnLab.Enterprise.ApprovalPart> approvalRepository,
          //  ContentRepository<ApprovalStepRecord> ApprovalStepRepository,
          IRepository<ApprovalStepRecord> ApprovalStepRepository,
         IOrchardServices orchardServices,

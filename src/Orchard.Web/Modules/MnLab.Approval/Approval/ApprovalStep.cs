@@ -2,7 +2,7 @@
 using Rhythm;
 using System;
 
-namespace Bitlab.Enterprise {
+namespace MnLab.Enterprise.Approval {
     //using Rhythm.
     public class ApprovalStepRecord {
         public virtual string ApprovalStepId { get; set; }

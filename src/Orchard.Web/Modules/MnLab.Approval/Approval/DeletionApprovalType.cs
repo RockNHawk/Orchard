@@ -1,15 +1,6 @@
-﻿/*************************************************
-  Author: Aska Li     
-  CreatedDate:  2014/02/21
-  function:  内容的操作类型
- 
-  Modified History:        
-    1. Date:  2014/02/21
-       Author: Aska Li
-       Modification:  内容的操作类型
-*************************************************/
+﻿using MnLab.Enterprise.Approval;
 
-namespace Bitlab.Enterprise
+namespace MnLab.Enterprise.Approval
 {
     /// <summary>
     /// 内容的操作类型：新增、编辑、删除

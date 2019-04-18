@@ -34,9 +34,12 @@ using Orchard.Settings;
 using Orchard.Utility.Extensions;
 using Orchard.Localization.Services;
 using Orchard.Core.Contents;
-using MnLab.Enterprise.Approval.Models;
+using MnLab.Enterprise;
+using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;
 
-namespace MnLab.Enterprise.Approval.Controllers {
+namespace MnLab.Enterprise.Approval {
     //[Admin]
     [ValidateInput(false)]
     public class AdminController : Controller, IUpdateModel {
@@ -66,6 +69,11 @@ namespace MnLab.Enterprise.Approval.Controllers {
         private readonly ISiteService _siteService;
         private readonly ICultureManager _cultureManager;
         private readonly ICultureFilter _cultureFilter;
+
+
+
+        readonly ContentApprovalService _approvalService;
+
 
         public AdminController(
             IOrchardServices orchardServices,
@@ -105,8 +113,8 @@ namespace MnLab.Enterprise.Approval.Controllers {
 
 
         [HttpPost, ActionName("Create")]
-        [Orchard.Mvc.FormValueRequired("submit.Publish")]
-        public ActionResult CreateAndPublishPOST(string id, string returnUrl) {
+        [Orchard.Mvc.FormValueRequired("submit.Commit")]
+        public ActionResult CreatePOST(string id, string returnUrl) {
 
             // pass a dummy content to the authorization check to check for "own" variations
             var dummyContent = _contentManager.New(id);
@@ -114,12 +122,16 @@ namespace MnLab.Enterprise.Approval.Controllers {
             if (!Services.Authorizer.Authorize(Permissions.PublishContent, dummyContent, T("Couldn't create content")))
                 return new HttpUnauthorizedResult();
 
-            return CreatePOST(id, returnUrl, contentItem => _contentManager.Publish(contentItem));
+            return CreatePOST(id, returnUrl, contentItem => {
+
+
+
+            });
         }
 
         [HttpPost, ActionName("Commit")]
         [Orchard.Mvc.FormValueRequired("submit.Commit")]
-        public ActionResult CommitPOST(int id, string returnUrl) {
+        public ActionResult EditPOST(int id, string returnUrl) {
 
             return EditPOST(id, returnUrl, contentItem => {
 
@@ -129,8 +141,6 @@ namespace MnLab.Enterprise.Approval.Controllers {
                 var approvalSupportPart = contentItem.As<ApprovalSupportPart>();
 
                 //approvalSupportPart.ApprovalType
-
-
 
             });
         }

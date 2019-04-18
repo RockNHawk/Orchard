@@ -1,7 +1,7 @@
 ﻿using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
 using Orchard.ContentManagement.Handlers;
-using MnLab.Enterprise.Approval.Models;
+using MnLab.Enterprise.Approval;
 using Orchard.Localization;
 
 namespace MnLab.Enterprise.Approval.Drivers {

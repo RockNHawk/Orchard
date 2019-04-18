@@ -159,7 +159,6 @@
     <Compile Include="AdminController.cs" />
     <Compile Include="AdminMenu.cs" />
     <Compile Include="ApprovalSupportExtensions.cs" />
-    <Compile Include="Approval\Approval.cs" />
     <Compile Include="Approval\ApprovalApproveEvent.cs" />
     <Compile Include="Approval\ApprovalExtensions.cs" />
     <Compile Include="Approval\ApprovalRejectEventArgs.cs" />
@@ -168,9 +167,9 @@
     <Compile Include="Approval\ApprovalSwitch.cs" />
     <Compile Include="Approval\ApprovalSwitchExntnsions.cs" />
     <Compile Include="Approval\ApprovalTypes.cs" />
+    <Compile Include="Approval\Business\ContentRepository.cs" />
     <Compile Include="Approval\Business\ContentServiceBase.cs" />
     <Compile Include="Approval\ContentActionEventArgs.cs" />
-    <Compile Include="Approval\ContentStatus.cs" />
     <Compile Include="Approval\CreationApprovalType.cs" />
     <Compile Include="Approval\DeletionApprovalType.cs" />
     <Compile Include="Approval\IApproval.cs" />
@@ -178,6 +177,7 @@
     <Compile Include="Approval\IApprovalRejectEvent.cs" />
     <Compile Include="Approval\ModificationApprovalType.cs" />
     <Compile Include="Approval\NoneApprovalType.cs" />
+    <Compile Include="Class1.cs" />
     <Compile Include="Core\Formats.cs" />
     <Compile Include="Department\Department.cs" />
     <Compile Include="Drivers\ApprovalPartDriver.cs" />

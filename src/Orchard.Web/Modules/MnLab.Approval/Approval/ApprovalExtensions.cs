@@ -12,7 +12,7 @@ using System;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 
-namespace Bitlab.Enterprise
+namespace MnLab.Enterprise.Approval
 {
     /// <summary>
     /// </summary>

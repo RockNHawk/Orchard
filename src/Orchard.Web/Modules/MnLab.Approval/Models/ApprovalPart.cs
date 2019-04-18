@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Bitlab.Enterprise;
+using MnLab.Enterprise;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Aspects;
 using System;
@@ -13,8 +13,10 @@ using Orchard.ContentManagement.Utilities;
 using Orchard.Core;
 using Orchard.Data;
 using Orchard.Security;
+using MnLab.Enterprise.Approval;
 
-namespace MnLab.Enterprise.Approval.Models {
+namespace MnLab.Enterprise.Approval {
+
     public class ApprovalPart : ContentPart<ApprovalPartRecord>, IApproval {
 
         ///// <summary>

@@ -1,4 +1,4 @@
-﻿namespace Bitlab.Enterprise {
+﻿namespace MnLab.Enterprise.Approval {
     public interface IApprovalApproveEvent {
         IApproval Approval { get; set; }
         ApprovalSwitch ApprovalSwitch { get; set; }

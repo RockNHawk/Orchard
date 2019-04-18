@@ -9,7 +9,7 @@
        Modification:  审批的状态枚举
 *************************************************/
 
-namespace Bitlab.Enterprise
+namespace MnLab.Enterprise.Approval
 {
     using System.ComponentModel.DataAnnotations;
     /// <summary>

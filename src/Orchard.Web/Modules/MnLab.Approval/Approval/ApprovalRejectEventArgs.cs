@@ -8,11 +8,11 @@
        Author: 
        Modification:  
 *************************************************/
-using MnLab.Enterprise.Approval.Models;
+using MnLab.Enterprise.Approval;
 using Orchard.Security;
 using Rhythm;
 
-namespace Bitlab.Enterprise
+namespace MnLab.Enterprise.Approval
 {
     /// <summary>
     /// 定义审批驳回事件

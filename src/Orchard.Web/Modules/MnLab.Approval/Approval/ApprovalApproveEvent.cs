@@ -11,9 +11,9 @@
 using Rhythm;
 using MnLab.Enterprise.Approval;
 using System;
-using MnLab.Enterprise.Approval.Models;
+using MnLab.Enterprise.Approval;
 
-namespace Bitlab.Enterprise {
+namespace MnLab.Enterprise.Approval {
     /// <summary>
     /// 定义审批通过事件
     /// </summary>

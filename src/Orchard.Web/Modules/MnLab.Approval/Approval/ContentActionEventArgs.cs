@@ -8,12 +8,12 @@
        Author: Aska Li
        Modification:  内容事件抽象基类
 *************************************************/
-using MnLab.Enterprise.Approval.Models;
+using MnLab.Enterprise.Approval;
 using Orchard.ContentManagement;
 using Orchard.Security;
 using Rhythm;
 
-namespace Bitlab.Enterprise {
+namespace MnLab.Enterprise.Approval {
     /// <summary>
     /// 内容事件接口
     /// </summary>

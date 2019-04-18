@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using MnLab.Enterprise.Approval.Models;
+using MnLab.Enterprise;
+using MnLab.Enterprise.Approval;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Orchard.Security;
 
-namespace Bitlab.Enterprise {
+namespace MnLab.Enterprise.Approval {
     public interface IApproval : IApprovalInfo {
         int Id { get; }
 

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Orchard.ContentManagement.Records;
 using System.ComponentModel.DataAnnotations;
-using Bitlab.Enterprise;
+using MnLab.Enterprise;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Aspects;
 using System;
@@ -15,8 +15,19 @@ using Orchard.ContentManagement.Utilities;
 using Orchard.Core;
 using Orchard.Data;
 using Orchard.Security;
+using System.Linq;
 
-namespace MnLab.Enterprise.Approval.Models {
+namespace MnLab.Enterprise.Approval {
+
+
+    public class RelationshipApprovalStepsRecord {
+        public virtual int Id { get; set; }
+        public virtual ApprovalPartRecord ApprovalPartRecord { get; set; }
+        public virtual ApprovalStepRecord ApprovalStepRecord { get; set; }
+    }
+
+
+
     public class ApprovalPartRecord : ContentPartVersionRecord, IApproval {
 
         [StringLength(1024)]
@@ -49,7 +60,20 @@ namespace MnLab.Enterprise.Approval.Models {
             }
         }
 
-        public virtual IList<ApprovalStepRecord> Steps { get; set; }
+
+        /// <summary>
+        /// Creating-1-n-and-n-n-relations
+        /// http://docs.orchardproject.net/en/latest/Documentation/Creating-1-n-and-n-n-relations/
+        /// </summary>
+        public virtual IList<RelationshipApprovalStepsRecord> RelationshipSteps { get; set; }
+
+        //public virtual IList<ApprovalStepRecord> Steps { get; set; }
+        public virtual IList<ApprovalStepRecord> Steps {
+            get => RelationshipSteps.Select(x => x.ApprovalStepRecord).ToList();
+            set {
+                this.RelationshipSteps = value.Select(x => new RelationshipApprovalStepsRecord { ApprovalPartRecord = this, ApprovalStepRecord = x }).ToList();
+            }
+        }
 
         ApprovalStepRecord m_CurrentStep;
         public virtual ApprovalStepRecord CurrentStep {
@@ -145,11 +169,11 @@ namespace MnLab.Enterprise.Approval.Models {
             //            var contentTypeDisplayName = contentType == null ? null : contentType.GetDisplayName() ?? contentType.Name;
 
             //            var approvalType = this.ApprovalType;
-            //            if (Bitlab.Enterprise.ApprovalType.Creation.IsAssignableFrom(approvalType)) {
+            //            if (MnLab.Enterprise.ApprovalType.Creation.IsAssignableFrom(approvalType)) {
             //                var newVersionTitle = ((IFormattable)newVersion).ToString(Formats.EventTitle, null);
             //                return String.Format("{0}{1}《{2}》", approvalType.GetDisplayName(), contentTypeDisplayName, newVersionTitle);
             //            }
-            //            else if (Bitlab.Enterprise.ApprovalType.Modification.IsAssignableFrom(approvalType)) {
+            //            else if (MnLab.Enterprise.ApprovalType.Modification.IsAssignableFrom(approvalType)) {
             //                var newVersionTitle = ((IFormattable)newVersion).ToString(Formats.EventTitle, null);
             //                var oldVersionTitle = ((IFormattable)oldVersion).ToString(Formats.EventTitle, null);
             //                if (oldVersionTitle != newVersionTitle) {
@@ -159,7 +183,7 @@ namespace MnLab.Enterprise.Approval.Models {
             //                    return String.Format("{0}{1}《{2}》", approvalType.GetDisplayName(), contentTypeDisplayName, newVersionTitle);
             //                }
             //            }
-            //            else if (Bitlab.Enterprise.ApprovalType.Deletion.IsAssignableFrom(approvalType)) {
+            //            else if (MnLab.Enterprise.ApprovalType.Deletion.IsAssignableFrom(approvalType)) {
             //                var versionTitle = ((IFormattable)(newVersion ?? oldVersion)).ToString(Formats.EventTitle, null);
             //                return String.Format("{0}{1}《{2}》", approvalType.GetDisplayName(), contentTypeDisplayName, versionTitle);
             //            }
