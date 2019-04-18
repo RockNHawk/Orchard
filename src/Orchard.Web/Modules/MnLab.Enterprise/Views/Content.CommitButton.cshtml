@@ -6,10 +6,12 @@
     var contentItem = (IContent)Model.ContentItem;
     //var basePath = WorkContext.CurrentSite.BaseUrl;
 }
-commit
+@*commit*@
 @if (Authorizer.Authorize(Permissions.CreateContent, contentItem))
 {
-    <fieldset class="publish-button">
-        <button fn-form-action="~/Admin/MnLab.Enterprise/Approval/@(contentItem.Id==0?$"Create":$"Edit")" type="submit" name="submit.Commit" value="submit.Commit">@T("Commit Approval")</button>
-    </fieldset>
+    @*<input /?*@
+<fieldset class="publish-button">
+    <button fn-form-action="~/Admin/MnLab.Enterprise/@(contentItem.Id==0?$"Create":$"Edit")/@(contentItem.Id)" type="submit" name="submit.Commit" value="submit.Commit">@T("Commit Approval")</button>
+    @*<button fn-form-action="~/Admin/MnLab.Enterprise/Approval/@(contentItem.Id==0?$"Create":$"Edit")" type="submit" name="submit.Commit" value="submit.Commit">@T("Commit Approval")</button>*@
+</fieldset>
 }

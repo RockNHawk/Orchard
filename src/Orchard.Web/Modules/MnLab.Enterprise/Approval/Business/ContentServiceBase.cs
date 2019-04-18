@@ -107,7 +107,7 @@ namespace MnLab.Enterprise.Approval {
         //readonly ContentRepository<ApprovalStepPart> ApprovalStepRepository;
 
         public ContentApprovalService(
-            ContentRepository<ApprovalPart> approvalRepository,
+         //  ContentRepository<ApprovalPart> approvalRepository,
          //  ContentRepository<ApprovalStepRecord> ApprovalStepRepository,
          IRepository<ApprovalStepRecord> ApprovalStepRepository,
         IOrchardServices orchardServices,
@@ -120,7 +120,8 @@ namespace MnLab.Enterprise.Approval {
             ICultureFilter cultureFilter) {
 
 
-            this.approvalRepository = approvalRepository;
+            // this.approvalRepository = approvalRepository;
+            this.approvalRepository = new ContentRepository<ApprovalPart>(contentManager);
             this.ApprovalStepRepository = ApprovalStepRepository;
 
             Services = orchardServices;

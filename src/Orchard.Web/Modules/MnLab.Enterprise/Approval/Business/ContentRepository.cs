@@ -2,6 +2,7 @@
 
 using Orchard;
 using Orchard.ContentManagement;
+using Orchard.ContentManagement.Records;
 
 namespace MnLab.Enterprise.Approval {
     public class ContentRepository<T> : IDependency where T : IContent {

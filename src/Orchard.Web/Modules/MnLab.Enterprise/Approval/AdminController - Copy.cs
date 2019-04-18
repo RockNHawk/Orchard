@@ -40,7 +40,7 @@ using MnLab.Enterprise.Approval;
 namespace MnLab.Enterprise.Approval.Controllers {
     //[Admin]
     [ValidateInput(false)]
-    public class AdminController : Controller, IUpdateModel {
+    public class ApprovalAdminController : Controller, IUpdateModel {
 
 
         //public ILogger Logger { get; set; }
@@ -73,7 +73,7 @@ namespace MnLab.Enterprise.Approval.Controllers {
         readonly ContentApprovalService _approvalService;
 
 
-        public AdminController(
+        public ApprovalAdminController(
             IOrchardServices orchardServices,
             IContentManager contentManager,
             IContentDefinitionManager contentDefinitionManager,
