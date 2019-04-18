@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="PuppeteerSharp" Version="1.14.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PuppeteerSharp.DevicesFetcher">
+      <HintPath>..\..\lib\PuppeteerSharp.DevicesFetcher\bin\Debug\netcoreapp2.0\PuppeteerSharp.DevicesFetcher.dll</HintPath>
+      <EmbedInteropTypes>false</EmbedInteropTypes>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28729.10
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{E9C9F120-07BA-4DFB-B9C3-3AFB9D44C9D5}"
 EndProject
@@ -308,6 +308,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHVSD", "Orchard.Web\Themes\NHVSD\NHVSD.csproj", "{76A6AB0C-4088-475B-965D-B3B89DAAF6A8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResponsiveThemeForDevelopers", "Orchard.Web\Themes\responsive-theme-for-developers-orchard-cms\ResponsiveThemeForDevelopers.csproj", "{C3F932D4-0179-4CE3-905F-B9FD8ABCF956}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PuppeteerSharpPdf", "Orchard.Web\Modules\PuppeteerSharpPdf\PuppeteerSharpPdf.csproj", "{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1474,6 +1476,18 @@ Global
 		{C3F932D4-0179-4CE3-905F-B9FD8ABCF956}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C3F932D4-0179-4CE3-905F-B9FD8ABCF956}.Stage|Any CPU.ActiveCfg = Release|Any CPU
 		{C3F932D4-0179-4CE3-905F-B9FD8ABCF956}.Stage|Any CPU.Build.0 = Release|Any CPU
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}.CodeCoverage|Any CPU.ActiveCfg = Debug|Any CPU
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}.CodeCoverage|Any CPU.Build.0 = Debug|Any CPU
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}.Coverage|Any CPU.ActiveCfg = Debug|Any CPU
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}.Coverage|Any CPU.Build.0 = Debug|Any CPU
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}.FxCop|Any CPU.ActiveCfg = Debug|Any CPU
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}.FxCop|Any CPU.Build.0 = Debug|Any CPU
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}.Stage|Any CPU.ActiveCfg = Debug|Any CPU
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC}.Stage|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1575,9 +1589,10 @@ Global
 		{54162F30-2D6C-63F9-0288-123690F26791} = {BD190832-BC8B-4112-847C-5263BED2B065}
 		{76A6AB0C-4088-475B-965D-B3B89DAAF6A8} = {BD190832-BC8B-4112-847C-5263BED2B065}
 		{C3F932D4-0179-4CE3-905F-B9FD8ABCF956} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
+		{D493EA54-86B6-401B-9F8F-F4A16DF2D8CC} = {E9C9F120-07BA-4DFB-B9C3-3AFB9D44C9D5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {3585D970-275B-4363-9F61-CD37CFC9DCD3}
 		EnterpriseLibraryConfigurationToolBinariesPath = packages\TransientFaultHandling.Core.5.1.1209.1\lib\NET4
+		SolutionGuid = {3585D970-275B-4363-9F61-CD37CFC9DCD3}
 	EndGlobalSection
 EndGlobal

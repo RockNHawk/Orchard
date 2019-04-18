@@ -116,12 +116,53 @@ namespace Orchard.Layouts.Services {
             return ApplyTemplate(LoadElements(layout), LoadElements(templateLayout));
         }
 
+        //public IEnumerable<Element> ApplyTemplate(IEnumerable<Element> layout, IEnumerable<Element> templateLayout) {
+        //    var template = Templatify(templateLayout).ToList();
+        //    var templateColumns = ExtractColumns(template).ToArray();
+        //    var layoutColumns = ExtractColumns(layout).ToArray();
+        //    var nonTemplatedElements = ExtractNonTemplatedElements(layout).ToList();
+        //    //if(nonull.>0)
+        //    foreach (var element in nonTemplatedElements) {
+        //        // Move the element to the template and try to maintain its index.
+        //        var column = element.Container as Column;
+        //        var indexInTemplate = templateColumns.Any() ? 0 : -1;
+        //        if (column != null) {
+        //            var indexInLayout = Array.IndexOf(layoutColumns, column);
+        //            indexInTemplate = indexInLayout < templateColumns.Count() ? indexInLayout : templateColumns.Any() ? 0 : -1;
+        //        }
+        //        if (indexInTemplate > -1) {
+        //                templateColumns[indexInTemplate].Elements.Add(element);
+        //        }
+        //        else {
+        //            template.Add(element);
+        //        }
+        //    }
+
+        //    return template;
+        //}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="layout"></param>
+        /// <param name="templateLayout"></param>
+        /// <returns></returns>
         public IEnumerable<Element> ApplyTemplate(IEnumerable<Element> layout, IEnumerable<Element> templateLayout) {
             var template = Templatify(templateLayout).ToList();
             var templateColumns = ExtractColumns(template).ToArray();
             var layoutColumns = ExtractColumns(layout).ToArray();
             var nonTemplatedElements = ExtractNonTemplatedElements(layout).ToList();
-
+            var nonull = layoutColumns.Where(m => !string.IsNullOrWhiteSpace(m.HtmlId)).ToList();
+            if (nonull.Count() > 0) {
+                foreach (var item in nonull) {
+                    var indexInTemplate = templateColumns.Where(m => m.HtmlId.Equals(item.HtmlId)).FirstOrDefault();
+                    var index = Array.IndexOf(templateColumns, indexInTemplate);
+                    if (index > -1) {
+                        //foreach(var if())
+                        templateColumns[index].Elements.AddRange(item.Elements);
+                    }
+                }
+            }
+            //if(nonull.>0)
             foreach (var element in nonTemplatedElements) {
 
                 // Move the element to the template and try to maintain its index.
@@ -133,7 +174,10 @@ namespace Orchard.Layouts.Services {
                 }
 
                 if (indexInTemplate > -1) {
-                    templateColumns[indexInTemplate].Elements.Add(element);
+                    if (templateColumns[indexInTemplate].Elements.Count == 0) {
+
+                        templateColumns[indexInTemplate].Elements.Add(element);
+                    }
                 }
                 else {
                     template.Add(element);
