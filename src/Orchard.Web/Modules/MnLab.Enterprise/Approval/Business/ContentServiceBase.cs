@@ -92,7 +92,7 @@ namespace MnLab.Enterprise.Approval {
         //protected readonly NHibernateRepository<IApproval> approvalRepository = (NHibernateRepository<IApproval>)Repository.Current.Of<IApproval>();
 
         ContentApprovalService approvalService;
-        static int idSequence = 1000;
+        //static int idSequence = 1000;
 
 
         private readonly IContentManager _contentManager;
@@ -102,6 +102,8 @@ namespace MnLab.Enterprise.Approval {
         private readonly ICultureManager _cultureManager;
         private readonly ICultureFilter _cultureFilter;
 
+
+        //IRepository<ApprovalSupportPartRecord> _approvalSupportRepos;
 
         //readonly ContentRepository<ApprovalPart> approvalRepository;
         //readonly ContentRepository<ApprovalStepPart> ApprovalStepRepository;
@@ -117,9 +119,11 @@ namespace MnLab.Enterprise.Approval {
             ISiteService siteService,
             IShapeFactory shapeFactory,
             ICultureManager cultureManager,
-            ICultureFilter cultureFilter) {
+              IRepository<ApprovalSupportPartRecord> approvalSupportRepos,
+        ICultureFilter cultureFilter) {
 
 
+            //this._approvalSupportRepos = approvalSupportRepos;
             // this.approvalRepository = approvalRepository;
             this.approvalRepository = new ContentRepository<ApprovalPart>(contentManager);
             this.ApprovalStepRepository = ApprovalStepRepository;
@@ -556,6 +560,7 @@ namespace MnLab.Enterprise.Approval {
             SetContentWaitingApproval(wc, content, actionType);
             var contentType = content.ContentType;
             var approval = new ApprovalPart {
+                Record = new ApprovalPartRecord(),
                 ApprovalType = actionType,
                 CommitDate = DateTime.Now,
                 CommitBy = commitUser,
@@ -591,6 +596,7 @@ namespace MnLab.Enterprise.Approval {
             SetContentWaitingApproval(wc, content, actionType);
             var contentType = content.ContentType;
             var approval = new ApprovalPart {
+                Record = new ApprovalPartRecord(),
                 ApprovalType = actionType,
                 CommitDate = DateTime.Now,
                 CommitBy = wc.CurrentUser,
@@ -615,6 +621,7 @@ namespace MnLab.Enterprise.Approval {
         public virtual ApprovalPart CommmitDeletionApproval(Orchard.WorkContext wc, ContentItem content, System.Type actionType, ApprovalSwitch approvalSwitch, IUser commitUser) {
             SetContentWaitingApproval(wc, content, actionType);
             var approval = new ApprovalPart {
+                Record = new ApprovalPartRecord(),
                 ApprovalType = actionType,
                 CommitDate = DateTime.Now,
                 CommitBy = wc.CurrentUser,
@@ -760,7 +767,7 @@ namespace MnLab.Enterprise.Approval {
 
             var ContentRecord = approval.ContentRecord;
             var content = ContentRecord.GetContentItem(_contentManager);
-            content.As<ApprovalSupportPart>().CurrentApproval = approval.Record;// flush update
+            UpdateCurrentApproval(content, approval);
 
             OnCreateApproval(approval);
             var steps = approval.Steps;
@@ -772,6 +779,19 @@ namespace MnLab.Enterprise.Approval {
             if (!approvalSwitch.IsOn()) {
                 Approve(wc, approval, approvalSwitch, commitUser, commitUser, true);
             }
+        }
+
+        private void UpdateCurrentApproval(ContentItem content, ApprovalPart approval)
+        {
+            var contentApproval = content.As<ApprovalSupportPart>();
+            contentApproval.CurrentApproval = approval.Record;
+            // _approvalSupportRepos.Update(contentApproval.Record);
+        }
+
+        private void UpdateCurrentApproval2(ApprovalSupportPart contentApproval, ApprovalPart approval)
+        {
+            contentApproval.CurrentApproval = approval?.Record;
+           // _approvalSupportRepos.Update(contentApproval.Record);
         }
 
         protected virtual void OnCreateApproval(ApprovalPart approval) {
@@ -991,7 +1011,8 @@ namespace MnLab.Enterprise.Approval {
                 throw new InvalidOperationException("unsupported ApprovalType#" + approval.ApprovalType);
             }
 
-            contentApproval.CurrentApproval = null;
+            //contentApproval.CurrentApproval = null;
+            UpdateCurrentApproval2(contentApproval, null);
             contentApproval.Status = ApprovalStatus.Approved;
             contentApproval.ApprovalType = approval.ApprovalType;
 
@@ -1019,12 +1040,19 @@ namespace MnLab.Enterprise.Approval {
         /// </summary>
         /// <param name="content"></param>
         /// <param name="actionType"></param>
-        static void SetContentWaitingApproval(Orchard.WorkContext wc, ContentItem content, System.Type actionType) {
+        void SetContentWaitingApproval(Orchard.WorkContext wc, ContentItem content, System.Type actionType) {
             NUnit.Framework.Assert.IsNotNull(content.As<CommonPart>().Owner, "content.CreatedByUser is null");
             NUnit.Framework.Assert.IsNotNull(wc.User(), "Orchard.WorkContext.User is null");
 
 
             var contentApproval = content.As<ApprovalSupportPart>();
+            if (contentApproval.Record == null) {
+                var record = new ApprovalSupportPartRecord() {
+                    ContentItemRecord = content.Record,
+                };
+               // _approvalSupportRepos.Create(record);
+                contentApproval.Record = record;
+            }
 
             //if (content.ApprovalStatus == ApprovalStatus.Deleted)
             //if (content.IsDeleted) {

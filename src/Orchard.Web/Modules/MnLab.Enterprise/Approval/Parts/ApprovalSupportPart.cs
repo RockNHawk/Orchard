@@ -7,11 +7,11 @@ using Orchard.ContentManagement.Aspects;
 namespace MnLab.Enterprise.Approval {
     public class ApprovalSupportPart : ContentPart<ApprovalSupportPartRecord>, IApprovalInfo {
 
-        public string CommitOpinion { get { return Record.CommitOpinion; } set { Record.CommitOpinion = value; } }
-        public string AuditOpinion { get { return Record.AuditOpinion; } set { Record.AuditOpinion = value; } }
-        public ApprovalStatus Status { get { return Record.Status; } set { Record.Status = value; } }
-        public Type ApprovalType { get { return Record.ApprovalType; } set { Record.ApprovalType = value; } }
-        public ApprovalPartRecord CurrentApproval { get { return Record.Latest; } set { Record.Latest = value; } }
+        public string CommitOpinion { get { return Record?.CommitOpinion; } set { Record.CommitOpinion = value; } }
+        public string AuditOpinion { get { return Record?.AuditOpinion; } set { Record.AuditOpinion = value; } }
+        public ApprovalStatus Status { get { return Record?.Status ?? default(ApprovalStatus); } set { Record.Status = value; } }
+        public Type ApprovalType { get { return Record?.ApprovalType; } set { Record.ApprovalType = value; } }
+        public ApprovalPartRecord CurrentApproval { get { return Record?.Latest; } set { Record.Latest = value; } }
 
         //public virtual string ApprovalComments { get; set; }
         //public virtual ApprovalStatus ApprovalStatus { get; set; }

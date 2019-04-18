@@ -30,7 +30,7 @@ namespace MnLab.Enterprise.Approval {
         public virtual System.Type ApprovalType { get { return Record.ApprovalType; } set { Record.ApprovalType = value; } }
 
 
-        string contentType;
+       // string contentType;
         /// <summary>
         /// 内容的类型，NHibernate 根据此字段的值，去 Map 找对应的 Question 子类型，实现多态
         /// </summary>

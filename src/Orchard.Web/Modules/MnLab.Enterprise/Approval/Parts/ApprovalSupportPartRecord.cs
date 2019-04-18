@@ -4,7 +4,7 @@ using MnLab.Enterprise;
 using Orchard.ContentManagement.Records;
 
 namespace MnLab.Enterprise.Approval {
-    public class ApprovalSupportPartRecord : ContentPartVersionRecord, IApprovalInfo {
+    public class ApprovalSupportPartRecord : ContentPartRecord, IApprovalInfo {
         [StringLength(1024)]
         public virtual string CommitOpinion { get; set; }
         public virtual string AuditOpinion { get; set; }

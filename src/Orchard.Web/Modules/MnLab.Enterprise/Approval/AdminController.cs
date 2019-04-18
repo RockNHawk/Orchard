@@ -197,7 +197,7 @@ namespace MnLab.Enterprise.Approval.Controllers {
             var model = _contentManager.UpdateEditor(contentItem, this);
             if (!ModelState.IsValid) {
                 _transactionManager.Cancel();
-                return View("Edit", model);
+                return View("~/Core/Contents/Views/Admin/Edit.cshtml", model);
             }
 
             conditionallyPublish(contentItem);

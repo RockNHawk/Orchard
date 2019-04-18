@@ -28,7 +28,7 @@ namespace MnLab.Enterprise.Approval {
 
 
 
-    public class ApprovalPartRecord : ContentPartVersionRecord, IApproval {
+    public class ApprovalPartRecord : ContentPartRecord, IApproval {
 
         [StringLength(1024)]
         public virtual string CommitOpinion { get; set; }
