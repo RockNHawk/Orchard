@@ -1,0 +1,23 @@
+﻿@using MnLab.Enterprise
+@using MnLab.Enterprise.Approval
+@model ApprovalSupportPart
+
+Parts.ApprovalSupport
+
+@using (Script.Foot()) {
+<script>
+   // alert('ApprovalSupport');
+    $("button[fn-form-action]").on("click", function () {
+        var form = this.form || $('form')[0];
+       // debugger
+        if (form) {
+            var btnAction = $(this).attr("fn-form-action");
+            var rawAction = $(form).attr("action");
+            $(form).attr("action", btnAction);
+            setTimeout(function () {
+                $(form).attr("action", rawAction);
+            }, 10);
+        }
+    });
+</script>
+}

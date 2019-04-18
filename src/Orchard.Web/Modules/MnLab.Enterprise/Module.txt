@@ -1,0 +1,10 @@
+﻿Name: MnLab.Enterprise
+AntiForgery: enabled
+Author: The Orchard Team
+Website: https://orchardproject.net
+Version: 1.0
+OrchardVersion: 1.10.3
+Description: Enterprise feature
+Features:
+    MnLab.Enterprise:
+        Description: The Approval module enables the approval of content types.

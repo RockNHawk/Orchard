@@ -2,7 +2,7 @@ using Orchard.ContentManagement.MetaData;
 using Orchard.Core.Contents.Extensions;
 using Orchard.Data.Migration;
 
-namespace MnLab.PdfVisualDesign.HtmlBlocks {
+namespace MnLab.PdfVisualDesign {
     public class Migrations : DataMigrationImpl {
         public int Create() {
 
@@ -14,7 +14,7 @@ namespace MnLab.PdfVisualDesign.HtmlBlocks {
 
             ContentDefinitionManager.AlterPartDefinition(nameof(TempalteSupportPart), builder => builder
                 .Attachable()
-                .WithDescription("Provides a Title for your content item."));
+                .WithDescription("Provides a tempalte support for your content item."));
 
 
             //SchemaBuilder.CreateTable(typeof(HtmlBlockRecord).Name,
@@ -24,8 +24,18 @@ namespace MnLab.PdfVisualDesign.HtmlBlocks {
             //        .Column<string>("HTML", x => x.Unlimited())
             //        .Column<string>("HelpText", x => x.Unlimited())
             //    );
-            return 1;
+            return 2;
         }
+
+
+        public int UpdateFrom1() {
+
+            ContentDefinitionManager.AlterPartDefinition(nameof(TempalteSupportPart), builder => builder
+              .Attachable()
+              .WithDescription("Provides a tempalte support for your content item."));
+            return 2;
+        }
+
 
     }
 }

@@ -1,7 +1,21 @@
 ﻿<Placement>
-  <Place Fields_TempalteSupportField_Edit="Content:2.5"/>
-  <Place Fields_TempalteSupportField="Content:before" />
-  <Match DisplayType="SummaryAdmin">
+    <!--<Place Fields_TempalteSupportField_Edit="Content:2.5"/>
+  <Place Fields_TempalteSupportField="Content:before" />-->
+
+
+    <!-- available display shapes -->
+    <!--
+        Parts_TempalteSupport
+        Parts_TempalteSupport_Summary
+        Parts_TempalteSupport_SummaryAdmin
+    -->
+
     <Place Fields_TempalteSupportField="-" />
-  </Match>
+
+    <Match DisplayType="SummaryAdmin">
+    </Match>
+    <Place Parts_TempalteSupport_Edit="Content:before"/>
+
+    <Match DisplayType="DetailAdmin">
+    </Match>
 </Placement>
