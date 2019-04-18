@@ -107,7 +107,7 @@ namespace MnLab.Enterprise.Approval {
         //readonly ContentRepository<ApprovalStepPart> ApprovalStepRepository;
 
         public ContentApprovalService(
-            ContentRepository<MnLab.Enterprise.ApprovalPart> approvalRepository,
+            ContentRepository<ApprovalPart> approvalRepository,
          //  ContentRepository<ApprovalStepRecord> ApprovalStepRepository,
          IRepository<ApprovalStepRecord> ApprovalStepRepository,
         IOrchardServices orchardServices,
@@ -759,7 +759,7 @@ namespace MnLab.Enterprise.Approval {
 
             var ContentRecord = approval.ContentRecord;
             var content = ContentRecord.GetContentItem(_contentManager);
-            content.As<ApprovalSupportPart>().CurrentApproval = approval;// flush update
+            content.As<ApprovalSupportPart>().CurrentApproval = approval.Record;// flush update
 
             OnCreateApproval(approval);
             var steps = approval.Steps;

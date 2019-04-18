@@ -10,7 +10,7 @@ using Orchard.ContentManagement.Handlers;
 using Orchard.Environment.Extensions;
 using Orchard.Localization;
 
-namespace MnLab.PdfVisualDesign.Fields {
+namespace MnLab.PdfVisualDesign.Drivers {
 
 
     public class TemplateSupportPartViewModel {
@@ -58,8 +58,12 @@ namespace MnLab.PdfVisualDesign.Fields {
         }
 
         protected override DriverResult Editor(TempalteSupportPart part, dynamic shapeHelper) {
+            var model = new TemplateSupportPartViewModel {
+                Field = part,
+                ContentItem = part.ContentItem,
+            };
             return ContentShape($"Parts_TempalteSupport_Edit",
-                () => shapeHelper.EditorTemplate(TemplateName: $"Parts.TempalteSupportPart", Model: part, Prefix: Prefix));
+                () => shapeHelper.EditorTemplate(TemplateName: $"Parts.TempalteSupportPart", Model: model, Prefix: Prefix));
         }
 
         protected override DriverResult Editor(TempalteSupportPart part, IUpdateModel updater, dynamic shapeHelper) {

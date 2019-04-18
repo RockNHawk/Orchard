@@ -5,7 +5,7 @@ using Orchard.Core.Contents.Settings;
 using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;
 
-namespace MnLab.Enterprise.Approval {
+namespace MnLab.Enterprise.Approval.Drivers  {
     public class ContentButtonDriver : ContentPartDriver<ContentPart> {
         //protected override DriverResult Display(ContentPart part, string displayType, dynamic shapeHelper) {
         //    return Combined(
@@ -21,7 +21,7 @@ namespace MnLab.Enterprise.Approval {
         //}
 
         protected override DriverResult Editor(ContentPart part, dynamic shapeHelper) {
-            var results = new List<DriverResult> { ContentShape("Content_SaveButton", saveButton => saveButton) };
+            var results = new List<DriverResult> { };
 
             if (part.TypeDefinition.Settings.GetModel<ContentTypeSettings>().Draftable)
                 results.Add(ContentShape("Content_CommitButton", publishButton => publishButton));

@@ -7,7 +7,7 @@ using Orchard.ContentManagement.Handlers;
 
 namespace Orchard.ContentExtensions.Handlers
 {
-    [UsedImplicitly]
+    //[UsedImplicitly]
     public class ContentExtensionMenuItemPartHandler: ContentHandler {
         private readonly IContentManager contentManager;
 

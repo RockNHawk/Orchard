@@ -2,8 +2,14 @@
 @using Orchard.Core.Contents;
 @using Orchard.Utility.Extensions;
 
-@if (Authorizer.Authorize(Permissions.PublishContent, (IContent)Model.ContentItem)) {
-<fieldset class="publish-button">
-    <button type="submit" name="commit.Save" value="commit.Save">@T("Commit Approval")</button>
-</fieldset>
+@{
+    var contentItem = (IContent)Model.ContentItem;
+    //var basePath = WorkContext.CurrentSite.BaseUrl;
+}
+commit
+@if (Authorizer.Authorize(Permissions.CreateContent, contentItem))
+{
+    <fieldset class="publish-button">
+        <button fn-form-action="~/Admin/MnLab.Enterprise/Approval/@(contentItem.Id==0?$"Create":$"Edit")" type="submit" name="submit.Commit" value="submit.Commit">@T("Commit Approval")</button>
+    </fieldset>
 }

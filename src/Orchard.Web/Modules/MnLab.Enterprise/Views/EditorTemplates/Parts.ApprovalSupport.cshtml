@@ -1,7 +1,23 @@
-﻿@model MnLab.Approval.Models.ApprovalSupportPart
+﻿@using MnLab.Enterprise
+@using MnLab.Enterprise.Approval
+@model ApprovalSupportPart
 
-<fieldset>
-    <label for="@Html.FieldIdFor(m => m.UserCommit)" class="required">@T("Title")</label>    
-    @Html.TextBoxFor(m => m.UserCommit, new { @class = "text large", autofocus = "autofocus" })
-    <span class="hint">@T("You must provide a title for this content item")</span>
-</fieldset>
+Parts.ApprovalSupport
+
+@using (Script.Foot()) {
+<script>
+   // alert('ApprovalSupport');
+    $("button[fn-form-action]").on("click", function () {
+        var form = this.form || $('form')[0];
+       // debugger
+        if (form) {
+            var btnAction = $(this).attr("fn-form-action");
+            var rawAction = $(form).attr("action");
+            $(form).attr("action", btnAction);
+            setTimeout(function () {
+                $(form).attr("action", rawAction);
+            }, 10);
+        }
+    });
+</script>
+}

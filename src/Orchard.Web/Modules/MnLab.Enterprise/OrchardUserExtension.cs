@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using MnLab.Enterprise;
+using MnLab.Enterprise.Approval;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Orchard.Security;

@@ -12,7 +12,7 @@ namespace MnLab.Enterprise.Approval.Drivers {
         public Localizer T { get; set; }
 
         protected override string Prefix {
-            get { return "Approval"; }
+            get { return "ApprovalSupport"; }
         }
 
         protected override DriverResult Display(ApprovalSupportPart part, string displayType, dynamic shapeHelper) {
@@ -38,19 +38,19 @@ namespace MnLab.Enterprise.Approval.Drivers {
             return Editor(part, shapeHelper);
         }
 
-        protected override void Importing(ApprovalSupportPart part, ImportContentContext context) {
-            // Don't do anything if the tag is not specified.
-            if (context.Data.Element(part.PartDefinition.Name) == null) {
-                return;
-            }
+        //protected override void Importing(ApprovalSupportPart part, ImportContentContext context) {
+        //    // Don't do anything if the tag is not specified.
+        //    if (context.Data.Element(part.PartDefinition.Name) == null) {
+        //        return;
+        //    }
 
-            context.ImportAttribute(part.PartDefinition.Name, "Approval", Approval =>
-                part.CommitOpinion = Approval
-            );
-        }
+        //    context.ImportAttribute(part.PartDefinition.Name, "Approval", Approval =>
+        //        part.CommitOpinion = Approval
+        //    );
+        //}
 
-        protected override void Exporting(ApprovalSupportPart part, ExportContentContext context) {
-            context.Element(part.PartDefinition.Name).SetAttributeValue("Approval", part.CommitOpinion);
-        }
+        //protected override void Exporting(ApprovalSupportPart part, ExportContentContext context) {
+        //    context.Element(part.PartDefinition.Name).SetAttributeValue("Approval", part.CommitOpinion);
+        //}
     }
 }
