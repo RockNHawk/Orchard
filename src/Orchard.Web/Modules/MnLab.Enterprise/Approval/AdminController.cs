@@ -114,6 +114,21 @@ namespace MnLab.Enterprise.Approval.Controllers {
         //}
 
 
+        public ActionResult Approve(int id, string returnUrl) {
+            var workContext = base.ControllerContext.GetWorkContext();
+            //var user = workContext.CurrentUser.As<UserPart>().Record;
+            _approvalService.Approve(workContext, id);
+            return Content("Approve");
+        }
+
+
+        public ActionResult Reject(int id, string returnUrl) {
+            var workContext = base.ControllerContext.GetWorkContext();
+          //  var user = workContext.CurrentUser.As<UserPart>().Record;
+            _approvalService.Reject(workContext, id);
+            return Content("Reject");
+        }
+
         [ActionName("Create")]
         [Orchard.Mvc.FormValueRequired("submit.Commit")]
         public ActionResult CreatePOST(string id, string returnUrl) {
@@ -126,10 +141,10 @@ namespace MnLab.Enterprise.Approval.Controllers {
 
             return CreatePOST(id, returnUrl, contentItem => {
                 var workContext = base.ControllerContext.GetWorkContext();
-                var commitUser = workContext.CurrentUser.As<UserPart>().Record;
-                _approvalService.CommmitApproval(base.ControllerContext.GetWorkContext(), new CreateApprovalCommand {
+                var user = workContext.CurrentUser.As<UserPart>().Record;
+                _approvalService.CommmitApproval(workContext, new CreateApprovalCommand {
                     ContentItem = contentItem,
-                    CommitBy = commitUser,
+                    CommitBy = user,
                     ApprovalType = ApprovalType.Creation,
                 });
             });
@@ -142,10 +157,10 @@ namespace MnLab.Enterprise.Approval.Controllers {
             return EditPOST(id, returnUrl, contentItem => {
                 //var approvalSupportPart = contentItem.As<ApprovalSupportPart>();
                 var workContext = base.ControllerContext.GetWorkContext();
-                var commitUser = workContext.CurrentUser.As<UserPart>().Record;
-                _approvalService.CommmitApproval(base.ControllerContext.GetWorkContext(), new CreateApprovalCommand {
+                var user = workContext.CurrentUser.As<UserPart>().Record;
+                _approvalService.CommmitApproval(workContext, new CreateApprovalCommand {
                     ContentItem = contentItem,
-                    CommitBy = commitUser,
+                    CommitBy = user,
                     ApprovalType = ApprovalType.Modification,
                 });
                 //if (!contentItem.Has<IPublishingControlAspect>() && !contentItem.TypeDefinition.Settings.GetModel<ContentTypeSettings>().Draftable)

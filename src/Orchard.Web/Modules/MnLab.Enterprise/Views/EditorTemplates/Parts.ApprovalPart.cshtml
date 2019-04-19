@@ -3,11 +3,28 @@
 @model ApprovalPart
 Parts.Approval
 
-@using (Script.Foot()) {
-<script>
+@using (Script.Foot())
+{
+    <script>
 
-    $("fieldset.save-button,fieldset.publish-button").remove();
+        $("fieldset.save-button,fieldset.publish-button").remove();
 
-  
-</script>
+
+    </script>
+
+    <script>
+        // alert('ApprovalSupport');
+        $("button[fn-form-action]").on("click", function () {
+            var form = this.form || $('form')[0];
+            // debugger
+            if (form) {
+                var btnAction = $(this).attr("fn-form-action");
+                var rawAction = $(form).attr("action");
+                $(form).attr("action", btnAction);
+                setTimeout(function () {
+                    $(form).attr("action", rawAction);
+                }, 10);
+            }
+        });
+    </script>
 }

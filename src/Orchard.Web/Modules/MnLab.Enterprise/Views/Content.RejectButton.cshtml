@@ -1,1 +1,10 @@
-﻿Content.RejectButton
+﻿@using Orchard.ContentManagement;
+@using Orchard.Core.Contents;
+@using Orchard.Utility.Extensions;
+@{
+    var contentItem = (IContent)Model.ContentItem;
+    //var basePath = WorkContext.CurrentSite.BaseUrl;
+}
+<fieldset class="approval-button">
+    <button fn-form-action="~/Admin/MnLab.Enterprise/Reject/@(contentItem.Id)" type="submit" name="submit.Commit" value="submit.Commit">@T("Reject")</button>
+</fieldset>

@@ -165,7 +165,6 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Approval\AdminController - Copy.cs" />
     <Compile Include="Approval\AdminController.cs" />
     <Compile Include="AdminMenu.cs" />
     <Compile Include="Approval\ApprovalSupportExtensions.cs" />
@@ -178,7 +177,7 @@
     <Compile Include="Approval\Core\ApprovalSwitch.cs" />
     <Compile Include="Approval\Core\ApprovalSwitchExntnsions.cs" />
     <Compile Include="Approval\Core\ApprovalTypes.cs" />
-    <Compile Include="Approval\Business\ContentRepository.cs" />
+    <Compile Include="Approval\Business\ContentPartRepository.cs" />
     <Compile Include="Approval\Business\ContentServiceBase.cs" />
     <Compile Include="Approval\Core\ContentActionEventArgs.cs" />
     <Compile Include="Approval\Core\CreationApprovalType.cs" />

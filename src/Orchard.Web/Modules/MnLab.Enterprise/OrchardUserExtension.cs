@@ -24,7 +24,9 @@ namespace Rhythm {
         }
 
         public static IEventTrace BeginTrace(this Orchard.WorkContext wc, IEvent @event) {
-            return null;
+            // return null;
+            //return new DisposableProxy(()=> { });
+            return new EventTrace<IEvent>(@event, new Rhythm.WorkContext());
         }
 
         public static DepartmentRecord Department(this UserPartRecord user1) {

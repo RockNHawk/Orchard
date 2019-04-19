@@ -18,7 +18,11 @@ namespace MnLab.Enterprise {
         }
 
         public TContentPart Get(int id) {
-            return _contentManager.Get(id).As<TContentPart>();
+            var part = _contentManager.Get<TContentPart>(id);
+            if (part.Record == null) {
+                part.Record = repository.Get(x => x.ContentItemRecord.Id == id);
+            }
+            return part;
         }
 
         public void Update(TContentPart obj) {

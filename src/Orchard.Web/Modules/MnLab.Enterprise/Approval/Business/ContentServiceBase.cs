@@ -106,15 +106,12 @@ namespace MnLab.Enterprise.Approval {
 
 
         IRepository<ApprovalSupportPartRecord> _approvalSupportRepos;
-        IRepository<ApprovalPartRecord> _ApprovalPartRecordRepos;
-        //readonly ContentRepository<ApprovalSupportPart> approvalSupportRepository;
-        readonly IContentPartRepository<ApprovalPart, ApprovalPartRecord> approvalRepository;
+        IRepository<ApprovalPartRecord> _approvalPartRecordRepos;
+        readonly IContentPartRepository<ApprovalPart, ApprovalPartRecord> _approvalRepository;
         readonly IRepository<ApprovalStepRecord> ApprovalStepRepository;
-        //readonly ContentRepository<ApprovalPart> approvalRepository;
-        //readonly ContentRepository<ApprovalStepPart> ApprovalStepRepository;
 
         public ContentApprovalService(
-         //   IContentPartRepository<ApprovalPart, ApprovalPartRecord> approvalRepository,
+            IContentPartRepository<ApprovalPart, ApprovalPartRecord> approvalRepository,
          //  ContentRepository<ApprovalStepRecord> ApprovalStepRepository,
          IRepository<ApprovalStepRecord> approvalStepRepository,
             IRepository<ApprovalPartRecord> approvalPartRecordRepos,
@@ -129,9 +126,8 @@ namespace MnLab.Enterprise.Approval {
         ICultureFilter cultureFilter) {
 
             this._approvalSupportRepos = approvalSupportRepos;
-            //this.approvalRepository = approvalRepository;
-            //this.approvalRepository = new ContentPartRepository<ApprovalPart>(contentManager);
-            this._ApprovalPartRecordRepos = approvalPartRecordRepos;
+            this._approvalRepository = approvalRepository;
+            this._approvalPartRecordRepos = approvalPartRecordRepos;
             this.ApprovalStepRepository = approvalStepRepository;
 
             Services = orchardServices;
@@ -535,6 +531,10 @@ namespace MnLab.Enterprise.Approval {
                 throw ValidationError("该内容已经提交审批，不能重复提交。");
             }
 
+            if (command.CommitBy == null) {
+                command.CommitBy = wc.User();
+            }
+
             ApprovalPart approval;
             if (ApprovalType.Creation.IsAssignableFrom(approvalType)) {
                 approval = CommmitCreationApproval(wc, command);
@@ -696,7 +696,7 @@ namespace MnLab.Enterprise.Approval {
             _contentManager.Create(approval, VersionOptions.Published);
             record.ContentItemRecord = approval.Record;
 
-            _ApprovalPartRecordRepos.Create(record);
+            _approvalPartRecordRepos.Create(record);
 
             var step = new ApprovalStepRecord() {
                 Approval = record,
@@ -774,11 +774,16 @@ namespace MnLab.Enterprise.Approval {
         /// <param name="comments">审批意见</param>
         [Rhythm.Transaction.Transactional]
         public virtual ApprovalPart Reject(Orchard.WorkContext wc, int approvalId, string comments) {
-            var approval = (ApprovalPart)approvalRepository.Get(approvalId);
+            var approval = GetApprovalPart(approvalId);
             if (approval == null) {
                 throw new ArgumentException(StringUtility.Format("给定的审批#{0}不存在", approvalId), nameof(approvalId));
             }
             return Reject(wc, approval, GetApprovalSwitch(), approval.CommitBy, wc.CurrentUser.As<UserPart>().Record, comments);
+        }
+
+        private ApprovalPart GetApprovalPart(int approvalId) {
+            // var part =  _contentManager.Get<ApprovalPart>(approvalId);
+            return _approvalRepository.Get(approvalId);
         }
 
         /// <summary>
@@ -981,10 +986,8 @@ namespace MnLab.Enterprise.Approval {
         /// <param name="approvalId">审批Id</param>
         [Rhythm.Transaction.Transactional]
         public virtual ApprovalPart Approve(Orchard.WorkContext wc, int approvalId) {
-            var approval = (ApprovalPart)approvalRepository.Get(approvalId);
-            if (approval == null) {
-                throw new ArgumentException(StringUtility.Format("给定的审批#{0}不存在", approvalId), nameof(approvalId));
-            }
+            var approval = GetApprovalPart(approvalId);
+            if (approval == null) throw new ArgumentException(StringUtility.Format("给定的审批#{0}不存在", approvalId), nameof(approvalId));
             return Approve(wc, approval, GetApprovalSwitch(), approval.CommitBy, wc.User());
         }
 
@@ -1035,7 +1038,11 @@ namespace MnLab.Enterprise.Approval {
                 if (currentStep.Seq + 1 == steps.Count) {
                     approval.CurrentStep = null;
                     SetApprove(approval, approvalUser, isAutoApprove ? autoApprovalDisabledMessage : null);
-                    approvalRepository.Update(approval);
+
+                    //approvalRepository.Update(approval);
+                    // var approval = GetApprovalPart(approvalId);
+                    _approvalPartRecordRepos.Update(approval.Record);
+
                     ApprovalStepRepository.Update(currentStep);
                     @event.IsCompleted = true;
                 }
@@ -1111,9 +1118,6 @@ namespace MnLab.Enterprise.Approval {
             }
             else if (ApprovalType.Deletion.IsAssignableFrom(approvalType)) {
                 //content.Draft = null;
-            }
-            else if (ApprovalType.Deletion.IsAssignableFrom(approvalType)) {
-                // !!Check
                 // content.IsDeleted = true;
             }
             else {
@@ -1207,10 +1211,6 @@ namespace MnLab.Enterprise.Approval {
             return false;
         }
 
-
-        public ApprovalPart GetApproval(int approvalId) {
-            return (ApprovalPart)approvalRepository.Get(approvalId);
-        }
 
         #endregion
 
