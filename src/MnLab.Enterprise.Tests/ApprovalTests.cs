@@ -124,7 +124,7 @@ namespace MnLab.Enterprise.Tests {
             });
 
 
-            approvalService.Approve(wk.Object,approval.Id);
+            approvalService.Approve(wk.Object, approval.Id, null);
 
 
             ClearSession();

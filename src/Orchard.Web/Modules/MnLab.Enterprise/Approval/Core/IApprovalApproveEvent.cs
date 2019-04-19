@@ -4,7 +4,7 @@ namespace MnLab.Enterprise.Approval {
         IApproval Approval { get; set; }
         ApprovalSwitch ApprovalSwitch { get; set; }
         UserPartRecord ApprovalUser { get; set; }
-        UserPartRecord CommitUser { get; set; }
+        //UserPartRecord CommitUser { get; set; }
         string Message { get; }
     }
 }

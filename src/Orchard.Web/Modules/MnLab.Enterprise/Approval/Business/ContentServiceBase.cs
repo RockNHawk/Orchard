@@ -778,31 +778,33 @@ namespace MnLab.Enterprise.Approval {
             if (approval == null) {
                 throw new ArgumentException(StringUtility.Format("给定的审批#{0}不存在", approvalId), nameof(approvalId));
             }
-            return Reject(wc, approval, GetApprovalSwitch(), approval.CommitBy, wc.CurrentUser.As<UserPart>().Record, comments);
-        }
 
-        private ApprovalPart GetApprovalPart(int approvalId) {
-            // var part =  _contentManager.Get<ApprovalPart>(approvalId);
-            return _approvalRepository.Get(approvalId);
-        }
+            //var isAutoApprove = false;
+            var approvalSwitch = GetApprovalSwitch();
+            var approvalUser = wc.User();
 
-        /// <summary>
-        /// 审批驳回
-        /// </summary>
-        /// <param name="approval">审批对象</param>
-        /// <param name="approvalSwitch">审批开关</param>
-        /// <param name="commitUser">提交用户</param>
-        /// <param name="approvalUser">审批用户</param>
-        /// <param name="comments">备注</param>
-        /// <returns>审批对象</returns>
-        [Rhythm.Transaction.Transactional]
-        public virtual ApprovalPart Reject(Orchard.WorkContext wc, ApprovalPart approval, ApprovalSwitch approvalSwitch, UserPartRecord commitUser, UserPartRecord approvalUser, string comments = null) {
-            if (approval == null) {
-                throw new ArgumentNullException(nameof(approval));
-            }
-            if (commitUser == null) {
-                throw new ArgumentNullException(nameof(commitUser));
-            }
+            //    return Reject(wc, approval, GetApprovalSwitch(), approval.CommitBy, wc.CurrentUser.As<UserPart>().Record, comments);
+            //}
+
+
+            ///// <summary>
+            ///// 审批驳回
+            ///// </summary>
+            ///// <param name="approval">审批对象</param>
+            ///// <param name="approvalSwitch">审批开关</param>
+            ///// <param name="commitUser">提交用户</param>
+            ///// <param name="approvalUser">审批用户</param>
+            ///// <param name="comments">备注</param>
+            ///// <returns>审批对象</returns>
+            //[Rhythm.Transaction.Transactional]
+            //public virtual ApprovalPart Reject(Orchard.WorkContext wc, ApprovalPart approval, ApprovalSwitch approvalSwitch, UserPartRecord commitUser, UserPartRecord approvalUser, string comments = null) {
+
+            //if (approval == null) {
+            //    throw new ArgumentNullException(nameof(approval));
+            //}
+            //if (commitUser == null) {
+            //    throw new ArgumentNullException(nameof(commitUser));
+            //}
             if (approvalUser == null) {
                 throw new ArgumentNullException(nameof(approvalUser));
             }
@@ -811,7 +813,7 @@ namespace MnLab.Enterprise.Approval {
                 Approval = approval,
                 ApprovalSwitch = approvalSwitch,
                 ApprovalUser = approvalUser,
-                CommitUser = commitUser,
+                //CommitUser = commitUser,
                 Comments = comments
             };
 
@@ -881,6 +883,11 @@ namespace MnLab.Enterprise.Approval {
         //    contentApproval.CurrentApproval = approval.Record;
         //    _approvalSupportRepos.Update(contentApproval.Record);
         //}
+
+        private ApprovalPart GetApprovalPart(int approvalId) {
+            // var part =  _contentManager.Get<ApprovalPart>(approvalId);
+            return _approvalRepository.Get(approvalId);
+        }
 
         private ApprovalSupportPart GetContentApprovalSupport(ContentItem content) {
             var contentApproval = content.As<ApprovalSupportPart>();
@@ -988,7 +995,7 @@ namespace MnLab.Enterprise.Approval {
         /// </summary>
         /// <param name="approvalId">审批Id</param>
         [Rhythm.Transaction.Transactional]
-        public virtual ApprovalPart Approve(Orchard.WorkContext wc, int approvalId,string AuditOpinion) {
+        public virtual ApprovalPart Approve(Orchard.WorkContext wc, int approvalId, string AuditOpinion) {
             var approval = GetApprovalPart(approvalId);
             if (approval == null) throw new ArgumentException(StringUtility.Format("给定的审批#{0}不存在", approvalId), nameof(approvalId));
             //    return Approve(wc, approval, GetApprovalSwitch(), approval.CommitBy, wc.User());

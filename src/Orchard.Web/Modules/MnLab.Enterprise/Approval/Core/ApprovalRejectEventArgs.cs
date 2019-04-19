@@ -31,10 +31,10 @@ namespace MnLab.Enterprise.Approval
         /// 审批开关
         /// </summary>
         public ApprovalSwitch ApprovalSwitch { get; set; }
-        /// <summary>
-        /// 此审批的提交者
-        /// </summary>
-        public UserPartRecord CommitUser { get; set; }
+        ///// <summary>
+        ///// 此审批的提交者
+        ///// </summary>
+        //public UserPartRecord CommitUser { get; set; }
         /// <summary>
         /// 此审批的审批者
         /// </summary>
