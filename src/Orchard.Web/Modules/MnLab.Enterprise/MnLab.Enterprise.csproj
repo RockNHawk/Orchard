@@ -218,6 +218,9 @@
     <Content Include="Views\Parts.ApprovalSupport_Summary.cshtml" />
     <Content Include="Views\Parts.ApprovalSupport_SummaryAdmin.cshtml" />
     <Content Include="Views\Content.CommitButton.cshtml" />
+    <Content Include="Views\EditorTemplates\Parts.ApprovalPart.cshtml" />
+    <Content Include="Views\Content.RejectButton.cshtml" />
+    <Content Include="Views\Content.ApproveButton.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
