@@ -12,8 +12,10 @@ using Autofac.Core;
 using Orchard.Layouts.Framework.Display;
 using Orchard.Environment.Configuration;
 using Orchard.Environment.ShellBuilders;
+using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval.Models;
 
-namespace MnLab.PdfVisualDesign {
+namespace MnLab.Enterprise {
 
     /// <summary>
     /// Where can I initialize AutoMapper mappings in an Orchard module?
@@ -22,11 +24,15 @@ namespace MnLab.PdfVisualDesign {
     public class OrchardShellEvents : IOrchardShellEvents {
 
         public OrchardShellEvents(IOrchardHost orchardHost, ShellSettings settings) {
- 
+
         }
 
         public void Activated() {
-           
+            Mapper.Initialize(cfg => {
+                cfg.CreateMap<ApprovalPartRecord, ApprovalPart>();
+                cfg.CreateMap<ApprovalPart, ApprovalPartRecord>();
+                cfg.CreateMap<ApprovalPartRecord, ApprovalPartRecord>();
+            });
         }
 
         public void Terminating() {

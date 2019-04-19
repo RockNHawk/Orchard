@@ -13,6 +13,7 @@ using MnLab.Enterprise.Approval;
 using System;
 using MnLab.Enterprise.Approval;
 using MnLab.Enterprise.Approval.Models;
+using Orchard.Users.Models;
 
 namespace MnLab.Enterprise.Approval {
     /// <summary>
@@ -38,11 +39,11 @@ namespace MnLab.Enterprise.Approval {
         /// <summary>
         /// 此审批的提交者
         /// </summary>
-        public Orchard.Security.IUser CommitUser { get; set; }
+        public UserPartRecord CommitUser { get; set; }
         /// <summary>
         /// 此审批的审批者
         /// </summary>
-        public Orchard.Security.IUser ApprovalUser { get; set; }
+        public UserPartRecord ApprovalUser { get; set; }
 
 
         /// <summary>

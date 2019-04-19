@@ -7,6 +7,7 @@ using Orchard.ContentManagement.Aspects;
 using System;
 using System.Collections.Generic;
 
+using Orchard.Users.Models;
 
 using Orchard;
 using Orchard.ContentManagement;
@@ -89,7 +90,7 @@ namespace MnLab.Enterprise.Approval.Models {
         /// <summary>
         /// 
         /// </summary>
-        public virtual IUser CommitBy { get; set; }
+        public virtual UserPartRecord CommitBy { get; set; }
 
         /// <summary>
         /// 
@@ -104,7 +105,7 @@ namespace MnLab.Enterprise.Approval.Models {
         /// <summary>
         /// 
         /// </summary>
-        public virtual IUser AuditBy { get; set; }
+        public virtual UserPartRecord AuditBy { get; set; }
 
         /// <summary>
         /// 总行审批员执行审批的时间

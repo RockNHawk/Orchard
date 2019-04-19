@@ -15,6 +15,7 @@ using Orchard.Data;
 using Orchard.Security;
 using MnLab.Enterprise.Approval;
 using MnLab.Enterprise.Approval.Models;
+using Orchard.Users.Models;
 
 namespace MnLab.Enterprise.Approval {
 
@@ -67,14 +68,14 @@ namespace MnLab.Enterprise.Approval {
         /// <summary>
         /// 提交人
         /// </summary>
-        public virtual IUser CommitBy { get { return Record.CommitBy; } set { Record.CommitBy = value; } }
+        public virtual UserPartRecord CommitBy { get { return Record.CommitBy; } set { Record.CommitBy = value; } }
         /// <summary>
         /// 提交审批时填写的消息（送审意见）
         /// </summary>
         public string CommitOpinion { get { return Record.CommitOpinion; } set { Record.CommitOpinion = value; } }
 
 
-        public virtual IUser AuditBy { get { return Record.AuditBy; } set { Record.AuditBy = value; } }
+        public virtual UserPartRecord AuditBy { get { return Record.AuditBy; } set { Record.AuditBy = value; } }
 
         /// <summary>
         /// 总行审批员执行审批的时间

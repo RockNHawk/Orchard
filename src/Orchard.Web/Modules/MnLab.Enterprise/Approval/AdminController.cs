@@ -36,6 +36,7 @@ using Orchard.Localization.Services;
 using Orchard.Core.Contents;
 using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;
+using Orchard.Users.Models;
 
 namespace MnLab.Enterprise.Approval.Controllers {
     //[Admin]
@@ -124,7 +125,13 @@ namespace MnLab.Enterprise.Approval.Controllers {
                 return new HttpUnauthorizedResult();
 
             return CreatePOST(id, returnUrl, contentItem => {
-                _approvalService.CommmitApproval(base.ControllerContext.GetWorkContext(), contentItem, ApprovalType.Creation);
+                var workContext = base.ControllerContext.GetWorkContext();
+                var commitUser = workContext.CurrentUser.As<UserPart>().Record;
+                _approvalService.CommmitApproval(base.ControllerContext.GetWorkContext(), new CreateApprovalCommand {
+                    ContentItem = contentItem,
+                    CommitBy = commitUser,
+                    ApprovalType = ApprovalType.Creation,
+                });
             });
         }
 
@@ -133,11 +140,14 @@ namespace MnLab.Enterprise.Approval.Controllers {
         public ActionResult EditPOST(int id, string returnUrl) {
 
             return EditPOST(id, returnUrl, contentItem => {
-
-                var approvalSupportPart = contentItem.As<ApprovalSupportPart>();
-
-                _approvalService.CommmitApproval(base.ControllerContext.GetWorkContext(), contentItem, ApprovalType.Modification);
-
+                //var approvalSupportPart = contentItem.As<ApprovalSupportPart>();
+                var workContext = base.ControllerContext.GetWorkContext();
+                var commitUser = workContext.CurrentUser.As<UserPart>().Record;
+                _approvalService.CommmitApproval(base.ControllerContext.GetWorkContext(), new CreateApprovalCommand {
+                    ContentItem = contentItem,
+                    CommitBy = commitUser,
+                    ApprovalType = ApprovalType.Modification,
+                });
                 //if (!contentItem.Has<IPublishingControlAspect>() && !contentItem.TypeDefinition.Settings.GetModel<ContentTypeSettings>().Draftable)
                 //    _contentManager.Publish(contentItem);
 

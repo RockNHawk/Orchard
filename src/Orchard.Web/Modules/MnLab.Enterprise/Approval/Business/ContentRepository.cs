@@ -6,7 +6,10 @@ using Orchard.ContentManagement.Records;
 using Orchard.Data;
 
 namespace MnLab.Enterprise {
-    public class ContentPartRepository<TContentPart, TRecord> : IDependency, IContentPartRepository<TContentPart, TRecord> where TContentPart : ContentPart<TRecord> {
+    public class ContentPartRepository<TContentPart, TRecord>
+        : IDependency, IContentPartRepository<TContentPart, TRecord>
+        where TContentPart : ContentPart<TRecord>
+        where TRecord : ContentPartRecord {
         IContentManager _contentManager;
         IRepository<TRecord> repository;
         public ContentPartRepository(IContentManager contentManager, IRepository<TRecord> repository) {
@@ -23,6 +26,7 @@ namespace MnLab.Enterprise {
         }
 
         public void Create(TContentPart obj) {
+            obj.Record.ContentItemRecord = obj.ContentItem.Record;
             repository.Create(obj.Record);
         }
     }

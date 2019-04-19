@@ -6,6 +6,7 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 
+using Orchard.Users.Models;
 
 using Orchard;
 using Orchard.ContentManagement;
@@ -403,60 +404,60 @@ namespace MnLab.Enterprise.Approval {
             }
         }
 
-        /// <summary>
-        /// 批量提交审批
-        /// </summary>
-        /// <param name="contentIds">审批 Id 集合</param>
-        public virtual void BatchCommitApproval(Orchard.WorkContext wc, int[] contentIds) {
-            if (contentIds == null || contentIds.Length == 0) {
-                return;
-            }
-            foreach (var contentId in contentIds.Distinct()) {
-                CommmitApproval(wc, contentId, null, false);
-            }
-        }
+        ///// <summary>
+        ///// 批量提交审批
+        ///// </summary>
+        ///// <param name="contentIds">审批 Id 集合</param>
+        //public virtual void BatchCommitApproval(Orchard.WorkContext wc, int[] contentIds) {
+        //    if (contentIds == null || contentIds.Length == 0) {
+        //        return;
+        //    }
+        //    foreach (var contentId in contentIds.Distinct()) {
+        //        CommmitApproval(wc, contentId, null, false);
+        //    }
+        //}
 
-        /// <summary>
-        /// 提交审批
-        /// </summary>
-        /// <param name="contentId">内容 Id</param>
-        /// <param name="actionType">内容动作</param>
-        /// <param name="isThrownIfValidateFail"></param>
-        /// <returns>审批对象</returns>
-        public ApprovalPart CommmitApproval(Orchard.WorkContext wc, int contentId, System.Type actionType = null, bool isThrownIfValidateFail = true) {
-            var content = _contentManager.Get(contentId);
-            if (content == null) {
-                throw ValidationEntityNotExistsError<ContentItem>(contentId);
-            }
-            //// 让 lazy load 的字段立即加载。否则，后面 content.Content = value 会无效，这不合理呀？
-            //contentRecordRepository.Update(content);
-            actionType = actionType ?? (content.GetCurrentVersion() == null ? ApprovalType.Creation : ApprovalType.Modification);
-            //if (content.Current == null && content.Draft == null)
-            //{
-            //    if (!isThrownIfValidateFail)
-            //    {
-            //        return null;
-            //    }
-            //    throw ValidationError(string.Format("内容 #{0} 未被修改，不能进行提交审批操作。"));
-            //}
-            if (ApprovalType.Creation.IsAssignableFrom(actionType)) {
-                if (content.GetDraftVersion(_contentManager) == null) {
-                    if (!isThrownIfValidateFail) {
-                        return null;
-                    }
-                    throw ValidationError(string.Format("内容 #{0} 没有草稿数据，不能进行新增提交审批操作。", content.Id));
-                }
-            }
-            else if (ApprovalType.Modification.IsAssignableFrom(actionType)) {
-                if (content.GetDraftVersion(_contentManager) == null) {
-                    if (!isThrownIfValidateFail) {
-                        return null;
-                    }
-                    throw ValidationError(string.Format("内容 #{0} 未被修改，不能进行编辑提交审批操作。", content.Id));
-                }
-            }
-            return approvalService.CommmitApproval(wc, content, actionType);
-        }
+        ///// <summary>
+        ///// 提交审批
+        ///// </summary>
+        ///// <param name="contentId">内容 Id</param>
+        ///// <param name="actionType">内容动作</param>
+        ///// <param name="isThrownIfValidateFail"></param>
+        ///// <returns>审批对象</returns>
+        //public ApprovalPart CommmitApproval(Orchard.WorkContext wc, int contentId, System.Type actionType = null, bool isThrownIfValidateFail = true) {
+        //    var content = _contentManager.Get(contentId);
+        //    if (content == null) {
+        //        throw ValidationEntityNotExistsError<ContentItem>(contentId);
+        //    }
+        //    //// 让 lazy load 的字段立即加载。否则，后面 content.Content = value 会无效，这不合理呀？
+        //    //contentRecordRepository.Update(content);
+        //    actionType = actionType ?? (content.GetCurrentVersion() == null ? ApprovalType.Creation : ApprovalType.Modification);
+        //    //if (content.Current == null && content.Draft == null)
+        //    //{
+        //    //    if (!isThrownIfValidateFail)
+        //    //    {
+        //    //        return null;
+        //    //    }
+        //    //    throw ValidationError(string.Format("内容 #{0} 未被修改，不能进行提交审批操作。"));
+        //    //}
+        //    if (ApprovalType.Creation.IsAssignableFrom(actionType)) {
+        //        if (content.GetDraftVersion(_contentManager) == null) {
+        //            if (!isThrownIfValidateFail) {
+        //                return null;
+        //            }
+        //            throw ValidationError(string.Format("内容 #{0} 没有草稿数据，不能进行新增提交审批操作。", content.Id));
+        //        }
+        //    }
+        //    else if (ApprovalType.Modification.IsAssignableFrom(actionType)) {
+        //        if (content.GetDraftVersion(_contentManager) == null) {
+        //            if (!isThrownIfValidateFail) {
+        //                return null;
+        //            }
+        //            throw ValidationError(string.Format("内容 #{0} 未被修改，不能进行编辑提交审批操作。", content.Id));
+        //        }
+        //    }
+        //    return approvalService.CommmitApproval(wc, content, actionType);
+        //}
 
         //public virtual ContentItem DirectEdit(Orchard.WorkContext wc, ContentEditEvent @event) {
         //    if (@event == null) {
@@ -490,13 +491,6 @@ namespace MnLab.Enterprise.Approval {
         //}
 
 
-        protected ApprovalPart CreateApproval(Orchard.WorkContext wc, ContentEvent @event, System.Type actionType) {
-            var content = @event.Content;
-            var approvalSwitch = (@event.Switch ?? GetApprovalSwitch());
-            var approval = (@event.IsUserImmediatelyCommit || approvalService.ShoultAotoCommit(@event.OperationUser, approvalSwitch))
-                ? approvalService.CommmitApproval(wc, content, actionType) : null;
-            return approval;
-        }
 
         public virtual string CanEdit(Orchard.WorkContext wc, IContent content) {
             var contentApproval = GetContentApprovalSupport(content.ContentItem);
@@ -523,28 +517,51 @@ namespace MnLab.Enterprise.Approval {
         /// 提交内容审批
         /// </summary>
         /// <param name="content">内容对象</param>
-        /// <param name="actionType">操作类型</param>
-        public virtual ApprovalPart CommmitApproval(Orchard.WorkContext wc, ContentItem content, System.Type actionType) {
-            if (content == null) {
-                throw new ArgumentNullException(nameof(content));
-            }
+        /// <param name="approvalType">操作类型</param>
+        public virtual ApprovalPart CommmitApproval(Orchard.WorkContext wc, CreateApprovalCommand command) {
+            if (command.ContentItem == null) throw new ArgumentNullException(nameof(command.ContentItem));
 
-            var commitUser = content.As<CommonPart>().Owner;
+            var content = command.ContentItem;
+            var approvalType = command.ApprovalType;
             //var commitUser = content.As<CommonPart>().Owner;
-            var approvalSwitch = GetApprovalSwitch();
 
-            if (ApprovalType.Creation.IsAssignableFrom(actionType)) {
-                return CommmitCreationApproval(wc, content, actionType, approvalSwitch, commitUser);
+            var approvalSwitch = command.Switch ?? (command.Switch = GetApprovalSwitch());
+
+
+            var contentApproval = GetContentApprovalSupport(content);
+            if (contentApproval.Status == ApprovalStatus.WaitingApproval) {
+                throw ValidationError("该内容已经提交审批，不能重复提交。");
             }
-            else if (ApprovalType.Modification.IsAssignableFrom(actionType)) {
-                return CommmitModificationApproval(wc, content, actionType, approvalSwitch, commitUser);
+
+            ApprovalPart approval;
+            if (ApprovalType.Creation.IsAssignableFrom(approvalType)) {
+                approval = CommmitCreationApproval(wc, command);
             }
-            else if (ApprovalType.Deletion.IsAssignableFrom(actionType)) {
-                return CommmitDeletionApproval(wc, content, actionType, approvalSwitch, commitUser);
+            else if (ApprovalType.Modification.IsAssignableFrom(approvalType)) {
+                approval = CommmitModificationApproval(wc, command);
+            }
+            else if (ApprovalType.Deletion.IsAssignableFrom(approvalType)) {
+                approval = CommmitDeletionApproval(wc, command);
             }
             else {
-                throw ValidationError(StringUtility.Format("不正确的自定义 {0}#{1}，自定义 {0} 应从审批流自带的中继承。", actionType.GetType().FullName, actionType));
+                throw ValidationError(StringUtility.Format("不正确的自定义 {0}#{1}，自定义 {0} 应从审批流自带的中继承。", approvalType.GetType().FullName, approvalType));
             }
+
+            contentApproval.Status = approval.Status;
+            contentApproval.ApprovalType = approval.ApprovalType;
+            //SetContentWaitingApproval(wc, content, command.ApprovalType);
+
+            //var approval = (@event.IsUserImmediatelyCommit || approvalService.ShoultAotoCommit(@event.OperationUser, approvalSwitch))
+            //    ? approvalService.CommmitApproval(wc, content, actionType) : null;
+            //return approval;
+            //}
+
+            // If Not On
+            //if (!approvalSwitch.IsOn()) {
+            //    Approve(wc, approval, approvalSwitch, commitUser, commitUser, true);
+            //}
+
+            return approval;
         }
 
         /// <summary>
@@ -554,31 +571,27 @@ namespace MnLab.Enterprise.Approval {
         /// <param name="approvalSwitch">审批开关</param>
         /// <param name="commitUser">提交人</param>
         /// <returns>审批对象</returns>
-        public virtual ApprovalPart CommmitCreationApproval(Orchard.WorkContext wc, ContentItem content, System.Type actionType, ApprovalSwitch approvalSwitch, IUser commitUser) {
-            if (content == null) {
-                throw new ArgumentNullException(nameof(content));
-            }
-            SetContentWaitingApproval(wc, content, actionType);
-            var contentType = content.ContentType;
-            var approval = new ApprovalPart {
-                Record = new ApprovalPartRecord(),
-                ApprovalType = actionType,
-                CommitDate = DateTime.Now,
-                CommitBy = commitUser,
-                ContentType = contentType,
-            };
-            approval.SetContent(content);
-            approval.SetContentOldVersion(null);
+        public virtual ApprovalPart CommmitCreationApproval(Orchard.WorkContext wc, CreateApprovalCommand command) {
+            //if (content == null) {
+            //    throw new ArgumentNullException(nameof(content));
+            //}
+            //var contentType = content.ContentType;
+            //var approval = new ApprovalPart {
+            //    Record = new ApprovalPartRecord(),
+            //    ApprovalType = actionType,
+            //    CommitDate = DateTime.Now,
+            //    CommitBy = commitUser,
+            //    ContentType = contentType,
+            //};
+            //approval.SetReferenceContent(content);
+            //approval.SetContentOldVersion(null);
 
+            var content = command.ContentItem;
             var draft = content.GetDraftVersion(_contentManager);
-            approval.SetContentNewVersion(draft);
-            CreateApproval(wc, approval, content, approvalSwitch, commitUser);
-
-            //approvalRepository.Flush();
-
-            NUnit.Framework.Assert.AreNotEqual(0, approval.Id);
-            return approval;
+            command.NewContentVersion = draft;
+            return CreateApproval(wc, command);
         }
+
 
         /// <summary>
         /// 提交内容 变更 审批
@@ -587,29 +600,19 @@ namespace MnLab.Enterprise.Approval {
         /// <param name="approvalSwitch">审批开关</param>
         /// <param name="commitUser">提交人</param>
         /// <returns>审批对象</returns>
-        public virtual ApprovalPart CommmitModificationApproval(Orchard.WorkContext wc, ContentItem content, System.Type actionType, ApprovalSwitch approvalSwitch, IUser commitUser) {
-            if (content == null) {
-                throw new ArgumentNullException(nameof(content));
-            }
-            if (content.GetDraftVersion(_contentManager) == null) {
-                throw new ArgumentNullException("content.GetDraftVersion(_contentManager)");
-            }
-            SetContentWaitingApproval(wc, content, actionType);
-            var contentType = content.ContentType;
-            var approval = new ApprovalPart {
-                Record = new ApprovalPartRecord(),
-                ApprovalType = actionType,
-                CommitDate = DateTime.Now,
-                CommitBy = wc.CurrentUser,
-                ContentType = contentType,
-            };
-            approval.SetContent(content);
+        public virtual ApprovalPart CommmitModificationApproval(Orchard.WorkContext wc, CreateApprovalCommand command) {
+            var content = command.ContentItem;
+            var draft = content.GetDraftVersion(_contentManager);
+            command.OldContentVersion = content.GetCurrentVersion();
+            command.NewContentVersion = content.GetDraftVersion(_contentManager);
+            return CreateApproval(wc, command);
 
-            approval.SetContentOldVersion(content.GetCurrentVersion());
-            approval.SetContentNewVersion(content.GetDraftVersion(_contentManager));
-            CreateApproval(wc, approval, content, approvalSwitch, commitUser);
-            NUnit.Framework.Assert.AreNotEqual(0, approval.Id);
-            return approval;
+            //approvalPart.SetReferenceContent(content);
+            //    approvalPart.SetContentOldVersion(content.GetCurrentVersion());
+            //    approvalPart.SetContentNewVersion(content.GetDraftVersion(_contentManager));
+            //    CreateApproval(wc, approvalPart, content, approvalSwitch, commitUser);
+            //    NUnit.Framework.Assert.AreNotEqual(0, approvalPart.Id);
+            //return approvalPart;
         }
 
         /// <summary>
@@ -619,23 +622,126 @@ namespace MnLab.Enterprise.Approval {
         /// <param name="approvalSwitch">审批开关</param>
         /// <param name="commitUser">提交人</param>
         /// <returns>审批对象</returns>
-        public virtual ApprovalPart CommmitDeletionApproval(Orchard.WorkContext wc, ContentItem content, System.Type actionType, ApprovalSwitch approvalSwitch, IUser commitUser) {
-            SetContentWaitingApproval(wc, content, actionType);
-            var approval = new ApprovalPart {
-                Record = new ApprovalPartRecord(),
-                ApprovalType = actionType,
-                CommitDate = DateTime.Now,
-                CommitBy = wc.CurrentUser,
-                ContentType = content.ContentType,
-            };
-            approval.SetContent(content);
+        public virtual ApprovalPart CommmitDeletionApproval(Orchard.WorkContext wc, CreateApprovalCommand command) {
+            var content = command.ContentItem;
+            var draft = content.GetDraftVersion(_contentManager);
+            command.OldContentVersion = content.GetCurrentVersion();
+            command.NewContentVersion = null;
+            return CreateApproval(wc, command);
+            //SetContentWaitingApproval(wc, content, actionType);
+            //var approvalPart = CreateApproval(new ApprovalPartRecord {
+            //    ApprovalType = actionType,
+            //    CommitDate = DateTime.Now,
+            //    CommitBy = commitUser,// wc.CurrentUser.As<UserPart>().Record,
+            //    ContentType = content.ContentType,
+            //    OldContentVersion = content.GetCurrentVersion(),
+            //    NewContentVersion = null,
+            //}, content);
 
-            approval.SetContentOldVersion(content.GetCurrentVersion());
-            approval.SetContentNewVersion(null);
-            CreateApproval(wc, approval, content, approvalSwitch, commitUser);
-            NUnit.Framework.Assert.AreNotEqual(0, approval.Id);
-            return approval;
+            ////approvalPart.SetContentOldVersion(content.GetCurrentVersion());
+            ////approvalPart.SetContentNewVersion(null);
+            ////CreateApproval(wc, approvalPart, content, approvalSwitch, commitUser);
+            //NUnit.Framework.Assert.AreNotEqual(0, approvalPart.Id);
+            //return approvalPart;
         }
+
+
+
+
+
+        /// <summary>
+        /// 创建审批对象
+        /// </summary>
+        /// <param name="approval">审批对象</param>
+        /// <param name="approvalSwitch">审批开关</param>
+        /// <param name="commitUser">提交用户</param>
+        public ApprovalPart CreateApproval(Orchard.WorkContext wc, CreateApprovalCommand command) {
+            var content = command.ContentItem;
+            var approvalSwitch = (command.Switch ?? GetApprovalSwitch());
+
+            var commitUser = command.CommitBy;
+            if (commitUser == null) throw new ArgumentNullException(nameof(command.CommitBy));
+
+            var status = ApprovalStatus.WaitingApproval;
+          
+            var record = new ApprovalPartRecord {
+                ContentRecord = content.Record,
+                ContentType = content.ContentType,
+                CommitBy = command.CommitBy,
+                Status = status,
+                CommitDate = DateTime.Now,
+                ApprovalType = command.ApprovalType,
+                OldContentVersion = command.OldContentVersion,
+                NewContentVersion = command.NewContentVersion,
+                Steps = new List<ApprovalStepRecord> {
+
+                },
+            };
+
+            var step = new ApprovalStepRecord() {
+                Approval = record,
+                Status = status,
+            };
+            record.CurrentStep = step;
+            record.Steps.Add(step);
+
+            // when new a content, maybe auto create the Record ? 
+            var approval = _contentManager.New("Approval");
+            var approvalPart = approval.As<ApprovalPart>();
+            AutoMapper.Mapper.Map(record, approvalPart.Record);
+            //approvalPart.Record = record;
+            //approvalPart.SetReferenceContent(content);
+
+            _contentManager.Create(approval, VersionOptions.Published);
+
+            UpdateCurrentApproval(content, approvalPart);
+
+            OnCreateApproval(approvalPart);
+
+            var steps = approvalPart.Steps;
+            NUnit.Framework.Assert.IsNotNull(steps);
+            NUnit.Framework.Assert.That(steps.Count > 0);
+            steps[0].Status = ApprovalStatus.WaitingApproval;
+
+
+            return approvalPart;
+        }
+
+
+        ///// <summary>
+        ///// 创建审批对象
+        ///// </summary>
+        ///// <param name="approval">审批对象</param>
+        ///// <param name="approvalSwitch">审批开关</param>
+        ///// <param name="commitUser">提交用户</param>
+        //[Rhythm.Transaction.Transactional]
+        //protected virtual void CreateApproval(Orchard.WorkContext wc, ApprovalPart approval, ContentItem content, ApprovalSwitch approvalSwitch, UserPartRecord commitUser) {
+        //    if (approval == null) {
+        //        throw new ArgumentNullException(nameof(approval));
+        //    }
+        //    if (commitUser == null) {
+        //        throw new ArgumentNullException(nameof(commitUser));
+        //    }
+        //    approval.Status = ApprovalStatus.WaitingApproval;
+
+        //    approvalRepository.Create(approval);
+
+        //    //var ContentRecord = approval.ContentRecord;
+        //    // var content = ContentRecord.GetContentItem(_contentManager);
+        //    UpdateCurrentApproval(content, approval);
+
+        //    OnCreateApproval(approval);
+        //    var steps = approval.Steps;
+        //    NUnit.Framework.Assert.IsNotNull(steps);
+        //    NUnit.Framework.Assert.That(steps.Count > 0);
+        //    steps[0].Status = ApprovalStatus.WaitingApproval;
+
+        //    // If Not On
+        //    if (!approvalSwitch.IsOn()) {
+        //        Approve(wc, approval, approvalSwitch, commitUser, commitUser, true);
+        //    }
+        //}
+
 
         #endregion
 
@@ -658,7 +764,7 @@ namespace MnLab.Enterprise.Approval {
             if (approval == null) {
                 throw new ArgumentException(StringUtility.Format("给定的审批#{0}不存在", approvalId), nameof(approvalId));
             }
-            return Reject(wc, approval, GetApprovalSwitch(), approval.CommitBy, wc.CurrentUser, comments);
+            return Reject(wc, approval, GetApprovalSwitch(), approval.CommitBy, wc.CurrentUser.As<UserPart>().Record, comments);
         }
 
         /// <summary>
@@ -671,7 +777,7 @@ namespace MnLab.Enterprise.Approval {
         /// <param name="comments">备注</param>
         /// <returns>审批对象</returns>
         [Rhythm.Transaction.Transactional]
-        public virtual ApprovalPart Reject(Orchard.WorkContext wc, ApprovalPart approval, ApprovalSwitch approvalSwitch, IUser commitUser, IUser approvalUser, string comments = null) {
+        public virtual ApprovalPart Reject(Orchard.WorkContext wc, ApprovalPart approval, ApprovalSwitch approvalSwitch, UserPartRecord commitUser, UserPartRecord approvalUser, string comments = null) {
             if (approval == null) {
                 throw new ArgumentNullException(nameof(approval));
             }
@@ -748,39 +854,7 @@ namespace MnLab.Enterprise.Approval {
         internal static void RejectContentChange(ContentItem content, System.Type actionType) {
         }
 
-        /// <summary>
-        /// 创建审批对象
-        /// </summary>
-        /// <param name="approval">审批对象</param>
-        /// <param name="approvalSwitch">审批开关</param>
-        /// <param name="commitUser">提交用户</param>
-        [Rhythm.Transaction.Transactional]
-        protected virtual void CreateApproval(Orchard.WorkContext wc, ApprovalPart approval, ContentItem content, ApprovalSwitch approvalSwitch, IUser commitUser) {
-            if (approval == null) {
-                throw new ArgumentNullException(nameof(approval));
-            }
-            if (commitUser == null) {
-                throw new ArgumentNullException(nameof(commitUser));
-            }
-            approval.Status = ApprovalStatus.WaitingApproval;
 
-            approvalRepository.Create(approval);
-
-            //var ContentRecord = approval.ContentRecord;
-            // var content = ContentRecord.GetContentItem(_contentManager);
-            UpdateCurrentApproval(content, approval);
-
-            OnCreateApproval(approval);
-            var steps = approval.Steps;
-            NUnit.Framework.Assert.IsNotNull(steps);
-            NUnit.Framework.Assert.That(steps.Count > 0);
-            steps[0].Status = ApprovalStatus.WaitingApproval;
-
-            // If Not On
-            if (!approvalSwitch.IsOn()) {
-                Approve(wc, approval, approvalSwitch, commitUser, commitUser, true);
-            }
-        }
 
         private void UpdateCurrentApproval(ContentItem content, ApprovalPart approval) {
             ApprovalSupportPart contentApproval = GetContentApprovalSupport(content);
@@ -900,7 +974,7 @@ namespace MnLab.Enterprise.Approval {
         /// <param name="isAutoApprove">是否自动审批</param>
         /// <returns>审批对象</returns>
         [Rhythm.Transaction.Transactional]
-        public virtual ApprovalPart Approve(Orchard.WorkContext wc, ApprovalPart approval, ApprovalSwitch approvalSwitch, IUser commitUser, IUser approvalUser, bool isAutoApprove = false) {
+        public virtual ApprovalPart Approve(Orchard.WorkContext wc, ApprovalPart approval, ApprovalSwitch approvalSwitch, UserPartRecord commitUser, UserPartRecord approvalUser, bool isAutoApprove = false) {
             if (approval == null) {
                 throw new ArgumentNullException(nameof(approval));
             }
@@ -978,7 +1052,7 @@ namespace MnLab.Enterprise.Approval {
         /// </summary>
         /// <param name="approval"></param>
         /// <param name="comments"></param>
-        void SetApprove(ApprovalPart approval, IUser approvalByUser, string comments = null) {
+        void SetApprove(ApprovalPart approval, UserPartRecord approvalByUser, string comments = null) {
 
             ValidateApproval(approval);
             Debug.Assert(approval.ContentType != null);
@@ -1046,31 +1120,31 @@ namespace MnLab.Enterprise.Approval {
             }
         }
 
-        /// <summary>
-        /// 验证被审批的内容的状态是否合法
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="actionType"></param>
-        void SetContentWaitingApproval(Orchard.WorkContext wc, ContentItem content, System.Type actionType) {
-            NUnit.Framework.Assert.IsNotNull(content.As<CommonPart>().Owner, "content.CreatedByUser is null");
-            NUnit.Framework.Assert.IsNotNull(wc.User(), "Orchard.WorkContext.User is null");
+        ///// <summary>
+        ///// 验证被审批的内容的状态是否合法
+        ///// </summary>
+        ///// <param name="content"></param>
+        ///// <param name="actionType"></param>
+        //void SetContentWaitingApproval(Orchard.WorkContext wc, ContentItem content, System.Type actionType) {
+        //    NUnit.Framework.Assert.IsNotNull(content.As<CommonPart>().Owner, "content.CreatedByUser is null");
+        //    NUnit.Framework.Assert.IsNotNull(wc.User(), "Orchard.WorkContext.User is null");
 
 
-            var contentApproval = GetContentApprovalSupport(content);
+        //    var contentApproval = GetContentApprovalSupport(content);
 
-            //if (content.ApprovalStatus == ApprovalStatus.Deleted)
-            //if (content.IsDeleted) {
-            //    throw ValidationError("该内容已被删除，不能提交审批。");
-            //}
-            if (contentApproval.Status == ApprovalStatus.WaitingApproval) {
-                throw ValidationError("该内容已经提交审批，不能重复提交。");
-            }
-            contentApproval.Status = ApprovalStatus.WaitingApproval;
-            contentApproval.ApprovalType = actionType;
+        //    //if (content.ApprovalStatus == ApprovalStatus.Deleted)
+        //    //if (content.IsDeleted) {
+        //    //    throw ValidationError("该内容已被删除，不能提交审批。");
+        //    //}
+        //    if (contentApproval.Status == ApprovalStatus.WaitingApproval) {
+        //        throw ValidationError("该内容已经提交审批，不能重复提交。");
+        //    }
+        //    contentApproval.Status = ApprovalStatus.WaitingApproval;
+        //    contentApproval.ApprovalType = actionType;
 
-            // !!Check
-            //RepositoryManager.Default.Of(content.GetContentRecordType()).Update(content);
-        }
+        //    // !!Check
+        //    //RepositoryManager.Default.Of(content.GetContentRecordType()).Update(content);
+        //}
 
         /// <summary>
         /// 抛出定义的审批状态验证异常
@@ -1095,7 +1169,7 @@ namespace MnLab.Enterprise.Approval {
         /// 自动提交
         /// </summary>
         /// <returns></returns>
-        public bool ShoultAotoCommit(IUser user) {
+        public bool ShoultAotoCommit(UserPartRecord user) {
             return ShoultAotoCommit(user, GetApprovalSwitch());
         }
 
@@ -1105,7 +1179,7 @@ namespace MnLab.Enterprise.Approval {
         /// <param name="approvalSwitch">审批开关</param>
         /// <param name="user">用户对象</param>
         /// <returns>是或者否</returns>
-        public bool ShoultAotoCommit(IUser user, ApprovalSwitch approvalSwitch) {
+        public bool ShoultAotoCommit(UserPartRecord user, ApprovalSwitch approvalSwitch) {
             return false;
         }
 

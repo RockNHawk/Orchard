@@ -1,4 +1,5 @@
 ﻿using Orchard.ContentManagement;
+using Orchard.Users.Models;
 using Rhythm;
 using System;
 
@@ -12,7 +13,7 @@ namespace MnLab.Enterprise.Approval.Models {
         public virtual DepartmentRecord Department { get; set; }
         public virtual ApprovalStatus Status { get; set; }
         public virtual string AuditOpinion { get; set; }
-        public virtual Orchard.Security.IUser CommentBy { get; set; }
+        public virtual UserPartRecord CommentBy { get; set; }
         public virtual DateTime? AuditDate { get; set; }
     }
 }
