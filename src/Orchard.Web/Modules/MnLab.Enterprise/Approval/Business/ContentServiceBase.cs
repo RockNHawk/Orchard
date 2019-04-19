@@ -759,13 +759,13 @@ namespace MnLab.Enterprise.Approval {
 
         #endregion
 
-        /// <summary>
-        /// 审批驳回
-        /// </summary>
-        /// <param name="approvalId">审批Id</param>
-        public virtual ApprovalPart Reject(Orchard.WorkContext wc, int approvalId) {
-            return Reject(wc, approvalId, null);
-        }
+        ///// <summary>
+        ///// 审批驳回
+        ///// </summary>
+        ///// <param name="approvalId">审批Id</param>
+        //public virtual ApprovalPart Reject(Orchard.WorkContext wc, int approvalId) {
+        //    return Reject(wc, approvalId, null);
+        //}
 
         /// <summary>
         /// 审批驳回
@@ -824,7 +824,7 @@ namespace MnLab.Enterprise.Approval {
                 if (approval.Status != ApprovalStatus.WaitingApproval) {
                     throw ValidationApprovalCommentsTypeIncorrectError(ApprovalStatus.WaitingApproval, approval.Status);
                 }
-                ValidateCurrentStep(currentStep);
+                ValidateCurrentStep(approval, currentStep);
                 ValidateDepartment(@event, trace, approvalUser.Department(), currentStep.Department);
 
 
@@ -846,9 +846,10 @@ namespace MnLab.Enterprise.Approval {
                     var content = ContentRecord.GetContentItem(_contentManager);
                     var contentApproval = GetContentApprovalSupport(content);
                     NUnit.Framework.Assert.IsNotNull(content);
-                    contentApproval.Status = ApprovalStatus.Rejected;
-                    contentApproval.ApprovalType = approval.ApprovalType;
+                    //contentApproval.Status = ApprovalStatus.Rejected;
+                    //contentApproval.ApprovalType = approval.ApprovalType;
                     contentApproval.AuditOpinion = comments;
+                    UpdateCurrentApproval(contentApproval, approval);
                     RejectContentChange(content, approval.ApprovalType);
 
                     // Orchard auto update content Object change to Dataabse?
@@ -897,12 +898,14 @@ namespace MnLab.Enterprise.Approval {
         }
 
         private void UpdateCurrentApproval(ApprovalSupportPart contentApproval, ApprovalPart approval) {
-            if (approval.Status == ApprovalStatus.Approved) {
-                contentApproval.Current = null;
-            }
-            else {
-                contentApproval.Current = approval.Record;
-            }
+            //if (approval.Status == ApprovalStatus.Approved) {
+            //    contentApproval.Current = null;
+            //}
+            //else {
+            //    contentApproval.Current = approval.Record;
+            //}
+            contentApproval.Current = approval.Record;
+
             contentApproval.Status = approval.Status;
             contentApproval.ApprovalType = approval.ApprovalType;
             // _approvalSupportRepos.Update(contentApproval.Record);
@@ -966,65 +969,64 @@ namespace MnLab.Enterprise.Approval {
         }
 
         /// <summary>
-        /// 批量审批通过
-        /// </summary>
-        public ApprovalPart[] BatchApprove(Orchard.WorkContext wc, int[] approvalIds) {
-            return Batch(wc, approvalIds, Approve);
-        }
+        ///// 批量审批通过
+        ///// </summary>
+        //public ApprovalPart[] BatchApprove(Orchard.WorkContext wc, int[] approvalIds) {
+        //    return Batch(wc, approvalIds, Approve);
+        //}
 
 
-        /// <summary>
-        /// 批量审批驳回
-        /// </summary>
-        public ApprovalPart[] BatchReject(Orchard.WorkContext wc, int[] approvalIds) {
-            return Batch(wc, approvalIds, Reject);
-        }
+        ///// <summary>
+        ///// 批量审批驳回
+        ///// </summary>
+        //public ApprovalPart[] BatchReject(Orchard.WorkContext wc, int[] approvalIds) {
+        //    return Batch(wc, approvalIds, Reject);
+        //}
 
         /// <summary>
         /// 审批通过
         /// </summary>
         /// <param name="approvalId">审批Id</param>
         [Rhythm.Transaction.Transactional]
-        public virtual ApprovalPart Approve(Orchard.WorkContext wc, int approvalId) {
+        public virtual ApprovalPart Approve(Orchard.WorkContext wc, int approvalId,string AuditOpinion) {
             var approval = GetApprovalPart(approvalId);
             if (approval == null) throw new ArgumentException(StringUtility.Format("给定的审批#{0}不存在", approvalId), nameof(approvalId));
-            return Approve(wc, approval, GetApprovalSwitch(), approval.CommitBy, wc.User());
-        }
+            //    return Approve(wc, approval, GetApprovalSwitch(), approval.CommitBy, wc.User());
+            //}
 
-        /// <summary>
-        /// 审批通过
-        /// </summary>
-        /// <param name="approval">审批对象</param>
-        /// <param name="approvalSwitch">审批开关</param>
-        /// <param name="commitUser">提交用户</param>
-        /// <param name="approvalUser">审批用户</param>
-        /// <param name="isAutoApprove">是否自动审批</param>
-        /// <returns>审批对象</returns>
-        [Rhythm.Transaction.Transactional]
-        public virtual ApprovalPart Approve(Orchard.WorkContext wc, ApprovalPart approval, ApprovalSwitch approvalSwitch, UserPartRecord commitUser, UserPartRecord approvalUser, bool isAutoApprove = false) {
-            if (approval == null) {
-                throw new ArgumentNullException(nameof(approval));
-            }
-            if (commitUser == null) {
-                throw new ArgumentNullException(nameof(commitUser));
-            }
-            if (approvalUser == null) {
-                throw new ArgumentNullException(nameof(approvalUser));
-            }
+            var isAutoApprove = false;
+            var approvalSwitch = GetApprovalSwitch();
+            var approvalUser = wc.User();
+
+
+            ///// <summary>
+            ///// 审批通过
+            ///// </summary>
+            ///// <param name="approval">审批对象</param>
+            ///// <param name="approvalSwitch">审批开关</param>
+            ///// <param name="commitUser">提交用户</param>
+            ///// <param name="approvalUser">审批用户</param>
+            ///// <param name="isAutoApprove">是否自动审批</param>
+            ///// <returns>审批对象</returns>
+            //[Rhythm.Transaction.Transactional]
+            //public virtual ApprovalPart Approve(Orchard.WorkContext wc, ApprovalPart approval, ApprovalSwitch approvalSwitch, UserPartRecord commitUser, UserPartRecord approvalUser, bool isAutoApprove = false) {
+            //if (approval == null) throw new ArgumentNullException(nameof(approval));
+            //if (commitUser == null) throw new ArgumentNullException(nameof(commitUser));
+            if (approvalUser == null) throw new ArgumentNullException(nameof(approvalUser));
+
             var steps = approval.Steps;
-
             var currentStep = approval.CurrentStep;
+            ValidateCurrentStep(approval, currentStep);
 
             var @event = new ApprovalApprove {
                 Approval = approval,
                 ApprovalSwitch = approvalSwitch,
                 ApprovalUser = approvalUser,
-                CommitUser = commitUser,
+                //CommitUser = commitUser,
                 Step = currentStep,
                 Date = DateTime.Now
             };
 
-            ValidateCurrentStep(currentStep);
             using (var trace = wc.BeginTrace(@event)) {
                 ValidateDepartment(@event, trace, approvalUser.Department(), currentStep.Department);
                 NUnit.Framework.Assert.AreNotEqual(0, approval.Id);
@@ -1054,13 +1056,16 @@ namespace MnLab.Enterprise.Approval {
                     ApprovalStepRepository.Update(currentStep);
                     ApprovalStepRepository.Update(nextStep);
                 }
-                // 发布审批通过事件
-                trace.Success();
+                //// 发布审批通过事件
+                //trace.Success();
             }
             return approval;
         }
 
-        private static void ValidateCurrentStep(ApprovalStepRecord currentStep) {
+        private static void ValidateCurrentStep(IApproval approval, ApprovalStepRecord currentStep) {
+            if (approval.Status != ApprovalStatus.WaitingApproval) {
+                throw new Exception(string.Format("approval.Status != ApprovalStatus.WaitingApproval, is: {0}", approval.Status));
+            }
             if (currentStep == null) {
                 throw new Exception("approval.CurrentStep is null");
             }
@@ -1069,12 +1074,14 @@ namespace MnLab.Enterprise.Approval {
             }
         }
 
-        static void ValidateDepartment(Event @event, IEventTrace trace, DepartmentRecord userDept, DepartmentRecord stepDept) {
-            if (userDept == null) {
-                throw trace.Error(new Exception("您没有所属部门，没有权限进行审批操作"));
-            }
-            else if (userDept.Id != stepDept.Id) {
-                throw trace.Error(new Exception(StringUtility.Format("您所属部门为 {0}，当前审批进程应由 {1} 进行审批。", userDept.Name, stepDept.Name)));
+        static void ValidateDepartment(Event @event, IDisposable trace, DepartmentRecord userDept, DepartmentRecord stepDept) {
+            if (stepDept != null) {
+                if (userDept == null) {
+                    throw trace.Error(new Exception("您没有所属部门，没有权限进行审批操作"));
+                }
+                else if (userDept.Id != stepDept.Id) {
+                    throw trace.Error(new Exception(StringUtility.Format("您所属部门为 {0}，当前审批进程应由 {1} 进行审批。", userDept.Name, stepDept.Name)));
+                }
             }
         }
 
@@ -1124,11 +1131,6 @@ namespace MnLab.Enterprise.Approval {
                 throw new InvalidOperationException("unsupported ApprovalType#" + approval.ApprovalType);
             }
 
-            //contentApproval.CurrentApproval = null;
-            //contentApproval.Status = ApprovalStatus.Approved;
-            //contentApproval.ApprovalType = approval.ApprovalType;
-            UpdateCurrentApproval(contentApproval, approval);
-
             // !!Check
             //contentRepository.Update(content);
 
@@ -1136,6 +1138,12 @@ namespace MnLab.Enterprise.Approval {
             approval.AuditDate = DateTime.Now;
             approval.AuditBy = approvalByUser;
             approval.Status = ApprovalStatus.Approved;
+
+            //contentApproval.CurrentApproval = null;
+            //contentApproval.Status = ApprovalStatus.Approved;
+            //contentApproval.ApprovalType = approval.ApprovalType;
+            UpdateCurrentApproval(contentApproval, approval);
+
         }
 
         /// <summary>

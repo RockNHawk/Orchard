@@ -13,7 +13,7 @@ Parts.ApprovalSupport
     {
         var contentManager = WorkContext.Resolve<IContentManager>();
         var repos = WorkContext.Resolve<IRepository<ApprovalSupportPartRecord>>();
-        approvalSupport.Record = repos.Table.SingleOrDefault(x => x.ContentItemRecord.Id == approvalSupport.ContentItem.Id);
+        approvalSupport.Record = repos.Get(x => x.ContentItemRecord.Id == approvalSupport.ContentItem.Id);
     }
     var status = approvalSupport.Status;
 }
@@ -21,12 +21,19 @@ Parts.ApprovalSupport
 {
     <div>当前内容正在等待审批，您不能编辑</div>
 }
+else if (status == ApprovalStatus.Rejected)
+{
+    <div>当前内容审批被驳回，原因：@(approvalSupport.AuditOpinion)</div>
+}
 @using (Script.Foot())
 {
+    <script>
+        $("fieldset.publish-button").remove();
+    </script>
     if (status == ApprovalStatus.WaitingApproval)
     {
         <script>
-            $("fieldset.save-button,fieldset.publish-button").remove();
+            $("fieldset.save-button").remove();
         </script>
     }
     else

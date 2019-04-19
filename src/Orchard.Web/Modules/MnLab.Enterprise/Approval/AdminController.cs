@@ -114,18 +114,18 @@ namespace MnLab.Enterprise.Approval.Controllers {
         //}
 
 
-        public ActionResult Approve(int id, string returnUrl) {
+        public ActionResult Approve(int id, string AuditOpinion, string returnUrl) {
             var workContext = base.ControllerContext.GetWorkContext();
             //var user = workContext.CurrentUser.As<UserPart>().Record;
-            _approvalService.Approve(workContext, id);
+            _approvalService.Approve(workContext, id, AuditOpinion);
             return Content("Approve");
         }
 
 
-        public ActionResult Reject(int id, string returnUrl) {
+        public ActionResult Reject(int id, string AuditOpinion, string returnUrl) {
             var workContext = base.ControllerContext.GetWorkContext();
           //  var user = workContext.CurrentUser.As<UserPart>().Record;
-            _approvalService.Reject(workContext, id);
+            _approvalService.Reject(workContext, id, AuditOpinion);
             return Content("Reject");
         }
 
