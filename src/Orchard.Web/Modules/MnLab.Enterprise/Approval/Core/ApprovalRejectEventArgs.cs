@@ -11,6 +11,7 @@
 using MnLab.Enterprise.Approval;
 using Orchard.Security;
 using Rhythm;
+using MnLab.Enterprise.Approval.Models;
 
 namespace MnLab.Enterprise.Approval
 {

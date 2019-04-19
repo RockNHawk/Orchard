@@ -12,6 +12,7 @@ using Rhythm;
 using MnLab.Enterprise.Approval;
 using System;
 using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval.Models;
 
 namespace MnLab.Enterprise.Approval {
     /// <summary>

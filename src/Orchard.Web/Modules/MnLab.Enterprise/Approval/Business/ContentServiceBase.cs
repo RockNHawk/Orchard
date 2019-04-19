@@ -48,6 +48,7 @@ using MnLab.Enterprise.Approval;
 using Rhythm;
 using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval.Models;
 
 namespace Rhythm {
 
@@ -103,15 +104,18 @@ namespace MnLab.Enterprise.Approval {
         private readonly ICultureFilter _cultureFilter;
 
 
-        //IRepository<ApprovalSupportPartRecord> _approvalSupportRepos;
-
+        IRepository<ApprovalSupportPartRecord> _approvalSupportRepos;
+        //readonly ContentRepository<ApprovalSupportPart> approvalSupportRepository;
+        readonly IContentPartRepository<ApprovalPart, ApprovalPartRecord> approvalRepository;
+        readonly IRepository<ApprovalStepRecord> ApprovalStepRepository;
         //readonly ContentRepository<ApprovalPart> approvalRepository;
         //readonly ContentRepository<ApprovalStepPart> ApprovalStepRepository;
 
         public ContentApprovalService(
-         //  ContentRepository<ApprovalPart> approvalRepository,
+           IContentPartRepository<ApprovalPart, ApprovalPartRecord> approvalRepository,
          //  ContentRepository<ApprovalStepRecord> ApprovalStepRepository,
          IRepository<ApprovalStepRecord> ApprovalStepRepository,
+              IRepository<ApprovalSupportPartRecord> approvalSupportRepos,
         IOrchardServices orchardServices,
             IContentManager contentManager,
             IContentDefinitionManager contentDefinitionManager,
@@ -119,13 +123,11 @@ namespace MnLab.Enterprise.Approval {
             ISiteService siteService,
             IShapeFactory shapeFactory,
             ICultureManager cultureManager,
-              IRepository<ApprovalSupportPartRecord> approvalSupportRepos,
         ICultureFilter cultureFilter) {
 
-
-            //this._approvalSupportRepos = approvalSupportRepos;
-            // this.approvalRepository = approvalRepository;
-            this.approvalRepository = new ContentRepository<ApprovalPart>(contentManager);
+            this._approvalSupportRepos = approvalSupportRepos;
+            this.approvalRepository = approvalRepository;
+            //this.approvalRepository = new ContentPartRepository<ApprovalPart>(contentManager);
             this.ApprovalStepRepository = ApprovalStepRepository;
 
             Services = orchardServices;
@@ -497,7 +499,7 @@ namespace MnLab.Enterprise.Approval {
         }
 
         public virtual string CanEdit(Orchard.WorkContext wc, IContent content) {
-            var contentApproval = content.As<ApprovalSupportPart>();
+            var contentApproval = GetContentApprovalSupport(content.ContentItem);
             if (contentApproval.Status == ApprovalStatus.WaitingApproval) {
                 return "此内容正在等待审批（" + contentApproval.GetApprovalTypeDisplayName() + "），因此您不能编辑";
             }
@@ -510,8 +512,7 @@ namespace MnLab.Enterprise.Approval {
         #region IApprovalService
 
 
-        readonly ContentRepository<ApprovalPart> approvalRepository;
-        readonly IRepository<ApprovalStepRecord> ApprovalStepRepository;
+
         //readonly ContentRepository<ApprovalStepRecord> ApprovalStepRepository;
         //readonly ApprovalRepository approvalRepository = ApprovalRepository.Instance;
         //  readonly IRepository<ApprovalStep> ApprovalStepRepository = RepositoryManager.Default.Of<ApprovalStep>();
@@ -571,7 +572,7 @@ namespace MnLab.Enterprise.Approval {
 
             var draft = content.GetDraftVersion(_contentManager);
             approval.SetContentNewVersion(draft);
-            CreateApproval(wc, approval, approvalSwitch, commitUser);
+            CreateApproval(wc, approval, content, approvalSwitch, commitUser);
 
             //approvalRepository.Flush();
 
@@ -606,7 +607,7 @@ namespace MnLab.Enterprise.Approval {
 
             approval.SetContentOldVersion(content.GetCurrentVersion());
             approval.SetContentNewVersion(content.GetDraftVersion(_contentManager));
-            CreateApproval(wc, approval, approvalSwitch, commitUser);
+            CreateApproval(wc, approval, content, approvalSwitch, commitUser);
             NUnit.Framework.Assert.AreNotEqual(0, approval.Id);
             return approval;
         }
@@ -631,7 +632,7 @@ namespace MnLab.Enterprise.Approval {
 
             approval.SetContentOldVersion(content.GetCurrentVersion());
             approval.SetContentNewVersion(null);
-            CreateApproval(wc, approval, approvalSwitch, commitUser);
+            CreateApproval(wc, approval, content, approvalSwitch, commitUser);
             NUnit.Framework.Assert.AreNotEqual(0, approval.Id);
             return approval;
         }
@@ -718,7 +719,7 @@ namespace MnLab.Enterprise.Approval {
                     //var content = approval.ContentRecord;
                     var ContentRecord = approval.ContentRecord;
                     var content = ContentRecord.GetContentItem(_contentManager);
-                    var contentApproval = content.As<ApprovalSupportPart>();
+                    var contentApproval = GetContentApprovalSupport(content);
                     NUnit.Framework.Assert.IsNotNull(content);
                     contentApproval.Status = ApprovalStatus.Rejected;
                     contentApproval.ApprovalType = approval.ApprovalType;
@@ -754,7 +755,7 @@ namespace MnLab.Enterprise.Approval {
         /// <param name="approvalSwitch">审批开关</param>
         /// <param name="commitUser">提交用户</param>
         [Rhythm.Transaction.Transactional]
-        protected virtual void CreateApproval(Orchard.WorkContext wc, ApprovalPart approval, ApprovalSwitch approvalSwitch, IUser commitUser) {
+        protected virtual void CreateApproval(Orchard.WorkContext wc, ApprovalPart approval, ContentItem content, ApprovalSwitch approvalSwitch, IUser commitUser) {
             if (approval == null) {
                 throw new ArgumentNullException(nameof(approval));
             }
@@ -763,10 +764,10 @@ namespace MnLab.Enterprise.Approval {
             }
             approval.Status = ApprovalStatus.WaitingApproval;
 
-            approvalRepository.Save(approval);
+            approvalRepository.Create(approval);
 
-            var ContentRecord = approval.ContentRecord;
-            var content = ContentRecord.GetContentItem(_contentManager);
+            //var ContentRecord = approval.ContentRecord;
+            // var content = ContentRecord.GetContentItem(_contentManager);
             UpdateCurrentApproval(content, approval);
 
             OnCreateApproval(approval);
@@ -781,17 +782,27 @@ namespace MnLab.Enterprise.Approval {
             }
         }
 
-        private void UpdateCurrentApproval(ContentItem content, ApprovalPart approval)
-        {
-            var contentApproval = content.As<ApprovalSupportPart>();
+        private void UpdateCurrentApproval(ContentItem content, ApprovalPart approval) {
+            ApprovalSupportPart contentApproval = GetContentApprovalSupport(content);
             contentApproval.CurrentApproval = approval.Record;
-            // _approvalSupportRepos.Update(contentApproval.Record);
+            _approvalSupportRepos.Update(contentApproval.Record);
         }
 
-        private void UpdateCurrentApproval2(ApprovalSupportPart contentApproval, ApprovalPart approval)
-        {
+        private ApprovalSupportPart GetContentApprovalSupport(ContentItem content) {
+            var contentApproval = content.As<ApprovalSupportPart>();
+            if (contentApproval.Record == null) {
+                var record = new ApprovalSupportPartRecord() {
+                    ContentItemRecord = content.Record,
+                };
+                _approvalSupportRepos.Create(record);
+                contentApproval.Record = record;
+            }
+            return contentApproval;
+        }
+
+        private void UpdateCurrentApproval2(ApprovalSupportPart contentApproval, ApprovalPart approval) {
             contentApproval.CurrentApproval = approval?.Record;
-           // _approvalSupportRepos.Update(contentApproval.Record);
+            // _approvalSupportRepos.Update(contentApproval.Record);
         }
 
         protected virtual void OnCreateApproval(ApprovalPart approval) {
@@ -989,7 +1000,7 @@ namespace MnLab.Enterprise.Approval {
             //IContent content = (IContent)contentRepository.Get(contentId);
             NUnit.Framework.Assert.IsNotNull(content != null);
 
-            var contentApproval = content.As<ApprovalSupportPart>();
+            var contentApproval = GetContentApprovalSupport(content);
 
             var approvalType = approval.ApprovalType;
             if (ApprovalType.Creation.IsAssignableFrom(approvalType) || ApprovalType.Modification.IsAssignableFrom(approvalType)) {
@@ -1045,14 +1056,7 @@ namespace MnLab.Enterprise.Approval {
             NUnit.Framework.Assert.IsNotNull(wc.User(), "Orchard.WorkContext.User is null");
 
 
-            var contentApproval = content.As<ApprovalSupportPart>();
-            if (contentApproval.Record == null) {
-                var record = new ApprovalSupportPartRecord() {
-                    ContentItemRecord = content.Record,
-                };
-               // _approvalSupportRepos.Create(record);
-                contentApproval.Record = record;
-            }
+            var contentApproval = GetContentApprovalSupport(content);
 
             //if (content.ApprovalStatus == ApprovalStatus.Deleted)
             //if (content.IsDeleted) {

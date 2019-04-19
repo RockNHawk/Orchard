@@ -4,33 +4,57 @@ using Orchard.Data.Migration;
 using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;
 using System;
+using MnLab.Enterprise.Approval.Models;
 
 namespace MnLab.Enterprise.Approval {
     public class Migrations : DataMigrationImpl {
 
         public int Create() {
 
+
+            SchemaBuilder.CreateTable(nameof(DepartmentRecord),
+                table => table
+                .Column<int>("Id", column => column.PrimaryKey().Identity())
+                .Column<string>(nameof(DepartmentRecord.Name))
+                );
+
+
             base.SchemaBuilder.CreateTable(nameof(ApprovalPartRecord),
               table =>
               MapApprovalInfo(table)
               .ContentPartRecord()
               // .Column<int>("Id", column => column.PrimaryKey().Identity())
-              .Column<int>(nameof(ApprovalPartRecord.CommitBy) + "_Id")
-              .Column<int>(nameof(ApprovalPartRecord.AuditBy) + "_Id")
-              .Column<int>(nameof(ApprovalPartRecord.ContentRecord) + "_Id")
-              .Column<int>(nameof(ApprovalPartRecord.OldContentVersion) + "_Id")
-              .Column<int>(nameof(ApprovalPartRecord.NewContentVersion) + "_Id")
+              .Column<int>(nameof(ApprovalPartRecord.CommitBy) + "_id")
+              .Column<int>(nameof(ApprovalPartRecord.AuditBy) + "_id")
+              .Column<int>(nameof(ApprovalPartRecord.ContentRecord) + "_id")
+              .Column<int>(nameof(ApprovalPartRecord.OldContentVersion) + "_id")
+              .Column<int>(nameof(ApprovalPartRecord.NewContentVersion) + "_id")
               .Column<string>(nameof(ApprovalPartRecord.ContentType))
               .Column<DateTime>(nameof(ApprovalPartRecord.AuditDate))
               .Column<DateTime>(nameof(ApprovalPartRecord.CommitDate))
               );
 
-            SchemaBuilder.CreateTable(nameof(RelationshipApprovalStepsRecord),
+
+            /// <summary>
+            /// Creating-1-n-and-n-n-relations
+            /// http://docs.orchardproject.net/en/latest/Documentation/Creating-1-n-and-n-n-relations/
+            /// </summary>
+            SchemaBuilder.CreateTable(nameof(ApprovalStepRecord),
               table => table
                   .Column<int>("Id", column => column.PrimaryKey().Identity())
-                  .Column<int>($"{nameof(RelationshipApprovalStepsRecord.ApprovalPartRecord)}_Id")
-                  .Column<int>($"{nameof(RelationshipApprovalStepsRecord.ApprovalStepRecord)}_Id")
+                  .Column<string>(nameof(ApprovalStepRecord.AuditOpinion))
+                  .Column<DateTime>(nameof(ApprovalStepRecord.AuditDate))
+                  .Column<int>($"{nameof(ApprovalStepRecord.Approval)}_id")
+                  .Column<int>($"{nameof(ApprovalStepRecord.CommentBy)}_id")
+                  .Column<int>($"{nameof(ApprovalStepRecord.Department)}_id")
               );
+
+            //SchemaBuilder.CreateTable(nameof(RelationshipApprovalStepsRecord),
+            //  table => table
+            //      .Column<int>("Id", column => column.PrimaryKey().Identity())
+            //      .Column<int>($"{nameof(RelationshipApprovalStepsRecord.ApprovalPartRecord)}_id")
+            //      .Column<int>($"{nameof(RelationshipApprovalStepsRecord.ApprovalStepRecord)}_id")
+            //  );
 
             ContentDefinitionManager.AlterPartDefinition(nameof(ApprovalPart), builder => builder
                 .Attachable()
@@ -41,7 +65,7 @@ namespace MnLab.Enterprise.Approval {
              table =>
              MapApprovalInfo(table)
              .ContentPartRecord()
-             .Column<int>(nameof(ApprovalSupportPartRecord.Latest) + "_Id")
+             .Column<int>(nameof(ApprovalSupportPartRecord.Latest) + "_id")
              );
 
             ContentDefinitionManager.AlterPartDefinition(nameof(ApprovalSupportPart), builder => builder

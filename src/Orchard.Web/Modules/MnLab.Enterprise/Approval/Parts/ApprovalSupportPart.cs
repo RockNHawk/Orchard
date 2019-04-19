@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using MnLab.Enterprise;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Aspects;
+using MnLab.Enterprise.Approval.Models;
 
 namespace MnLab.Enterprise.Approval {
     public class ApprovalSupportPart : ContentPart<ApprovalSupportPartRecord>, IApprovalInfo {

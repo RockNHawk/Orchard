@@ -3,7 +3,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MnLab.Enterprise.Approval
+namespace MnLab.Enterprise.Approval.Models
 {
     /// <summary>
     /// 部室实体

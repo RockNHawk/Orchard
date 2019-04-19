@@ -14,7 +14,7 @@ namespace Rhythm {
     public static class OrchardUserExtension {
 
         public static ContentItem GetContentItem(this ContentItemRecord record, IContentManager contentManager) {
-            return contentManager.Get(record.Id);
+            return contentManager.Get(record.Id, VersionOptions.AllVersions);
         }
 
         public static IUser User(this Orchard.WorkContext wc) {

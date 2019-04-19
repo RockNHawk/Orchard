@@ -14,6 +14,7 @@ using Orchard.Core;
 using Orchard.Data;
 using Orchard.Security;
 using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval.Models;
 
 namespace MnLab.Enterprise.Approval {
 

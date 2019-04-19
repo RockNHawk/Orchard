@@ -165,10 +165,11 @@
     <Compile Include="Approval\AdminController.cs" />
     <Compile Include="AdminMenu.cs" />
     <Compile Include="Approval\ApprovalSupportExtensions.cs" />
+    <Compile Include="Approval\Business\IContentPartRepository.cs" />
     <Compile Include="Approval\Core\ApprovalApproveEvent.cs" />
     <Compile Include="Approval\Core\ApprovalExtensions.cs" />
     <Compile Include="Approval\Core\ApprovalRejectEventArgs.cs" />
-    <Compile Include="Approval\Parts\ApprovalStep.cs" />
+    <Compile Include="Approval\Models\ApprovalStepRecord.cs" />
     <Compile Include="Approval\Core\ApprovalStatus.cs" />
     <Compile Include="Approval\Core\ApprovalSwitch.cs" />
     <Compile Include="Approval\Core\ApprovalSwitchExntnsions.cs" />
@@ -183,15 +184,16 @@
     <Compile Include="Approval\Core\IApprovalRejectEvent.cs" />
     <Compile Include="Approval\Core\ModificationApprovalType.cs" />
     <Compile Include="Approval\Core\NoneApprovalType.cs" />
+    <Compile Include="Approval\Models\RelationshipApprovalStepsRecord.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="Fw\Formats.cs" />
-    <Compile Include="Department\Department.cs" />
+    <Compile Include="Department\Models\Department.cs" />
     <Compile Include="Approval\Drivers\ApprovalPartDriver.cs" />
     <Compile Include="Approval\Drivers\ContentButtonDriver.cs" />
     <Compile Include="Fw\ServiceBase.cs" />
     <Compile Include="Approval\Migrations.cs" />
     <Compile Include="Approval\Parts\ApprovalPart.cs" />
-    <Compile Include="Approval\Parts\ApprovalSupportPartRecord.cs" />
+    <Compile Include="Approval\Models\ApprovalSupportPartRecord.cs" />
     <Compile Include="Approval\Parts\IApprovalInfo.cs" />
     <Compile Include="OrchardShellEvents.cs" />
     <Compile Include="OrchardUserExtension.cs" />
@@ -199,7 +201,8 @@
     <Compile Include="Approval\Drivers\ApprovalSupportPartDriver.cs" />
     <Compile Include="Approval\Handlers\TitlePartHandler.cs" />
     <Compile Include="Approval\Parts\ApprovalSupportPart.cs" />
-    <Compile Include="Approval\Parts\ApprovalPartRecord.cs" />
+    <Compile Include="Approval\Models\ApprovalPartRecord.cs" />
+    <Compile Include="EnterpriseModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Placement.info">
