@@ -106,6 +106,7 @@ namespace MnLab.Enterprise.Approval {
 
 
         IRepository<ApprovalSupportPartRecord> _approvalSupportRepos;
+        IRepository<ApprovalPartRecord> _ApprovalPartRecordRepos;
         //readonly ContentRepository<ApprovalSupportPart> approvalSupportRepository;
         readonly IContentPartRepository<ApprovalPart, ApprovalPartRecord> approvalRepository;
         readonly IRepository<ApprovalStepRecord> ApprovalStepRepository;
@@ -113,9 +114,10 @@ namespace MnLab.Enterprise.Approval {
         //readonly ContentRepository<ApprovalStepPart> ApprovalStepRepository;
 
         public ContentApprovalService(
-           IContentPartRepository<ApprovalPart, ApprovalPartRecord> approvalRepository,
+         //   IContentPartRepository<ApprovalPart, ApprovalPartRecord> approvalRepository,
          //  ContentRepository<ApprovalStepRecord> ApprovalStepRepository,
-         IRepository<ApprovalStepRecord> ApprovalStepRepository,
+         IRepository<ApprovalStepRecord> approvalStepRepository,
+            IRepository<ApprovalPartRecord> approvalPartRecordRepos,
               IRepository<ApprovalSupportPartRecord> approvalSupportRepos,
         IOrchardServices orchardServices,
             IContentManager contentManager,
@@ -127,9 +129,10 @@ namespace MnLab.Enterprise.Approval {
         ICultureFilter cultureFilter) {
 
             this._approvalSupportRepos = approvalSupportRepos;
-            this.approvalRepository = approvalRepository;
+            //this.approvalRepository = approvalRepository;
             //this.approvalRepository = new ContentPartRepository<ApprovalPart>(contentManager);
-            this.ApprovalStepRepository = ApprovalStepRepository;
+            this._ApprovalPartRecordRepos = approvalPartRecordRepos;
+            this.ApprovalStepRepository = approvalStepRepository;
 
             Services = orchardServices;
             _contentManager = contentManager;
@@ -527,7 +530,6 @@ namespace MnLab.Enterprise.Approval {
 
             var approvalSwitch = command.Switch ?? (command.Switch = GetApprovalSwitch());
 
-
             var contentApproval = GetContentApprovalSupport(content);
             if (contentApproval.Status == ApprovalStatus.WaitingApproval) {
                 throw ValidationError("该内容已经提交审批，不能重复提交。");
@@ -547,8 +549,10 @@ namespace MnLab.Enterprise.Approval {
                 throw ValidationError(StringUtility.Format("不正确的自定义 {0}#{1}，自定义 {0} 应从审批流自带的中继承。", approvalType.GetType().FullName, approvalType));
             }
 
-            contentApproval.Status = approval.Status;
-            contentApproval.ApprovalType = approval.ApprovalType;
+            UpdateCurrentApproval(contentApproval, approval);
+
+            //contentApproval.CurrentApproval = approval.Record;
+
             //SetContentWaitingApproval(wc, content, command.ApprovalType);
 
             //var approval = (@event.IsUserImmediatelyCommit || approvalService.ShoultAotoCommit(@event.OperationUser, approvalSwitch))
@@ -663,7 +667,10 @@ namespace MnLab.Enterprise.Approval {
             if (commitUser == null) throw new ArgumentNullException(nameof(command.CommitBy));
 
             var status = ApprovalStatus.WaitingApproval;
-          
+
+            var approval = _contentManager.New("Approval");
+
+
             var record = new ApprovalPartRecord {
                 ContentRecord = content.Record,
                 ContentType = content.ContentType,
@@ -674,9 +681,22 @@ namespace MnLab.Enterprise.Approval {
                 OldContentVersion = command.OldContentVersion,
                 NewContentVersion = command.NewContentVersion,
                 Steps = new List<ApprovalStepRecord> {
-
                 },
             };
+
+
+            var approvalPart = approval.As<ApprovalPart>();
+            // when new a content, maybe auto create the Record ? no, it's null
+            //AutoMapper.Mapper.Map(record, approvalPart.Record);
+            approvalPart.Record = record;
+            //NUnit.Framework.Assert.AreEqual(record.Steps, approvalPart.Steps);
+            //approvalPart.SetReferenceContent(content);
+
+            // must create to get ContentItemRecord
+            _contentManager.Create(approval, VersionOptions.Published);
+            record.ContentItemRecord = approval.Record;
+
+            _ApprovalPartRecordRepos.Create(record);
 
             var step = new ApprovalStepRecord() {
                 Approval = record,
@@ -685,23 +705,17 @@ namespace MnLab.Enterprise.Approval {
             record.CurrentStep = step;
             record.Steps.Add(step);
 
-            // when new a content, maybe auto create the Record ? 
-            var approval = _contentManager.New("Approval");
-            var approvalPart = approval.As<ApprovalPart>();
-            AutoMapper.Mapper.Map(record, approvalPart.Record);
-            //approvalPart.Record = record;
-            //approvalPart.SetReferenceContent(content);
-
-            _contentManager.Create(approval, VersionOptions.Published);
-
-            UpdateCurrentApproval(content, approvalPart);
-
-            OnCreateApproval(approvalPart);
-
-            var steps = approvalPart.Steps;
+            var steps = record.Steps;
             NUnit.Framework.Assert.IsNotNull(steps);
             NUnit.Framework.Assert.That(steps.Count > 0);
             steps[0].Status = ApprovalStatus.WaitingApproval;
+            foreach (var item in steps) {
+                ApprovalStepRepository.Create(step);
+            }
+
+
+
+            OnCreateApproval(approvalPart);
 
 
             return approvalPart;
@@ -856,26 +870,36 @@ namespace MnLab.Enterprise.Approval {
 
 
 
-        private void UpdateCurrentApproval(ContentItem content, ApprovalPart approval) {
-            ApprovalSupportPart contentApproval = GetContentApprovalSupport(content);
-            contentApproval.CurrentApproval = approval.Record;
-            _approvalSupportRepos.Update(contentApproval.Record);
-        }
+        //private void UpdateCurrentApproval(ContentItem content, ApprovalPart approval) {
+        //    ApprovalSupportPart contentApproval = GetContentApprovalSupport(content);
+        //    contentApproval.CurrentApproval = approval.Record;
+        //    _approvalSupportRepos.Update(contentApproval.Record);
+        //}
 
         private ApprovalSupportPart GetContentApprovalSupport(ContentItem content) {
             var contentApproval = content.As<ApprovalSupportPart>();
             if (contentApproval.Record == null) {
-                var record = new ApprovalSupportPartRecord() {
-                    ContentItemRecord = content.Record,
-                };
-                _approvalSupportRepos.Create(record);
+                var record = _approvalSupportRepos.Table.SingleOrDefault(x => x.ContentItemRecord.Id == content.Id);
+                if (record == null) {
+                    record = new ApprovalSupportPartRecord() {
+                        ContentItemRecord = content.Record,
+                    };
+                    _approvalSupportRepos.Create(record);
+                }
                 contentApproval.Record = record;
             }
             return contentApproval;
         }
 
-        private void UpdateCurrentApproval2(ApprovalSupportPart contentApproval, ApprovalPart approval) {
-            contentApproval.CurrentApproval = approval?.Record;
+        private void UpdateCurrentApproval(ApprovalSupportPart contentApproval, ApprovalPart approval) {
+            if (approval.Status == ApprovalStatus.Approved) {
+                contentApproval.Current = null;
+            }
+            else {
+                contentApproval.Current = approval.Record;
+            }
+            contentApproval.Status = approval.Status;
+            contentApproval.ApprovalType = approval.ApprovalType;
             // _approvalSupportRepos.Update(contentApproval.Record);
         }
 
@@ -1097,9 +1121,9 @@ namespace MnLab.Enterprise.Approval {
             }
 
             //contentApproval.CurrentApproval = null;
-            UpdateCurrentApproval2(contentApproval, null);
-            contentApproval.Status = ApprovalStatus.Approved;
-            contentApproval.ApprovalType = approval.ApprovalType;
+            //contentApproval.Status = ApprovalStatus.Approved;
+            //contentApproval.ApprovalType = approval.ApprovalType;
+            UpdateCurrentApproval(contentApproval, approval);
 
             // !!Check
             //contentRepository.Update(content);

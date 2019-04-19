@@ -12,7 +12,7 @@ namespace MnLab.Enterprise.Approval {
         public string AuditOpinion { get { return Record?.AuditOpinion; } set { Record.AuditOpinion = value; } }
         public ApprovalStatus Status { get { return Record?.Status ?? default(ApprovalStatus); } set { Record.Status = value; } }
         public Type ApprovalType { get { return Record?.ApprovalType; } set { Record.ApprovalType = value; } }
-        public ApprovalPartRecord CurrentApproval { get { return Record?.Latest; } set { Record.Latest = value; } }
+        public ApprovalPartRecord Current { get { return Record?.Current; } set { Record.Current = value; } }
 
         //public virtual string ApprovalComments { get; set; }
         //public virtual ApprovalStatus ApprovalStatus { get; set; }

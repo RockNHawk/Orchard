@@ -32,6 +32,6 @@ namespace MnLab.Enterprise.Approval.Models {
         public virtual string AuditOpinion { get; set; }
         public virtual ApprovalStatus Status { get; set; }
         public virtual Type ApprovalType { get; set; }
-        public virtual ApprovalPartRecord Latest { get; set; }
+        public virtual ApprovalPartRecord Current { get; set; }
     }
 }

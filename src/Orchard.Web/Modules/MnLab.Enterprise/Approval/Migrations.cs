@@ -29,7 +29,10 @@ namespace MnLab.Enterprise.Approval {
               .Column<int>(nameof(ApprovalPartRecord.ContentRecord) + "_id")
               .Column<int>(nameof(ApprovalPartRecord.OldContentVersion) + "_id")
               .Column<int>(nameof(ApprovalPartRecord.NewContentVersion) + "_id")
+              .Column<int>(nameof(ApprovalPartRecord.CurrentStep) + "_id")
+              .Column<int>(nameof(ApprovalPartRecord.CurrentStepDepartment) + "_id")
               .Column<string>(nameof(ApprovalPartRecord.ContentType))
+              .Column<string>(nameof(ApprovalPartRecord.Message))
               .Column<DateTime>(nameof(ApprovalPartRecord.AuditDate))
               .Column<DateTime>(nameof(ApprovalPartRecord.CommitDate))
               );
@@ -44,8 +47,10 @@ namespace MnLab.Enterprise.Approval {
                   .Column<int>("Id", column => column.PrimaryKey().Identity())
                   .Column<string>(nameof(ApprovalStepRecord.AuditOpinion))
                   .Column<DateTime>(nameof(ApprovalStepRecord.AuditDate))
+                  .Column<int>(nameof(ApprovalStepRecord.Seq))
+                  .Column<string>(nameof(ApprovalStepRecord.Status))
                   .Column<int>($"{nameof(ApprovalStepRecord.Approval)}_id")
-                  .Column<int>($"{nameof(ApprovalStepRecord.CommentBy)}_id")
+                  .Column<int>($"{nameof(ApprovalStepRecord.AuditBy)}_id")
                   .Column<int>($"{nameof(ApprovalStepRecord.Department)}_id")
               );
 
@@ -65,7 +70,7 @@ namespace MnLab.Enterprise.Approval {
              table =>
              MapApprovalInfo(table)
              .ContentPartRecord()
-             .Column<int>(nameof(ApprovalSupportPartRecord.Latest) + "_id")
+             .Column<int>(nameof(ApprovalSupportPartRecord.Current) + "_id")
              );
 
             ContentDefinitionManager.AlterPartDefinition(nameof(ApprovalSupportPart), builder => builder
@@ -81,7 +86,7 @@ namespace MnLab.Enterprise.Approval {
                 .Column<string>(nameof(IApprovalInfo.AuditOpinion), column => column.WithLength(1024))
                 // TODO: map type to string,map enum to int
                 .Column<string>(nameof(IApprovalInfo.ApprovalType), column => column.WithLength(1024))
-                .Column<int>(nameof(IApprovalInfo.Status));
+                .Column<string>(nameof(IApprovalInfo.Status));
         }
 
         //public int UpdateFrom1() {

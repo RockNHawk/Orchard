@@ -18,17 +18,17 @@ namespace MnLab.Enterprise.Approval.Models
 
         public virtual int Id { get; set; }
 
-        /// <summary>
-        /// 分行id
-        /// </summary>
-        [Display(Name = "分行id")]
-        public virtual int? BranchId { get; set; }
+        ///// <summary>
+        ///// 分行id
+        ///// </summary>
+        //[Display(Name = "分行id")]
+        //public virtual int? BranchId { get; set; }
 
-        /// <summary>
-        /// 排序
-        /// </summary>
-        [Display(Name = "序号")]
-        public virtual int SortOrder { get; set; }
+        ///// <summary>
+        ///// 排序
+        ///// </summary>
+        //[Display(Name = "序号")]
+        //public virtual int SortOrder { get; set; }
         /// <summary>
         /// 名称
         /// </summary>
