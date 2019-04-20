@@ -25,7 +25,7 @@ namespace MnLab.Enterprise {
 
         protected override void Load(ContainerBuilder builder) {
             //moduleBuilder.RegisterType<CustomElementDisplay >().As<IElementDisplay>();
-            builder.RegisterGeneric(typeof(ContentPartRepository<,>)).As(typeof(IContentPartRepository<,>));
+           // builder.RegisterGeneric(typeof(ContentPartRepository<,>)).As(typeof(IContentPartRepository<,>));
         }
 
     }
