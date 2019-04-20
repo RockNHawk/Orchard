@@ -186,6 +186,9 @@
     <TypeScriptCompile Include="Scripts\base\index.ts" />
     <TypeScriptCompile Include="Scripts\jquery.rhythm-ajax-form.config\index.ts" />
     <Content Include="Scripts\jquery.rhythm-ajax-form\index.css" />
+    <Content Include="Scripts\jquery.rhythm-ajax-form\debug.css" />
+    <Content Include="Scripts\ModalWindowEffects\index.css" />
+    <Content Include="Scripts\ModalWindowEffects\index.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

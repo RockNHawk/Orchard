@@ -6,7 +6,7 @@ using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Orchard.Data;
 
-namespace MnLab.Enterprise {
+namespace Drahcro.Data {
 
     public class ContentPartRecordRepository : IDependency {
         IContentManager _contentManager;

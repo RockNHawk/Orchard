@@ -6,21 +6,33 @@ using Rhythm.Globalization;
 using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using Orchard.ContentManagement;
+using Orchard.Localization;
 //using Microsoft.AspNetCore.Mvc;
 //using Microsoft.AspNetCore.Mvc.Filters;
 
 //public class AdvancedCriteriaDef {
 
 //}
-namespace Rhythm.Web
-{
+namespace Rhythm.Web {
     /// <summary>
     /// MVC Controller基类
     /// 添加Controller请继承此类
     /// </summary>
-    public class RhythmControllerBase : Controller
-    {
-        private int firstActionExecute;
+    public class RhythmControllerBase : Controller, IUpdateModel {
+
+
+
+        bool IUpdateModel.TryUpdateModel<TModel>(TModel model, string prefix, string[] includeProperties, string[] excludeProperties) {
+            return TryUpdateModel(model, prefix, includeProperties, excludeProperties);
+        }
+
+        void IUpdateModel.AddModelError(string key, LocalizedString errorMessage) {
+            ModelState.AddModelError(key, errorMessage.ToString());
+        }
+
+
+        //private int firstActionExecute;
 
         //protected override void OnActionExecuting(ActionExecutingContext context)
         //{
@@ -50,8 +62,7 @@ namespace Rhythm.Web
         //    await base.OnActionExecutionAsync(context, next);
         //}
 
-        protected virtual void OnInit(IContext context)
-        {
+        protected virtual void OnInit(IContext context) {
         }
 
         ///// <summary>
@@ -137,10 +148,8 @@ namespace Rhythm.Web
         /// 获取管理后台的配置信息
         /// </summary>
         //protected internal ManagementConfiguration Configuration { get { return managementConfiguration; } }
-        protected internal AjaxActionResult CreateAjaxResult()
-        {
-            return new AjaxActionResult(this.ControllerContext, this.ModelState)
-            {
+        protected internal AjaxActionResult CreateAjaxResult() {
+            return new AjaxActionResult(this.ControllerContext, this.ModelState) {
                 ItemsSerializerSettings = JsonUtility.Settings.CamelCase,
                 ModelStateSerializerSettings = JsonUtility.Settings.Default,
             };
@@ -151,8 +160,7 @@ namespace Rhythm.Web
         /// </summary>
         /// <param name="message">用于在用户界面上显示的提示消息</param>
         /// <returns>AjaxResult</returns>
-        protected internal AjaxActionResult AjaxResult(string message = null)
-        {
+        protected internal AjaxActionResult AjaxResult(string message = null) {
             return ModelState.IsValid ? CreateAjaxResult().Succeed(message) : CreateAjaxResult().Failure(message);
         }
 
@@ -161,8 +169,7 @@ namespace Rhythm.Web
         /// </summary>
         /// <returns>AjaxResult</returns>
         [Obsolete("请使用 Success 代替")]
-        protected internal AjaxActionResult AjaxSuccess()
-        {
+        protected internal AjaxActionResult AjaxSuccess() {
             return CreateAjaxResult().Succeed();
         }
 
@@ -172,8 +179,7 @@ namespace Rhythm.Web
         /// <param name="message">用于在用户界面上显示的提示消息</param>
         /// <returns>AjaxResult</returns>
         [Obsolete("请使用 Success 代替")]
-        protected internal AjaxActionResult AjaxSuccess(string message)
-        {
+        protected internal AjaxActionResult AjaxSuccess(string message) {
             return CreateAjaxResult().Succeed(message);
         }
 
@@ -182,8 +188,7 @@ namespace Rhythm.Web
         /// </summary>
         /// <returns>AjaxResult</returns>
         [Obsolete("请使用 Failure 代替")]
-        protected internal AjaxActionResult AjaxFailure()
-        {
+        protected internal AjaxActionResult AjaxFailure() {
             return CreateAjaxResult().Failure();
         }
 
@@ -193,8 +198,7 @@ namespace Rhythm.Web
         /// <param name="message">用于在用户界面上显示的提示消息</param>
         /// <returns>AjaxResult</returns>
         [Obsolete("请使用 Failure 代替")]
-        protected internal AjaxActionResult AjaxFailure(string message)
-        {
+        protected internal AjaxActionResult AjaxFailure(string message) {
             return CreateAjaxResult().Failure(message);
         }
 
@@ -203,8 +207,7 @@ namespace Rhythm.Web
         /// 表示当前操作执行成功
         /// </summary>
         /// <returns>AjaxResult</returns>
-        public AjaxActionResult Success()
-        {
+        public AjaxActionResult Done() {
             return CreateAjaxResult().Succeed();
         }
 
@@ -214,8 +217,7 @@ namespace Rhythm.Web
         /// </summary>
         /// <param name="message">用于在用户界面上显示的提示消息</param>
         /// <returns>AjaxResult</returns>
-        public AjaxActionResult Success(string message)
-        {
+        public AjaxActionResult Done(string message) {
             return CreateAjaxResult().Succeed(message);
         }
 
@@ -223,8 +225,7 @@ namespace Rhythm.Web
         /// 表示当前操作执行失败
         /// </summary>
         /// <returns>AjaxResult</returns>
-        public AjaxActionResult Failure()
-        {
+        public AjaxActionResult Fail() {
             return CreateAjaxResult().Failure();
         }
 
@@ -233,27 +234,23 @@ namespace Rhythm.Web
         /// </summary>
         /// <param name="message">用于在用户界面上显示的提示消息</param>
         /// <returns>AjaxResult</returns>
-        public AjaxActionResult Fail(string message)
-        {
+        public AjaxActionResult Fail(string message) {
             return CreateAjaxResult().Failure(message);
         }
 
-        protected internal AjaxActionResult AjaxRedirect(string url)
-        {
+        protected internal AjaxActionResult AjaxRedirect(string url) {
             return CreateAjaxResult().Succeed().RedirectUrl(url);
         }
 
         /// <param name="actionName">The name of the action method.</param>
-        protected internal AjaxActionResult AjaxRedirectAction(string actionName)
-        {
+        protected internal AjaxActionResult AjaxRedirectAction(string actionName) {
             return CreateAjaxResult().Succeed().RedirectUrl(Url.Action(actionName));
         }
 
         /// <param name="actionName">The name of the action method.</param>
         /// <param name="controllerName">The name of the controller.</param>
         /// <returns>AjaxResult</returns>
-        protected internal AjaxActionResult AjaxRedirectAction(string actionName, string controllerName)
-        {
+        protected internal AjaxActionResult AjaxRedirectAction(string actionName, string controllerName) {
             return CreateAjaxResult().Succeed().RedirectUrl(Url.Action(actionName, controllerName));
         }
 
@@ -267,13 +264,11 @@ namespace Rhythm.Web
         //    return new HttpUnauthorizedResult(statusDescription);
         //}
 
-        public ActionResult Error(string errorMessage)
-        {
-            return View("Error", (object) errorMessage);
+        public ActionResult Error(string errorMessage) {
+            return View("Error", (object)errorMessage);
         }
 
-        public ActionResult Error(Exception ex)
-        {
+        public ActionResult Error(Exception ex) {
             return View("Error", ex);
         }
 
@@ -419,8 +414,7 @@ namespace Rhythm.Web
         /// LocalizationManager is auto set by IOC
         /// </summary>
         //[FromServices]
-        public LocalizationManager LocalizationManager
-        {
+        public LocalizationManager LocalizationManager {
             get { return localizationManager; }
             set { localizationManager = value; }
         }
@@ -449,12 +443,9 @@ namespace Rhythm.Web
 
         Rhythm.Globalization.LocalizationProvider localizationProvider;
 
-        protected Rhythm.Globalization.LocalizationProvider LocalizationProvider
-        {
-            get
-            {
-                if (localizationProvider == null)
-                {
+        protected Rhythm.Globalization.LocalizationProvider LocalizationProvider {
+            get {
+                if (localizationProvider == null) {
                     localizationProvider =
                         new LocalizationProvider(LocalizationManager, this.GetType().GetNonProxyType());
                 }
@@ -464,8 +455,7 @@ namespace Rhythm.Web
             set { localizationProvider = value; }
         }
 
-        protected override void Dispose(bool disposing)
-        {
+        protected override void Dispose(bool disposing) {
             //_repositoryContext?.Dispose();
             //// set object to null to avoid memory leak (another outer out of controled Object keep this Object)
             //this.workContext = null;

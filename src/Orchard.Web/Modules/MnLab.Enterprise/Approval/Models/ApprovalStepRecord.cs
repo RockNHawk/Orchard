@@ -1,6 +1,6 @@
 ﻿using Orchard.ContentManagement;
 using Orchard.Users.Models;
-using Rhythm;
+using Rhythm;using Drahcro.Data;
 using System;
 
 namespace MnLab.Enterprise.Approval.Models {

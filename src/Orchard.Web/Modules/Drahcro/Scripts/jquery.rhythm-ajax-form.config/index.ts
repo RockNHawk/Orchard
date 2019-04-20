@@ -296,11 +296,12 @@ declare var ModalEffects;
         var form = this.form;
         if (form) {
             bindFormAsAjax(form, options);
+            options.isDisabled = true;
             $element.click(function (event) {
-              //  debugger
+                //  debugger
                 options.isDisabled = false;
                 setTimeout(function () {
-                 //   debugger
+                    //   debugger
                     options.isDisabled = true;
                 }, 1);
                 //$(form).submit();

@@ -1,6 +1,6 @@
 ﻿using Orchard.ContentManagement;
 
-namespace MnLab.Enterprise {
+namespace Drahcro.Data {
     public interface IContentPartRepository<TContentPart, TRecord> where TContentPart : ContentPart<TRecord> {
         void Create(TContentPart obj);
         TContentPart Get(int id);

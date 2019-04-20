@@ -279,6 +279,7 @@
         var form = this.form;
         if (form) {
             bindFormAsAjax(form, options);
+            options.isDisabled = true;
             $element.click(function (event) {
                 //  debugger
                 options.isDisabled = false;

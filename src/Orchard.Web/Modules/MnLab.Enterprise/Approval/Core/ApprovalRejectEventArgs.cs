@@ -10,7 +10,7 @@
 *************************************************/
 using MnLab.Enterprise.Approval;
 using Orchard.Security;
-using Rhythm;
+using Rhythm;using Drahcro.Data;
 using MnLab.Enterprise.Approval.Models;
 using Orchard.Users.Models;
 

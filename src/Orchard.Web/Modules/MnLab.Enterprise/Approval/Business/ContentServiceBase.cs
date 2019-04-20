@@ -1,4 +1,4 @@
-﻿using Rhythm;
+﻿using Rhythm;using Drahcro.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -46,7 +46,7 @@ using Orchard.Core.Contents;
 using MnLab.Enterprise.Approval;
 using MnLab.Enterprise.Approval;
 
-using Rhythm;
+using Rhythm;using Drahcro.Data;
 using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;
 using MnLab.Enterprise.Approval.Models;

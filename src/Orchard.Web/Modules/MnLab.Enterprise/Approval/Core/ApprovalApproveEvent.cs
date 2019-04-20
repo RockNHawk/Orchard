@@ -8,7 +8,7 @@
        Author: 
        Modification:  
 *************************************************/
-using Rhythm;
+using Rhythm;using Drahcro.Data;
 using MnLab.Enterprise.Approval;
 using System;
 using MnLab.Enterprise.Approval;
