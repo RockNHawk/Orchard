@@ -12,7 +12,7 @@
 
     Script.Include("ContentPicker.js");
     Style.Include("ContentPicker.css");
-    
+
 }
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -29,96 +29,107 @@
         $.extend({
             contentPicker: {}
         });
-            
+
         $.contentPicker.cannotPerformMsg="@T("Cannot perform requested operation")";
         $.contentPicker.accessDeniedMsg="@T("Authentication timed-out: please log-on again")";
         $.contentPicker.logonUrl="@Url.Action("LogOn", new { Controller = "Account", Area = "Orchard.Users" })";
     </script>
 
     @Display.ContentPickerNavigation()
-    
+
     <div class="content-picker-tab">
-    @Display(Model.Tab)
+        @Display(Model.Tab)
     </div>
 
-@using(Script.Foot()) {
-<script type="text/javascript">
-//<![CDATA[
-    $(".select").on("click", function () {
-        try {
-            debugger;
+    @using (Script.Foot())
+    {
+        <script type="text/javascript">
+            //<![CDATA[
+            $(".select").on("click", function () {
+                try {
+                    debugger;
 
 
 
-            var container = $(this).closest("[data-id]");
-            var result = {
-                id: container.data("id"),
-                displayText: container.data("display-text"),
-                editLink: container.data("edit-link"),
-                editUrl: container.data("edit-url"),
-                adminUrl: container.data("admin-url"),
-                displayLink: container.data("display-link"),
-                published: container.data("published"),
-            };
+                    var container = $(this).closest("[data-id]");
+                    var result = {
+                        id: container.data("id"),
+                        displayText: container.data("display-text"),
+                        editLink: container.data("edit-link"),
+                        editUrl: container.data("edit-url"),
+                        adminUrl: container.data("admin-url"),
+                        displayLink: container.data("display-link"),
+                        published: container.data("published"),
+                    };
 
-            var $$ = window.opener.jQuery;
-           // $$("#LayoutPart_LayoutEditor_TemplateId").find("option[value='" + container.data("id") + "']").attr("selected", true);
-            $$("#LayoutPart_LayoutEditor_TemplateId").val(container.data("id"));
-            $$("#LayoutPart_LayoutEditor_TemplateId").trigger('change');
+                    var field = getQueryString("field")
+                    if (field == "SpecificationTemplate") {
+
+                        var $$ = window.opener.jQuery;
+                        // $$("#LayoutPart_LayoutEditor_TemplateId").find("option[value='" + container.data("id") + "']").attr("selected", true);
+                        $$("#LayoutPart_LayoutEditor_TemplateId").val(container.data("id"));
+                        $$("#LayoutPart_LayoutEditor_TemplateId").trigger('change');
+
+                    }
 
 
+                    window.opener.jQuery[query("callback")](result);
+                    //console.log(result)
+                } catch (ex) {
+                    alert($.contentPicker.cannotPerformMsg);
+                    alert(ex);
+                }
+                window.close();
+                //alert(1);
+            });
 
-            window.opener.jQuery[query("callback")](result);
-            //console.log(result)
-        } catch (ex) {
-            alert($.contentPicker.cannotPerformMsg);
-            alert(ex);
-        }
-        window.close();
-        //alert(1);
-    });
+            $("ul a").each(function () {
+                var self = $(this);
+                var link = self.attr("href");
+                var url = link.split("?");
 
-    $("ul a").each(function () {
-        var self = $(this);
-        var link = self.attr("href");
-        var url = link.split("?");
+                // if the link doesn't define the "callback" query string, then append it
+                // n.b., pagers already append it
+                if (url.length == 1 || query("callback", "?" + url[1]).length == 0) {
+                    link = link + "?callback=" + query("callback");
+                    self.attr("href", link);
+                }
 
-        // if the link doesn't define the "callback" query string, then append it
-        // n.b., pagers already append it
-        if (url.length == 1 || query("callback", "?" + url[1]).length == 0) {
-            link = link + "?callback=" + query("callback");
-            self.attr("href", link);
-        }
-        
-        if (url.length == 1 || query("part", "?" + url[1]).length == 0) {
-            link = link + "&part=" + query("part");
-            self.attr("href", link);
-        }
+                if (url.length == 1 || query("part", "?" + url[1]).length == 0) {
+                    link = link + "&part=" + query("part");
+                    self.attr("href", link);
+                }
 
-        if (url.length == 1 || query("field", "?" + url[1]).length == 0) {
-            link = link + "&field=" + query("field");
-            self.attr("href", link);
-        }
-    });
-    
-    // get a querystring value
-    function query(name, querystring) {
-        name = name.toLowerCase();
-        var search = querystring || location.search;
-        var parts = search.replace("?", "").replace("#", "").split("&");
-        for (var i = 0, l = parts.length; i < l; i++) {
-            var part = parts[i];
-            var eqIndex = part.indexOf("=");
-            if (eqIndex !== -1 && part.substr(0, eqIndex).toLowerCase() === name) {
-                return part.substr(eqIndex + 1);
+                if (url.length == 1 || query("field", "?" + url[1]).length == 0) {
+                    link = link + "&field=" + query("field");
+                    self.attr("href", link);
+                }
+            });
+
+            // get a querystring value
+            function query(name, querystring) {
+                name = name.toLowerCase();
+                var search = querystring || location.search;
+                var parts = search.replace("?", "").replace("#", "").split("&");
+                for (var i = 0, l = parts.length; i < l; i++) {
+                    var part = parts[i];
+                    var eqIndex = part.indexOf("=");
+                    if (eqIndex !== -1 && part.substr(0, eqIndex).toLowerCase() === name) {
+                        return part.substr(eqIndex + 1);
+                    }
+                }
+
+                return [];
             }
-        }
-      
-        return [];
-    }
+            function getQueryString(name) {
+
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) return unescape(r[2]); return null;
+            }
 //]]>
-</script>
-}
+        </script>
+    }
 
     @Display.FootScripts()
 </body>

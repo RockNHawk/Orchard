@@ -456,7 +456,6 @@
     <Content Include="Views\Elements\Placeholder.cshtml" />
     <Content Include="Views\Elements\Placeholder.Design.cshtml" />
     <Content Include="Views\LayoutEditor.Template.Placeholder.cshtml" />
-    <Content Include="Views\NHProductManualTemplate.SummaryAdmin.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
