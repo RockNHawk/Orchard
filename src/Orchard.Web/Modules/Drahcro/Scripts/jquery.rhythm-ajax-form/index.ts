@@ -1,74 +1,13 @@
-﻿/**
+﻿"use strict";
+/**
  * jQuery plugin for posting form into iframe (support post input[type='file']).
  * author: laurel 664856248@qq.com
 **/
 
 /// <reference path="../jquery.d.ts" />
+/// <reference path="../base/index.ts" />
 
 module RhythmAjaxForm {
-
-
-    /** 
-    *  Base64 encode / decode 
-    *  @author haitao.tu 
-    *  @date   2010-04-26 
-    *  @email  tuhaitao@foxmail.com 
-    */
-    export class Base64Utility {
-        // private property  
-        static _keyStr: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-        // private method for UTF-8 decoding  
-        static _utf8_decode(utftext: String): string {
-            var str = "";
-            var i = 0;
-            while (i < utftext.length) {
-                var c = utftext.charCodeAt(i);
-                if (c < 128) {
-                    str += String.fromCharCode(c);
-                    i++;
-                } else if ((c > 191) && (c < 224)) {
-                    var c2 = utftext.charCodeAt(i + 1);
-                    str += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
-                    i += 2;
-                } else {
-                    var c2 = utftext.charCodeAt(i + 1);
-                    var c3 = utftext.charCodeAt(i + 2);
-                    str += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-                    i += 3;
-                }
-            }
-            return str;
-        }
-
-        // public method for decoding  
-        public static decode(input: String) {
-            var output = "";
-            var chr1, chr2, chr3;
-            var enc1, enc2, enc3, enc4;
-            var i = 0;
-            input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-            var keyStr = Base64Utility._keyStr;
-            while (i < input.length) {
-                enc1 = keyStr.indexOf(input.charAt(i++));
-                enc2 = keyStr.indexOf(input.charAt(i++));
-                enc3 = keyStr.indexOf(input.charAt(i++));
-                enc4 = keyStr.indexOf(input.charAt(i++));
-                chr1 = (enc1 << 2) | (enc2 >> 4);
-                chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-                chr3 = ((enc3 & 3) << 6) | enc4;
-                output = output + String.fromCharCode(chr1);
-                if (enc3 != 64) {
-                    output = output + String.fromCharCode(chr2);
-                }
-                if (enc4 != 64) {
-                    output = output + String.fromCharCode(chr3);
-                }
-            }
-            output = Base64Utility._utf8_decode(output);
-            return output;
-        }
-
-    }/* eof Base64Utility */
 
     export class ModelStateUtility {
         public static getValdationMsg($contanier: JQuery, key): JQuery {
@@ -129,7 +68,7 @@ module RhythmAjaxForm {
                 var key: string = modelStateKeys[i];
                 var $input = ModelStateUtility.getInput($contanier, key) || ModelStateUtility.getInput($doc, key);
                 var $valmsg = ModelStateUtility.getValdationMsg($contanier, key) || ModelStateUtility.getValdationMsg($doc, key);
-            debugger
+                debugger
 
                 if ($valmsg) {
                     $valmsg.html("").removeClass("field-validation-error");
@@ -225,7 +164,11 @@ module RhythmAjaxForm {
     //    success= 0,
     //    failure= 1
     //}
-    export interface AjaxOptions {
+    export interface AjaxFormOptions {
+        disabled?: boolean,
+        callbacks?: AjaxCallbacks,
+    }
+    export interface AjaxCallbacks {
         //target?: HTMLIFrameElement;
         submit?: (context: AjaxContext) => void;
         lock?: (isLock: boolean, context: AjaxContext) => void;
@@ -243,7 +186,7 @@ module RhythmAjaxForm {
         contentDocument?: Document;
         //contentType?: string;
         statusCode?: StatusCodes;
-        operationStatus? ;
+        operationStatus?;
         message?: string;
         redirect?: string;
         messageShowTime?: Number;
@@ -255,7 +198,7 @@ module RhythmAjaxForm {
         target: HTMLIFrameElement;
         form: HTMLFormElement;
         url: string;
-        options: AjaxOptions;
+        options: AjaxFormOptions;
         response?: AjaxResponse;
     }
 
@@ -272,9 +215,9 @@ module RhythmAjaxForm {
             //    "succeed": true, "operationStatus": "success", "message": "保存成功", "redirect": "/"
             //};
             //try {
-            var respJson: AjaxResponse = responseContextText ? Utility.parseJSON(responseContextText) : {};
-            respJson.modelState = respJson.modelState && respJson.modelState.length ? Utility.parseJSON(Base64Utility.decode(respJson.modelState)) : null;
-            respJson.datas = respJson.datas && respJson.datas.length ? Utility.parseJSON(Base64Utility.decode(respJson.datas)) : null;
+            var respJson: AjaxResponse = responseContextText ? Drahcro.ObjectUtility.parseJSON(responseContextText) : {};
+            respJson.modelState = respJson.modelState && respJson.modelState.length ? Drahcro.ObjectUtility.parseJSON(Drahcro.Base64Utility.decode(respJson.modelState)) : null;
+            respJson.datas = respJson.datas && respJson.datas.length ? Drahcro.ObjectUtility.parseJSON(Drahcro.Base64Utility.decode(respJson.datas)) : null;
             $.extend(resp, respJson.datas);/* 为了兼容之前的代码 */
             $.extend(resp, respJson);
             //} catch (e) {
@@ -293,46 +236,10 @@ module RhythmAjaxForm {
             return resp;
         }
 
-        public static stringFormat(format: String, ...args: String[]): String {
-            for (var i = 0; i < args.length; i++) {
-                var reg = new RegExp("\\{" + (i - 1) + "\\}", "ig");
-                format = format.replace(reg, args[i] + "");
-            }
-            return format;
-        }
         //public static isErrorResponse(responseContent: String): Boolean {
         //  return responseContent && responseContent.length && responseContent.trim().indexOf("<!DOCTYPE html>") == 0
         //}
-        /** 
-        *  判断一个对象是不是json
-        */
-        public static isJson(obj): Boolean {
-            return typeof (obj) == "object" && Object.prototype.toString.call(obj).toLowerCase() == "[object object]" && !obj.length;
-        }
-        /// <summary>
-        /// 转换成JSON
-        /// </summary>
-        public static parseJSON(text) {
-            if (Utility.isJson(text)) { return text; }
-            try { return $.parseJSON(text); } catch (e) { return eval("(" + text + ")"); }
-        }
-        public static htmlDecode(str): String {
-            return str ? str.replace(/&gt;/g, "&").replace(/&lt;/g, "<")
-                .replace(/&gt;/g, ">").replace(/&nbsp;/g, " ")
-                .replace(/'/g, "\'").replace(/&quot;/g, "\"")
-                .replace("&#39;", "'") : "";
-        }
-        public static combineObject(target: any, obj1: any): any {
-            if (!target) { return obj1; }
-            if (target == obj1) { return target; }
-            for (var key in obj1) {
-                target[key] = obj1[key];
-            }
-            return target;
-        }
-        public static parseAjaxOptions(str: String): AjaxOptions {
-            return Utility.parseJSON(str);
-        }
+
         public static createIframe(id): JQuery {
             return $('<iframe id="' + id + '" name="' + id + '" class="rhythm-ajax-iframe" style="display:none"  src="javascript:void(0)" />').appendTo("body");
             ////return $('<iframe id="' + id + '" name="' + id + '" class="rhythm-ajax-iframe" style="display:none"  src="http://120.55.76.16:8011/CrossDomainProxy.aspx" />').appendTo("body");
@@ -369,14 +276,15 @@ module RhythmAjaxForm {
     /**
     * 默认的服务器返回结果处理程序，外部也可以自定义、替换处理程序。
     */
-    export class Handler {
+    export class Handler implements AjaxCallbacks {
 
         public static cancel(context: AjaxContext) {
             var args = arguments;
             var options = context.options;
+            var callbacks = options && options.callbacks;
             try {
-                if (options && options.cancel) {
-                    options.cancel.apply(this, args);
+                if (callbacks && callbacks.cancel) {
+                    callbacks.cancel.apply(this, args);
                 }
             } finally {
                 Handler.dispose.apply(this, [context]);
@@ -404,11 +312,13 @@ module RhythmAjaxForm {
             }
         }
         public static dispose(context: AjaxContext) {
-            if (Utility.isRequireLock(context.options.lock)) {
-                context.options.lock.apply(this, [false, context]);
+            var options = context.options;
+            var callbacks = options && options.callbacks;
+            if (Utility.isRequireLock(callbacks.lock)) {
+                callbacks.lock.apply(this, [false, context]);
             }
-            if (context.options && context.options.dispose) {
-                context.options.dispose.apply(this, arguments);
+            if (callbacks && callbacks.dispose) {
+                callbacks.dispose.apply(this, arguments);
             }
             if ($.fn.ajaxForm.current == context) {
                 $.fn.ajaxForm.current = null;
@@ -419,20 +329,21 @@ module RhythmAjaxForm {
             var resp: AjaxResponse = context.response;
             if (resp.customHtml) {
                 // TODO: 服务端应该base64 编码一下 html code 再传输， 因为 html code 中可能存在意外符号
-                $(document.body).append(Base64Utility.decode(resp.customHtml));
+                $(document.body).append(Drahcro.Base64Utility.decode(resp.customHtml));
             }
 
             var form: HTMLFormElement = context.form;
-            var opt = context.options || {};
+            var options = context.options;// || {};
+            var callbacks = (options && options.callbacks) || {};
             var resp: AjaxResponse = context.response;
             var args = [resp, context];
 
             Handler.load.apply(form, args);
-            if (opt.load) {
-                opt.load.apply(form, args);
+            if (callbacks.load) {
+                callbacks.load.apply(form, args);
             }
 
-            if (!opt.showModelState || opt.showModelState.apply(form, args)) {
+            if (!callbacks.showModelState || callbacks.showModelState.apply(form, args)) {
                 // 处理 MVC 返回的 ModelState 验证信息。
                 ModelStateUtility.showModelState.apply(form, args);
             }
@@ -443,8 +354,8 @@ module RhythmAjaxForm {
                     switch (resp.operationStatus) {
                         case OperationStatus.success:
                             Handler.success.apply(form, args);
-                            if (opt.success) {
-                                opt.success.apply(form, args);
+                            if (callbacks.success) {
+                                callbacks.success.apply(form, args);
                             }
                             if (resp.redirect) {
                                 setTimeout(function () {
@@ -464,24 +375,24 @@ module RhythmAjaxForm {
                         case OperationStatus.failure:
                         default:
                             Handler.failure.apply(form, args);
-                            if (opt.failure) {
-                                opt.failure.apply(form, args);
+                            if (callbacks.failure) {
+                                callbacks.failure.apply(form, args);
                             }
                             break;
                     }
                     break;
                 case StatusCodes.unauthorized:
                     Handler.unauthorized.apply(form, args);
-                    if (opt.unauthorized) {
-                        opt.unauthorized.apply(form, args);
+                    if (callbacks.unauthorized) {
+                        callbacks.unauthorized.apply(form, args);
                     }
                     break;
                 // 服务器内部错误
                 case StatusCodes.internalServerError:
                 default:
                     Handler.error.apply(form, args);
-                    if (opt.error) {
-                        opt.error.apply(form, args);
+                    if (callbacks.error) {
+                        callbacks.error.apply(form, args);
                     }
                     break;
             }
@@ -495,156 +406,11 @@ module RhythmAjaxForm {
 
         //var historyLength = 0;
 
-        $.fn.ajaxForm = function (options: AjaxOptions) {
+        $.fn.ajaxForm = function (options: AjaxFormOptions) {
             var $els = this;
             for (var i = 0; i < $els.length; i++) {
                 var form: HTMLFormElement = $els[i];
-                var $form = $(form);
-
-                $("<input value='XMLHttpRequest' name='X-Requested-With' type='hidden' /><input value='RhythmAjaxForm' name='X-Requested-With-Rhythm-Ajax-Form' type='hidden' />").appendTo($form);
-
-                // 获取自定义 options 
-                var inlineOptionsAttr = $form.attr("on-ajax") || $form.attr("data-ajax");
-                var inlineOptions: AjaxOptions = inlineOptionsAttr ? Utility.parseAjaxOptions(Utility.htmlDecode(inlineOptionsAttr)) : null;
-                options = options ? (inlineOptions ? Utility.combineObject(options, inlineOptions) : options) : {};
-                $form.data("ajax.options", options);
-                (<any>form).ajaxOptions = options;
-
-                //var targetSelector = (form.target ? "#" + form.target : null) || options.target;
-                //var $target: JQuery = targetSelector ? $(targetSelector) : Utility.createIframe("rhythm-ajax-from-iframe-" + $.now());
-
-                var $target: JQuery = Utility.createIframe("rhythm-ajax-from-iframe-" + $.now());
-                var target: HTMLIFrameElement = <any>($target[0]);
-                form.target = target.id;
-
-
-                //window.onpopstate = function () {
-                //    alert(1);
-                //}
-                //$(window).on("popstate", function (e) {
-                //    debugger
-                //    historyLength++;
-                //});
-                // Submit listener.
-                $form.submit(function () {
-                    var form: HTMLFormElement = this;
-
-                    var context: AjaxContext = {
-                        form: form,
-                        url: form.action,
-                        options: options,
-                        target: target
-                    };
-                    //alert($(context.form).html());
-                    $.fn.ajaxForm.current = context;
-                    var validator = $form.data("validator");
-                    if (validator) {
-                        // 是否验本地 JS 证通过
-                        var isValid = validator.form();
-                        if (!isValid) {
-                            Handler.cancel.apply(form, [context]);
-                            return;
-                        }
-                    }
-                    // TODO: should try-finally
-                    if (options.submit && options.submit.apply(form, [context]) === false) {
-                        Handler.cancel.apply(form, [context]);
-                        return false;
-                    }
-                    if (Utility.isRequireLock(options.lock)) {
-                        options.lock.apply(this, [true, context]);
-                    }
-
-                    //target.contentWindow.onpopstate = function (e) {
-                    //    alert(2)
-                    //historyLength++;
-                    //};
-
-                    //Utility.isStartsWithHtml("<!doctype html>");
-                    //Utility.isStartsWithHtml("<!-- --><!doctype html>");
-                    //Utility.isStartsWithHtml("<!-- --><!-- -->\r\n<!doctype html>");
-
-                    // iframe document loaded
-                    $target.load(function () {
-                        //debugger;
-                        $target.unbind('load');
-
-                        //var $newIframe = Utility.createIframe(target.id);
-                        //options
-
-                        var iframe: HTMLIFrameElement = this;
-                        var contentWindow: Window = iframe.contentWindow;
-                        try {
-                            //if (!window["cc"]) {
-                            //    window["cc"] = contentWindow;
-                            //} else {
-                            //    alert("window eq:"+(window["cc"] == contentWindow?"1":"0"));
-                            //}
-                            var contentDocument: HTMLDocument = iframe.contentDocument || contentWindow.document;// cross domain will throw error
-                            var resp: AjaxResponse = { contentDocument: contentDocument };
-                            resp.operationStatus = OperationStatus.success;
-                            context.response = resp;
-
-                            //var $contentDocument: JQuery = $target.contents(); // ie6,7 not support contentDocument
-                            //var contentDocument: HTMLDocument = <any>($contentDocument[0]);// cross domain will throw error
-                            //var resp: AjaxResponse = { contentDocument: contentDocument };
-                            //context.response = resp;
-                            //resp.operationStatus = OperationStatus.success;
-                            //var $contentBody = $contentDocument.find('body');
-                            //if (!$contentBody.length) $contentBody = $contentDocument;
-
-                            //var respPureText = $contentBody.text();
-                            //if (respPureText && respPureText.length && !contentDocument.doctype) {
-                            //    Utility.parseResponseContent(respPureText, resp);
-                            //}
-
-                            var root = contentDocument.documentElement;
-                            var contentElement = (contentDocument.body || root);
-                            var respHtml = root.outerHTML;
-                            var respPureText = contentElement.innerText || contentElement.innerHTML;
-                            var hasDocType = contentDocument.doctype || Utility.isStartsWithDoctype(respHtml);
-                            if (respPureText && respPureText.length && (!hasDocType || (respPureText.indexOf("operationStatus") != -1) && respPureText.indexOf("statusCode") != -1)) {
-                                Utility.parseResponseContent(respPureText, resp);
-                            }
-
-                            if (navigator.userAgent.indexOf("MicroMessenger") == -1) {
-                                //  alert(1);
-                                ////history.back();
-                                //contentWindow.history.back();
-                                //var html = root.innerHTML;
-                                //$target.remove().appendTo(doc.body); // destory iframe, browser auto clean  history
-
-                                //if (hasDocType) {
-                                //// iframe remove 后重新添加，里面的内容会丢失，并且 contentWindow / contentDocument 引用会变化，
-                                //// 为了让界面能够在服务端返回错误时把异常信息显示出来，这里把 remove 前的 html 复制到 reAppend 之后的 iframe 内，
-                                //// 不过这里有副作用，如果 html 里面含 script 的话。
-                                //// target.contentDocument.documentElement.innerHTML = html;
-                                //    (<any>target).srcdoc = html;
-                                //}
-                            } else {
-                                // weixin bug, iframe destroyed still keep history
-                                history.back();
-                            }
-                            Handler.handle(context);
-                        } finally {
-                            Handler.dispose.apply(this, [context]);
-                            //$target.remove();
-                            //$target = Utility.createIframe("rhythm-ajax-from-iframe-" + $.now());
-                            //target = <any>$target[0];
-                            //form.target = target.id;
-                        }
-                        //history.length = history.length - 1;
-                        //setTimeout(function () {
-                        //    //history.back();
-                        //    if (contentWindow.history.length > 1) {
-                        //    contentWindow.history.back();
-                        //    }
-                        //}, 100);
-                    });
-                    //} else {
-
-                    //}
-                });
+                options = bindFormAjax($, form, options, history);
             }
             return this;
         };
@@ -655,4 +421,143 @@ module RhythmAjaxForm {
 
     })(jQuery, document, history);/* eof jQuery ajaxForm */
 
+
+
+    function bindFormAjax($: JQueryStatic, form: HTMLFormElement, options: AjaxFormOptions, history: History) {
+        var $form = $(form);
+        $("<input value='XMLHttpRequest' name='X-Requested-With' type='hidden' /><input value='RhythmAjaxForm' name='X-Requested-With-Rhythm-Ajax-Form' type='hidden' />").appendTo($form);
+        // 获取自定义 options 
+        var inlineOptionsAttr = $form.attr("on-ajax") || $form.attr("fn-ajax");
+        var inlineOptions: AjaxFormOptions = inlineOptionsAttr ? Drahcro.ObjectUtility.parseJSON(Drahcro.StringUtility.htmlDecode(inlineOptionsAttr)) : null;
+        var _options: AjaxFormOptions = options ? (inlineOptions ? Drahcro.ObjectUtility.combineObject(options, inlineOptions) : options) : {};
+        var callbacks = _options.callbacks;
+        $form.data("ajax.options", callbacks);
+        (<any>form).ajaxOptions = callbacks;
+        //var targetSelector = (form.target ? "#" + form.target : null) || options.target;
+        //var $target: JQuery = targetSelector ? $(targetSelector) : Utility.createIframe("rhythm-ajax-from-iframe-" + $.now());
+        var $target: JQuery = Utility.createIframe("rhythm-ajax-from-iframe-" + $.now());
+        var target: HTMLIFrameElement = <any>($target[0]);
+        form.target = target.id;
+        //window.onpopstate = function () {
+        //    alert(1);
+        //}
+        //$(window).on("popstate", function (e) {
+        //    debugger
+        //    historyLength++;
+        //});
+        // Submit listener.
+        $form.submit(function () {
+
+            if (_options.disabled) return;
+
+            var form: HTMLFormElement = this;
+            var context: AjaxContext = {
+                form: form,
+                url: form.action,
+                options: _options,
+                target: target
+            };
+            //alert($(context.form).html());
+            $.fn.ajaxForm.current = context;
+            var validator = $form.data("validator");
+            if (validator) {
+                // 是否验本地 JS 证通过
+                var isValid = validator.form();
+                if (!isValid) {
+                    Handler.cancel.apply(form, [context]);
+                    return;
+                }
+            }
+            // TODO: should try-finally
+            if (callbacks.submit && callbacks.submit.apply(form, [context]) === false) {
+                Handler.cancel.apply(form, [context]);
+                return false;
+            }
+            if (Utility.isRequireLock(callbacks.lock)) {
+                callbacks.lock.apply(this, [true, context]);
+            }
+            //target.contentWindow.onpopstate = function (e) {
+            //    alert(2)
+            //historyLength++;
+            //};
+            //Utility.isStartsWithHtml("<!doctype html>");
+            //Utility.isStartsWithHtml("<!-- --><!doctype html>");
+            //Utility.isStartsWithHtml("<!-- --><!-- -->\r\n<!doctype html>");
+            // iframe document loaded
+            $target.load(function () {
+                //debugger;
+                $target.unbind('load');
+                //var $newIframe = Utility.createIframe(target.id);
+                //options
+                var iframe: HTMLIFrameElement = this;
+                var contentWindow: Window = iframe.contentWindow;
+                try {
+                    //if (!window["cc"]) {
+                    //    window["cc"] = contentWindow;
+                    //} else {
+                    //    alert("window eq:"+(window["cc"] == contentWindow?"1":"0"));
+                    //}
+                    var contentDocument: HTMLDocument = iframe.contentDocument || contentWindow.document; // cross domain will throw error
+                    var resp: AjaxResponse = { contentDocument: contentDocument };
+                    resp.operationStatus = OperationStatus.success;
+                    context.response = resp;
+                    //var $contentDocument: JQuery = $target.contents(); // ie6,7 not support contentDocument
+                    //var contentDocument: HTMLDocument = <any>($contentDocument[0]);// cross domain will throw error
+                    //var resp: AjaxResponse = { contentDocument: contentDocument };
+                    //context.response = resp;
+                    //resp.operationStatus = OperationStatus.success;
+                    //var $contentBody = $contentDocument.find('body');
+                    //if (!$contentBody.length) $contentBody = $contentDocument;
+                    //var respPureText = $contentBody.text();
+                    //if (respPureText && respPureText.length && !contentDocument.doctype) {
+                    //    Utility.parseResponseContent(respPureText, resp);
+                    //}
+                    var root = contentDocument.documentElement;
+                    var contentElement = (contentDocument.body || root);
+                    var respHtml = root.outerHTML;
+                    var respPureText = contentElement.innerText || contentElement.innerHTML;
+                    var hasDocType = contentDocument.doctype || Utility.isStartsWithDoctype(respHtml);
+                    if (respPureText && respPureText.length && (!hasDocType || (respPureText.indexOf("operationStatus") != -1) && respPureText.indexOf("statusCode") != -1)) {
+                        Utility.parseResponseContent(respPureText, resp);
+                    }
+                    if (navigator.userAgent.indexOf("MicroMessenger") == -1) {
+                        //  alert(1);
+                        ////history.back();
+                        //contentWindow.history.back();
+                        //var html = root.innerHTML;
+                        //$target.remove().appendTo(doc.body); // destory iframe, browser auto clean  history
+                        //if (hasDocType) {
+                        //// iframe remove 后重新添加，里面的内容会丢失，并且 contentWindow / contentDocument 引用会变化，
+                        //// 为了让界面能够在服务端返回错误时把异常信息显示出来，这里把 remove 前的 html 复制到 reAppend 之后的 iframe 内，
+                        //// 不过这里有副作用，如果 html 里面含 script 的话。
+                        //// target.contentDocument.documentElement.innerHTML = html;
+                        //    (<any>target).srcdoc = html;
+                        //}
+                    }
+                    else {
+                        // weixin bug, iframe destroyed still keep history
+                        history.back();
+                    }
+                    Handler.handle(context);
+                }
+                finally {
+                    Handler.dispose.apply(this, [context]);
+                    //$target.remove();
+                    //$target = Utility.createIframe("rhythm-ajax-from-iframe-" + $.now());
+                    //target = <any>$target[0];
+                    //form.target = target.id;
+                }
+                //history.length = history.length - 1;
+                //setTimeout(function () {
+                //    //history.back();
+                //    if (contentWindow.history.length > 1) {
+                //    contentWindow.history.back();
+                //    }
+                //}, 100);
+            });
+            //} else {
+            //}
+        });
+        return _options;
+    }
 }

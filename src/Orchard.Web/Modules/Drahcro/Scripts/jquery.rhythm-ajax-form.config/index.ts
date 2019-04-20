@@ -1,13 +1,19 @@
-"use strict";
-;
-(function ($) {
+﻿"use strict";
+/// <reference path="../jquery.rhythm-ajax-form/index.ts" />
+declare var ModalEffects;
+
+
+; (function ($: any) {
+
+
     $.showSuccess = function (options) {
         if (!options) {
             throw Error("options is null");
         }
-        options = options.message ? options : { message: options };
+        options = options.message ? options : { message: options }
         $.extend(options, { delay: 2000 }, options);
-        var mdOpt = { theme: "success" };
+
+        var mdOpt: any = { theme: "success" };
         if (options.message) {
             mdOpt.title = options.message;
         }
@@ -21,8 +27,9 @@
         if (!options) {
             throw Error("options is null");
         }
-        options = options.message ? options : { message: options };
-        var mdOpt = { theme: "failure" };
+        options = options.message ? options : { message: options }
+
+        var mdOpt: any = { theme: "failure" };
         if (options.message) {
             mdOpt.title = options.message;
         }
@@ -35,8 +42,8 @@
         if (!options) {
             throw Error("options is null");
         }
-        options = options.message ? options : { message: options };
-        var mdOpt = { theme: "error" };
+        options = options.message ? options : { message: options }
+        var mdOpt: any = { theme: "error" };
         if (options.message) {
             mdOpt.title = options.message;
         }
@@ -45,8 +52,11 @@
         }
         ModalEffects.show(mdOpt);
     };
+
+
+
     // ajax Form  全局处理程序
-    var handler = $.fn.ajaxForm.handler;
+    var handler: RhythmAjaxForm.AjaxCallbacks = $.fn.ajaxForm.handler;
     handler.success = function (response, context) {
         //response.redirect = null;
         if (response.message) {
@@ -65,20 +75,17 @@
             $.showError(response);
             if (url) {
                 setTimeout(function () {
-                    location.href = url;
+                    location.href = url
                 }, 1500);
             }
-        }
-        else {
-            if (url)
-                location.href = url;
+        } else {
+            if (url) location.href = url;
         }
     };
     handler.error = function (response, context) {
         if (response.message) {
             $.showError(response);
-        }
-        else {
+        } else {
             var $close = $('<a id="rhythm-ajax-iframe-error-close" style="position:absolute;z-index:9999;top:0;right:10px;height:10px;cursor:pointer;*cursor:hand;color:#000;bottom:10px;text-decoration:none;font-size:30px;font-weight:600;">X</a>');
             var tgt = context.target;
             var $tgt = $(tgt);
@@ -88,24 +95,28 @@
                 //$tgt.css("display", "block");
                 $tgt.addClass("rhythm-ajax-iframe-error");
                 $((tgt.contentDocument || tgt.contentWindow.document || $tgt.contents()[0]).body).append($close);
+
                 $close.click(function () {
                     $tgt.slideUp(500);
                 });
+
                 // when esc pressed on parent window
                 $(window).keypress(function (e) {
                     if (e.keyCode == 27) {
                         $tgt.slideUp(500);
-                        $(window).unbind("keypress", arguments.callee);
+                        $(window).unbind("keypress", arguments.callee)
                     }
                 });
+
                 // when esc pressed on ifrmae content window
-                $(tgt.contentWindow || tgt.window).keypress(function (e) {
+                $(tgt.contentWindow || (<any>tgt).window).keypress(function (e) {
                     if (e.keyCode == 27) {
                         $tgt.slideUp(500);
-                        $(tgt.contentWindow || tgt.window).unbind("keypress", arguments.callee);
+                        $(tgt.contentWindow || (<any>tgt).window).unbind("keypress", arguments.callee)
                     }
                 });
             }
+
             //$.showError({ message: (tgt.contentDocument || tgt.contentWindow.document).body, delay: 0 });
             //art.dialog({
             //    id: "ajax-error",
@@ -114,9 +125,11 @@
             //});
         }
     };
+
     function createDialog(id, message) {
         return {
             show: function () {
+
                 $.blockUI({
                     message: '<i class="icon-spinner4 spinner"></i>',
                     timeout: 0,
@@ -133,13 +146,13 @@
                 });
             }
         };
-    }
-    ;
+    };
+
     var nullDialog = { show: function () { }, hide: function () { }, lock: function () { }, unlock: function () { }, content: function () { } };
     // 初始化为空，避免外部可能在 jQuery 还没有 document ready 的情况下调用
-    var progressDialog = nullDialog;
-    var redirectDialog = nullDialog;
-    var refreshDialog = nullDialog;
+    var progressDialog: any = nullDialog;
+    var redirectDialog: any = nullDialog;
+    var refreshDialog: any = nullDialog;
     //var exceptionIdDialog = nullDialog;
     $(function () {
         if (typeof ($.blockUI) == "undefined") {
@@ -151,13 +164,14 @@
         refreshDialog = createDialog("ajax-refresh", "正在刷新");
         //exceptionIdDialog = ;
     });
+
     var sl = function (isLock, context) {
         var el = $(context.form);
         if (isLock) {
             if (el.block) {
                 el.block({
                     message: '<i class="icon-spinner4 spinner"></i>',
-                    timeout: 0,
+                    timeout: 0, //unblock after 2 seconds
                     overlayCSS: {
                         backgroundColor: '#fff',
                         opacity: 0.8,
@@ -171,8 +185,7 @@
                 });
             }
             //progressDialog.show();
-        }
-        else {
+        } else {
             if (el.unblock) {
                 el.unblock();
             }
@@ -184,13 +197,13 @@
             setTimeout(function () {
                 context.$disabledButtons = $(context.form).find("button,input[type='submit']").filter("*[disabled!='disabled']").addClass("_ajax_disabled").attr("disabled", true);
             }, 1);
-        }
-        else {
+        } else {
             if (typeof (context.$disabledButtons) != "undefined" && context.$disabledButtons.length) {
                 context.$disabledButtons.removeClass("_ajax_disabled").attr("disabled", false);
             }
         }
     };
+
     var ajaxLocks = {
         screenLock: sl,
         buttonLock: bl,
@@ -200,7 +213,9 @@
         }
     };
     window['ajaxLocks'] = ajaxLocks;
-    var bindFormAsAjax = function (form, options) {
+
+
+    var bindFormAsAjax = function (form, options?: RhythmAjaxForm.AjaxFormOptions) {
         var $form = $(form || this);
         //alert($form.length);
         // 默认全部 ajax 提交，如果 form 不要ajax提交，则需加一个“noajax” class
@@ -227,8 +242,7 @@
                                 var isRefresh = (response.redirect == "." || response.redirect == window.location.href);
                                 if (isRefresh) {
                                     refreshDialog.show();
-                                }
-                                else {
+                                } else {
                                     redirectDialog.show();
                                 }
                             }
@@ -251,7 +265,8 @@
         var opts = options ? $.extend(options, defaultOptions) : defaultOptions;
         $form.ajaxForm(opts);
     };
-    var createAjaxForm = function (action, ajaxOptions) {
+
+    var createAjaxForm = function (action, ajaxOptions: RhythmAjaxForm.AjaxFormOptions) {
         var $form = $("<form class='ajax-dynamic' action='" + action + "' method='post'></form>");
         if (ajaxOptions) {
             $form.attr("fn-ajax", ajaxOptions);
@@ -261,6 +276,7 @@
         // 必须添加到 dom 后在添加 ajax class，否则会被 $("form.ajax").livequery 监听到，造成重复绑定
         return $form;
     };
+
     /* bind button click */
     $("a[fn-ajax]").livequery(function () {
         var $element = $(this);
@@ -271,10 +287,11 @@
             return false;
         });
     });
+
     $("button[fn-form-ajax]").livequery(function () {
         var $element = $(this);
         var optionStr = $element.attr("fn-form-ajax");
-        var option = optionStr && JSON.parse(optionStr);
+        var option: RhythmAjaxForm.AjaxFormOptions = optionStr && JSON.parse(optionStr);
         var form = this.form;
         if (form) {
             var options = { disabled: true };
@@ -288,8 +305,11 @@
             });
         }
     });
+
     // find ajax forms and bind
     $("form[fn-ajax]").livequery(bindFormAsAjax);
+
+
     (function () {
         //var o1 = { f: function () { alert("o1"); } };
         //var o2 = { f: function () { alert("o2"); } };
@@ -353,8 +373,7 @@
                         thisDispose();
                         originalDispose.apply(this, arguments);
                     };
-                }
-                else {
+                } else {
                     options.dispose = thisDispose;
                 }
                 $btn.addClass("ajax-button-progress");
@@ -365,35 +384,28 @@
                         if ($namedButton.length) {
                             $namedButton.val(btnValue);
                             $namedButton.click();
-                        }
-                        else {
+                        } else {
                             $namedInput.val(btnValue);
                             $form.submit();
                         }
-                    }
-                    else {
+                    } else {
                         $namedInput = $(Drahcro.StringUtility.format("<button type='submit' style='display:none;' name='{0}' value='{1}' ></button>", btnName, btnValue));
                         $form.append($namedInput);
                         $namedInput.click();
                     }
-                }
-                else {
+                } else {
                     $form.submit();
                 }
             });
+
         });
     })();
+
     (function () {
         var validator = $.validator;
-        if (!validator) {
-            console.warn("$.validator not imported");
-            return;
-        }
+        if (!validator) { console.warn("$.validator not imported"); return; }
         var unobtrusive = validator.unobtrusive;
-        if (!unobtrusive) {
-            console.warn("$.validator.unobtrusive not imported");
-            return;
-        }
+        if (!unobtrusive) { console.warn("$.validator.unobtrusive not imported"); return; }
         //debugger
         var options = unobtrusive.options || (unobtrusive.options = {});
         //options.errorClass = 'validation-error-label';
@@ -407,21 +419,24 @@
         //    debugger
         //    $(element).removeClass(errorClass);
         //};
+
         unobtrusive.listeners.push({
             error: function (form, label, input) {
                 //input.removeClass(options.errorClass);
                 label.addClass("validation-error-label");
             },
             success: function (form, label) {
-                label.addClass("validation-valid-label").text("Successfully");
+                label.addClass("validation-valid-label").text("Successfully")
             }
         });
+
         //var handler = unobtrusive.handler;
         //if (!handler) { console.warn("$.validator.unobtrusive.handler undefinded"); return; }
         //var old = handler.onSuccess;
         //handler.onSuccess = function ($input, $valmsg) {
         //    old.apply(this, arguments);
+
         //}
     })();
+
 })(jQuery);
-//# sourceMappingURL=index.js.map

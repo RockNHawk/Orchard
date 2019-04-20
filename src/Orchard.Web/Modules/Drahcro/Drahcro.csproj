@@ -180,8 +180,10 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Scripts\fill\common.js" />
     <Content Include="Scripts\jquery.livequery\index.js" />
-    <Content Include="Scripts\jquery.rhythm-ajax-form.config\index.js" />
+    <TypeScriptCompile Include="Scripts\base\index.ts" />
+    <TypeScriptCompile Include="Scripts\jquery.rhythm-ajax-form.config\index.ts" />
     <Content Include="Scripts\jquery.rhythm-ajax-form\index.css" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -194,6 +196,7 @@
     <Content Include="Views\Parts.WebCoreSupport.cshtml" />
     <Content Include="Views\Parts.WebCoreSupport_Summary.cshtml" />
     <Content Include="Views\Parts.WebCoreSupport_SummaryAdmin.cshtml" />
+    <Content Include="Scripts\Web.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
