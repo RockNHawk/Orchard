@@ -109,23 +109,22 @@ namespace Rhythm {
             return wc.CurrentUser.As<UserPart>().Record;
         }
 
-        //public static IEventTrace BeginTrace(this Orchard.WorkContext wc, IEvent @event) {
-        //    // return null;
-        //    //return new DisposableProxy(()=> { });
-        //    return new EventTrace<IEvent>(@event, new Rhythm.WorkContext());
-        //}
-
-        public static IDisposable BeginTrace(this Orchard.WorkContext wc, IEvent @event) {
+        public static IEventTrace BeginTrace(this Orchard.WorkContext wc, IEvent @event) {
             // return null;
-            return new DisposableProxy(() => { });
+            //return new DisposableProxy(()=> { });
+            //return new EventTrace<IEvent>(@event, new Rhythm.WorkContext());
+            return new EventTrace<IEvent>(@event, null);
         }
 
-        public static Exception Error(this IDisposable ds,Exception ex) {
+        //public static IDisposable BeginTrace(this Orchard.WorkContext wc, IEvent @event) {
+        //    // return null;
+        //    return new DisposableProxy(() => { });
+        //}
+
+        public static Exception Error(this IDisposable ds, Exception ex) {
             // return null;
             return ex;
         }
-
-        
 
         public static DepartmentRecord Department(this UserPartRecord user1) {
             return null;

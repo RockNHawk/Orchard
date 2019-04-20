@@ -3,6 +3,7 @@
 @using Orchard.ContentManagement
 @using MnLab.Enterprise
 @using MnLab.Enterprise.Approval
+@using MnLab.Enterprise.Approval.Drivers
 @using MnLab.Enterprise.Approval.Models
 @model ApprovalSupportPart
 
@@ -17,43 +18,47 @@ Parts.ApprovalSupport
     }
     var status = approvalSupport.Status;
 }
-@if (status == ApprovalStatus.WaitingApproval)
+@if (ApprovalPartDriver.IsCurrentInApproval.Value == false)
 {
-    <div>当前内容正在等待审批，您不能编辑</div>
-}
-else if (status == ApprovalStatus.Rejected)
-{
-    <div>当前内容审批被驳回，原因：@(approvalSupport.AuditOpinion)</div>
-}
-@using (Script.Foot())
-{
-    <script>
-        $("fieldset.publish-button").remove();
-    </script>
     if (status == ApprovalStatus.WaitingApproval)
     {
-        <script>
-            $("fieldset.save-button").remove();
-        </script>
+        <div>当前内容正在等待审批，您不能编辑</div>
     }
-    else
+    else if (status == ApprovalStatus.Rejected)
     {
-
+        <div>当前内容审批被驳回，原因：@(approvalSupport.AuditOpinion)</div>
     }
+    using (Script.Foot())
+    {
+        <script>
+            $("fieldset.publish-button").remove();
+        </script>
+        if (status == ApprovalStatus.WaitingApproval)
+        {
+            <script>
+                $("fieldset.save-button").remove();
+            </script>
+        }
+        else
+        {
 
-    <script>
-        // alert('ApprovalSupport');
-        $("button[fn-form-action]").on("click", function () {
-            var form = this.form || $('form')[0];
-            // debugger
-            if (form) {
-                var btnAction = $(this).attr("fn-form-action");
-                var rawAction = $(form).attr("action");
-                $(form).attr("action", btnAction);
-                setTimeout(function () {
-                    $(form).attr("action", rawAction);
-                }, 10);
-            }
-        });
-    </script>
+        }
+    }
 }
+
+
+@*<script>
+    // alert('ApprovalSupport');
+    $("button[fn-form-action]").on("click", function () {
+        var form = this.form || $('form')[0];
+        // debugger
+        if (form) {
+            var btnAction = $(this).attr("fn-form-action");
+            var rawAction = $(form).attr("action");
+            $(form).attr("action", btnAction);
+            setTimeout(function () {
+                $(form).attr("action", rawAction);
+            }, 10);
+        }
+    });
+</script>*@

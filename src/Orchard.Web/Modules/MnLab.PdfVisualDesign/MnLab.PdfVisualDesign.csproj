@@ -373,7 +373,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Drivers\" />
     <Folder Include="Services\" />
     <Folder Include="Settings\" />
     <Folder Include="Views\DefinitionTemplates\" />
@@ -409,7 +408,7 @@
     <Compile Include="Migrations.cs" />
     <Compile Include="OrchardShellEvents.cs" />
     <Compile Include="Parts\TempalteSupportPart.cs" />
-    <Compile Include="Parts\TempalteSupportPartDriver.cs" />
+    <Compile Include="Drivers\TempalteSupportPartDriver.cs" />
     <Compile Include="Parts\TempalteSupportPartRecord.cs" />
     <Compile Include="ResourceManifest.cs" />
     <Compile Include="ViewModels\PropertyBindViewModel.cs" />

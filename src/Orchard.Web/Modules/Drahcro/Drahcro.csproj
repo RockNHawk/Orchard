@@ -8,12 +8,12 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{54162F30-2D6C-63F9-0288-123690F26791}</ProjectGuid>
+    <ProjectGuid>{CE9BA046-D766-41D6-AD8D-8E7E832463E8}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MnLab.Enterprise</RootNamespace>
-    <AssemblyName>MnLab.Enterprise</AssemblyName>
+    <RootNamespace>Drahcro</RootNamespace>
+    <AssemblyName>Drahcro</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <FileUpgradeFlags>
@@ -151,13 +151,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Ajax\" />
-    <Folder Include="Core\" />
-    <Folder Include="NewFolder1\" />
-    <Folder Include="Services\" />
-    <Folder Include="Settings\" />
-    <Folder Include="Views\Admin\" />
-    <Folder Include="Views\DefinitionTemplates\" />
+    <Compile Include="Web\Drivers\WebCoreSupportPartDriver.cs" />
+    <Compile Include="Web\Migrations.cs" />
+    <Compile Include="Web\Models\ApprovalSupportPartRecord.cs" />
+    <Compile Include="Web\Parts\WebCoreSupportPart.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
@@ -166,61 +163,14 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Approval\AdminController.cs" />
-    <Compile Include="AdminMenu.cs" />
-    <Compile Include="Approval\ApprovalSupportExtensions.cs" />
-    <Compile Include="Fw\IContentPartRepository.cs" />
-    <Compile Include="Approval\Core\ApprovalApproveEvent.cs" />
-    <Compile Include="Approval\Core\ApprovalExtensions.cs" />
-    <Compile Include="Approval\Core\ApprovalRejectEventArgs.cs" />
-    <Compile Include="Approval\Models\ApprovalStepRecord.cs" />
-    <Compile Include="Approval\Core\ApprovalStatus.cs" />
-    <Compile Include="Approval\Core\ApprovalSwitch.cs" />
-    <Compile Include="Approval\Core\ApprovalSwitchExntnsions.cs" />
-    <Compile Include="Approval\Core\ApprovalTypes.cs" />
-    <Compile Include="Fw\ContentPartRepository.cs" />
-    <Compile Include="Approval\Business\ContentServiceBase.cs" />
-    <Compile Include="Approval\Core\ContentActionEventArgs.cs" />
-    <Compile Include="Approval\Core\CreationApprovalType.cs" />
-    <Compile Include="Approval\Core\DeletionApprovalType.cs" />
-    <Compile Include="Approval\Core\IApproval.cs" />
-    <Compile Include="Approval\Core\IApprovalApproveEvent.cs" />
-    <Compile Include="Approval\Core\IApprovalRejectEvent.cs" />
-    <Compile Include="Approval\Core\ModificationApprovalType.cs" />
-    <Compile Include="Approval\Core\NoneApprovalType.cs" />
-    <Compile Include="Approval\Models\RelationshipApprovalStepsRecord.cs" />
-    <Compile Include="Class1.cs" />
-    <Compile Include="Fw\Formats.cs" />
-    <Compile Include="Department\Models\Department.cs" />
-    <Compile Include="Approval\Drivers\ApprovalPartDriver.cs" />
-    <Compile Include="Approval\Drivers\ContentButtonDriver.cs" />
-    <Compile Include="Fw\ServiceBase.cs" />
-    <Compile Include="Approval\Migrations.cs" />
-    <Compile Include="Approval\Parts\ApprovalPart.cs" />
-    <Compile Include="Approval\Models\ApprovalSupportPartRecord.cs" />
-    <Compile Include="Approval\Parts\IApprovalInfo.cs" />
-    <Compile Include="OrchardShellEvents.cs" />
-    <Compile Include="OrchardUserExtension.cs" />
-    <Compile Include="ResourceManifest.cs" />
-    <Compile Include="Approval\Drivers\ApprovalSupportPartDriver.cs" />
-    <Compile Include="Approval\Handlers\TitlePartHandler.cs" />
-    <Compile Include="Approval\Parts\ApprovalSupportPart.cs" />
-    <Compile Include="Approval\Models\ApprovalPartRecord.cs" />
-    <Compile Include="EnterpriseModule.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Placement.info">
       <SubType>Designer</SubType>
     </Content>
     <None Include="packages.config" />
-    <Content Include="Views\EditorTemplates\Parts.ApprovalSupport.cshtml" />
-    <Content Include="Views\Parts.ApprovalSupport.cshtml" />
-    <Content Include="Views\Parts.ApprovalSupport_Summary.cshtml" />
-    <Content Include="Views\Parts.ApprovalSupport_SummaryAdmin.cshtml" />
-    <Content Include="Views\Content.CommitButton.cshtml" />
-    <Content Include="Views\EditorTemplates\Parts.ApprovalPart.cshtml" />
-    <Content Include="Views\Content.RejectButton.cshtml" />
-    <Content Include="Views\Content.ApproveButton.cshtml" />
+    <Content Include="Views\EditorTemplates\Parts.WebCoreSupport.cshtml" />
+    <Content Include="Views\Parts.WebCoreSupport.cshtml" />
+    <Content Include="Views\Parts.WebCoreSupport_Summary.cshtml" />
+    <Content Include="Views\Parts.WebCoreSupport_SummaryAdmin.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -230,6 +180,10 @@
     <None Include="Web.Stage.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\Admin\" />
+    <Folder Include="Views\DefinitionTemplates\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

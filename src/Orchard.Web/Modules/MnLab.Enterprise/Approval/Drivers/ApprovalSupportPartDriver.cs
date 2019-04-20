@@ -11,9 +11,9 @@ namespace MnLab.Enterprise.Approval.Drivers {
 
         public Localizer T { get; set; }
 
-        protected override string Prefix {
-            get { return "ApprovalSupport"; }
-        }
+        //protected override string Prefix {
+        //    get { return "ApprovalSupport"; }
+        //}
 
         protected override DriverResult Display(ApprovalSupportPart part, string displayType, dynamic shapeHelper) {
             return Combined(

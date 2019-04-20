@@ -1,0 +1,25 @@
+﻿@using Orchard
+@using Orchard.Data
+@using Orchard.ContentManagement
+@using Drahcro
+@using Drahcro.Web
+@using Drahcro.Web.Drivers
+@*@model WebCoreSupportPart*@
+
+Parts.WebCoreSupport
+
+<script>
+    // alert('WebCoreSupport');
+    $("button[fn-form-action]").on("click", function () {
+        var form = this.form || $('form')[0];
+        // debugger
+        if (form) {
+            var btnAction = $(this).attr("fn-form-action");
+            var rawAction = $(form).attr("action");
+            $(form).attr("action", btnAction);
+            setTimeout(function () {
+                $(form).attr("action", rawAction);
+            }, 10);
+        }
+    });
+</script>

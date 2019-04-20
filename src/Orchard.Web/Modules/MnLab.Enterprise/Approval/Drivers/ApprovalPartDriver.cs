@@ -3,17 +3,38 @@ using Orchard.ContentManagement.Drivers;
 using Orchard.ContentManagement.Handlers;
 using MnLab.Enterprise.Approval;
 using Orchard.Localization;
+using MnLab.Enterprise.Approval.Models;
 
 namespace MnLab.Enterprise.Approval.Drivers {
+
+    public class ApprovalViewModel {
+        public ApprovalPart ApprovalPart { get; set; }
+        public dynamic ContentEditor { get; set; }
+
+    }
+
     public class ApprovalPartDriver : ContentPartDriver<ApprovalPart> {
 
         private const string TemplateName = "Parts.ApprovalPart";
 
-        public Localizer T { get; set; }
-
-        protected override string Prefix {
-            get { return "Approval"; }
+        IContentManager _contentManager;
+        //IContentPartRepository<ApprovalPart, ApprovalPartRecord> contentPartRepository;
+        ContentPartRecordRepository contentPartRepository;
+        public ApprovalPartDriver(
+            IContentManager contentManager,
+            ContentPartRecordRepository contentPartRepository
+            ) {
+            this._contentManager = contentManager;
+            this.contentPartRepository = contentPartRepository;
+            // T = NullLocalizer.Instance;
+            // Logger = NullLogger.Instance;
         }
+
+        //public Localizer T { get; set; }
+
+        //protected override string Prefix {
+        //    get { return "Approval"; }
+        //}
 
         protected override DriverResult Display(ApprovalPart part, string displayType, dynamic shapeHelper) {
             return Combined(
@@ -26,14 +47,39 @@ namespace MnLab.Enterprise.Approval.Drivers {
                 );
         }
 
+
+        public static System.Threading.ThreadLocal<bool> IsCurrentInApproval = new System.Threading.ThreadLocal<bool>();
+
         protected override DriverResult Editor(ApprovalPart part, dynamic shapeHelper) {
 
+            var vm = new ApprovalViewModel {
+                ApprovalPart = part,
+                // ContentEditor = contentEditor,
+            };
+
+
+            IsCurrentInApproval.Value = true;
+            //System.Threading.Thread.CurrentThread
+            //System.AppDomain.CurrentDomain.SetData("_isInApprovalEditor",1);
+            //part.ContentItem.ContentManager.
+
+            contentPartRepository.Fill(part);
+
+            var referenceContentRecord = part.ContentRecord;
+            if (referenceContentRecord != null) {
+                var content = _contentManager.Get(referenceContentRecord.Id);
+                var contentEditor = _contentManager.BuildEditor(content);
+                vm.ContentEditor = contentEditor;
+            }
+
             return ContentShape("Parts_ApprovalPart_Edit",
-                () => shapeHelper.EditorTemplate(TemplateName: TemplateName, Model: part, Prefix: Prefix));
+                () => shapeHelper.EditorTemplate(TemplateName: TemplateName, Model: vm, Prefix: Prefix));
         }
 
         protected override DriverResult Editor(ApprovalPart part, IUpdateModel updater, dynamic shapeHelper) {
-            updater.TryUpdateModel(part, Prefix, null, null);
+
+            _contentManager.UpdateEditor(part.ContentItem, updater);
+            //updater.TryUpdateModel(part, Prefix, null, null);
 
             return Editor(part, shapeHelper);
         }
