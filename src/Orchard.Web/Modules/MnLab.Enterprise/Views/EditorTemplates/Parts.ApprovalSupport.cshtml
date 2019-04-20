@@ -50,11 +50,11 @@ Parts.ApprovalSupport
 
 @*<script>
     // alert('ApprovalSupport');
-    $("button[fn-form-action]").on("click", function () {
+    $("button[fn-form-ajax]").on("click", function () {
         var form = this.form || $('form')[0];
         // debugger
         if (form) {
-            var btnAction = $(this).attr("fn-form-action");
+            var btnAction = $(this).attr("fn-form-ajax");
             var rawAction = $(form).attr("action");
             $(form).attr("action", btnAction);
             setTimeout(function () {

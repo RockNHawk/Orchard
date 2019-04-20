@@ -369,7 +369,7 @@ var RhythmAjaxForm;
     function bindFormAjax($, form, options, history) {
         var $form = $(form);
         $("<input value='XMLHttpRequest' name='X-Requested-With' type='hidden' /><input value='RhythmAjaxForm' name='X-Requested-With-Rhythm-Ajax-Form' type='hidden' />").appendTo($form);
-        // 获取自定义 options 
+        // 获取自定义 options
         var inlineOptionsAttr = $form.attr("on-ajax") || $form.attr("fn-ajax");
         var inlineOptions = inlineOptionsAttr ? Drahcro.ObjectUtility.parseJSON(Drahcro.StringUtility.htmlDecode(inlineOptionsAttr)) : null;
         var _options = options ? (inlineOptions ? Drahcro.ObjectUtility.combineObject(options, inlineOptions) : options) : {};
@@ -380,7 +380,6 @@ var RhythmAjaxForm;
         //var $target: JQuery = targetSelector ? $(targetSelector) : Utility.createIframe("rhythm-ajax-from-iframe-" + $.now());
         var $target = Utility.createIframe("rhythm-ajax-from-iframe-" + $.now());
         var target = ($target[0]);
-        form.target = target.id;
         //window.onpopstate = function () {
         //    alert(1);
         //}
@@ -390,9 +389,23 @@ var RhythmAjaxForm;
         //});
         // Submit listener.
         $form.submit(function () {
-            if (_options.disabled)
+            //debugger
+            if (_options.isDisabled)
                 return;
             var form = this;
+            var originalTarget = form.target;
+            form.target = target.id;
+            setTimeout(function () {
+                form.target = originalTarget;
+            }, 1);
+            var url = _options.url;
+            if (url) {
+                var originalUrl = $form.attr('action');
+                $form.attr('action', url);
+                setTimeout(function () {
+                    $form.attr('action', originalUrl);
+                }, 1);
+            }
             var context = {
                 form: form,
                 url: form.action,

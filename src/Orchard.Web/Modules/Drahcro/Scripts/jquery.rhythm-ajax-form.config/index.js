@@ -274,17 +274,20 @@
     $("button[fn-form-ajax]").livequery(function () {
         var $element = $(this);
         var optionStr = $element.attr("fn-form-ajax");
-        var option = optionStr && JSON.parse(optionStr);
+        // debugger
+        var options = optionStr && JSON.parse(optionStr) || {};
         var form = this.form;
         if (form) {
-            var options = { disabled: true };
             bindFormAsAjax(form, options);
             $element.click(function (event) {
-                options.disabled = false;
+                //  debugger
+                options.isDisabled = false;
                 setTimeout(function () {
-                    options.disabled = true;
+                    //   debugger
+                    options.isDisabled = true;
                 }, 1);
-                return false;
+                //$(form).submit();
+                //return false;
             });
         }
     });

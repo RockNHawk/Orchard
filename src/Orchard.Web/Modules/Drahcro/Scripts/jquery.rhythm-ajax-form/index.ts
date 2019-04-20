@@ -165,7 +165,9 @@ module RhythmAjaxForm {
     //    failure= 1
     //}
     export interface AjaxFormOptions {
-        disabled?: boolean,
+        isDisabled?: boolean,
+        noIframe?: boolean,
+        url?: string,
         callbacks?: AjaxCallbacks,
     }
     export interface AjaxCallbacks {
@@ -426,18 +428,20 @@ module RhythmAjaxForm {
     function bindFormAjax($: JQueryStatic, form: HTMLFormElement, options: AjaxFormOptions, history: History) {
         var $form = $(form);
         $("<input value='XMLHttpRequest' name='X-Requested-With' type='hidden' /><input value='RhythmAjaxForm' name='X-Requested-With-Rhythm-Ajax-Form' type='hidden' />").appendTo($form);
-        // 获取自定义 options 
+
+        // 获取自定义 options
         var inlineOptionsAttr = $form.attr("on-ajax") || $form.attr("fn-ajax");
         var inlineOptions: AjaxFormOptions = inlineOptionsAttr ? Drahcro.ObjectUtility.parseJSON(Drahcro.StringUtility.htmlDecode(inlineOptionsAttr)) : null;
         var _options: AjaxFormOptions = options ? (inlineOptions ? Drahcro.ObjectUtility.combineObject(options, inlineOptions) : options) : {};
-        var callbacks = _options.callbacks;
+        var callbacks = _options.callbacks
+
         $form.data("ajax.options", callbacks);
         (<any>form).ajaxOptions = callbacks;
+
         //var targetSelector = (form.target ? "#" + form.target : null) || options.target;
         //var $target: JQuery = targetSelector ? $(targetSelector) : Utility.createIframe("rhythm-ajax-from-iframe-" + $.now());
         var $target: JQuery = Utility.createIframe("rhythm-ajax-from-iframe-" + $.now());
         var target: HTMLIFrameElement = <any>($target[0]);
-        form.target = target.id;
         //window.onpopstate = function () {
         //    alert(1);
         //}
@@ -447,10 +451,25 @@ module RhythmAjaxForm {
         //});
         // Submit listener.
         $form.submit(function () {
-
-            if (_options.disabled) return;
+            //debugger
+            if (_options.isDisabled) return;
 
             var form: HTMLFormElement = this;
+            var originalTarget = form.target;
+            form.target = target.id;
+            setTimeout(function () {
+                form.target = originalTarget;
+            }, 1);
+
+            var url = _options.url;
+            if (url) {
+                var originalUrl = $form.attr('action');
+                $form.attr('action', url);
+                setTimeout(function () {
+                    $form.attr('action', originalUrl);
+                }, 1);
+            }
+
             var context: AjaxContext = {
                 form: form,
                 url: form.action,
