@@ -373,7 +373,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Drivers\" />
     <Folder Include="Services\" />
     <Folder Include="Settings\" />
     <Folder Include="Views\DefinitionTemplates\" />
@@ -382,6 +381,7 @@
   <ItemGroup>
     <Compile Include="AdminMenu.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Drivers\Class1.cs" />
     <Compile Include="Elements\Placeholder.cs" />
     <Compile Include="Elements\PlaceholderElementDriver.cs" />
     <Compile Include="Extensions\Grouping.cs" />
@@ -456,6 +456,7 @@
     <Content Include="Views\Elements\Placeholder.cshtml" />
     <Content Include="Views\Elements\Placeholder.Design.cshtml" />
     <Content Include="Views\LayoutEditor.Template.Placeholder.cshtml" />
+    <Content Include="Views\NHProductManualTemplate.SummaryAdmin.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
