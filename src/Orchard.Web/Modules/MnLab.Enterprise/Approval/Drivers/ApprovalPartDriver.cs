@@ -52,18 +52,18 @@ namespace MnLab.Enterprise.Approval.Drivers {
 
         protected override DriverResult Editor(ApprovalPart part, dynamic shapeHelper) {
 
-            var vm = new ApprovalViewModel {
-                ApprovalPart = part,
-                // ContentEditor = contentEditor,
-            };
-
-
             IsCurrentInApproval.Value = true;
+
             //System.Threading.Thread.CurrentThread
             //System.AppDomain.CurrentDomain.SetData("_isInApprovalEditor",1);
             //part.ContentItem.ContentManager.
 
             contentPartRepository.Fill(part);
+
+            var vm = new ApprovalViewModel {
+                ApprovalPart = part,
+                // ContentEditor = contentEditor,
+            };
 
             var referenceContentRecord = part.ContentRecord;
             if (referenceContentRecord != null) {
@@ -78,8 +78,14 @@ namespace MnLab.Enterprise.Approval.Drivers {
 
         protected override DriverResult Editor(ApprovalPart part, IUpdateModel updater, dynamic shapeHelper) {
 
-            _contentManager.UpdateEditor(part.ContentItem, updater);
-            //updater.TryUpdateModel(part, Prefix, null, null);
+            contentPartRepository.Fill(part);
+
+            var referenceContentRecord = part.ContentRecord;
+            if (referenceContentRecord != null) {
+                var content = _contentManager.Get(referenceContentRecord.Id);
+                _contentManager.UpdateEditor(content, updater);
+                //updater.TryUpdateModel(part, Prefix, null, null);
+            }
 
             return Editor(part, shapeHelper);
         }

@@ -29,7 +29,7 @@
     <IISExpressUseClassicPipelineMode />
     <Use64BitIISExpress />
     <UseGlobalApplicationHostFile />
-    <TypeScriptToolsVersion>3.3</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -43,6 +43,19 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+    <TypeScriptModuleKind />
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -137,6 +150,10 @@
       <Project>{9916839C-39FC-4CEB-A5AF-89CA7E87119F}</Project>
       <Name>Orchard.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Drahcro\Drahcro.csproj">
+      <Project>{ce9ba046-d766-41d6-ad8d-8e7e832463e8}</Project>
+      <Name>Drahcro</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Orchard.Fields\Orchard.Fields.csproj">
       <Project>{3787dde5-e5c8-4841-bda7-dcb325388064}</Project>
       <Name>Orchard.Fields</Name>
@@ -152,7 +169,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Ajax\" />
-    <Folder Include="Core\" />
     <Folder Include="NewFolder1\" />
     <Folder Include="Services\" />
     <Folder Include="Settings\" />
@@ -169,7 +185,6 @@
     <Compile Include="Approval\AdminController.cs" />
     <Compile Include="AdminMenu.cs" />
     <Compile Include="Approval\ApprovalSupportExtensions.cs" />
-    <Compile Include="Fw\IContentPartRepository.cs" />
     <Compile Include="Approval\Core\ApprovalApproveEvent.cs" />
     <Compile Include="Approval\Core\ApprovalExtensions.cs" />
     <Compile Include="Approval\Core\ApprovalRejectEventArgs.cs" />
@@ -178,7 +193,6 @@
     <Compile Include="Approval\Core\ApprovalSwitch.cs" />
     <Compile Include="Approval\Core\ApprovalSwitchExntnsions.cs" />
     <Compile Include="Approval\Core\ApprovalTypes.cs" />
-    <Compile Include="Fw\ContentPartRepository.cs" />
     <Compile Include="Approval\Business\ContentServiceBase.cs" />
     <Compile Include="Approval\Core\ContentActionEventArgs.cs" />
     <Compile Include="Approval\Core\CreationApprovalType.cs" />
@@ -190,17 +204,15 @@
     <Compile Include="Approval\Core\NoneApprovalType.cs" />
     <Compile Include="Approval\Models\RelationshipApprovalStepsRecord.cs" />
     <Compile Include="Class1.cs" />
-    <Compile Include="Fw\Formats.cs" />
+    <Compile Include="Core\OrchardExtension.cs" />
     <Compile Include="Department\Models\Department.cs" />
     <Compile Include="Approval\Drivers\ApprovalPartDriver.cs" />
     <Compile Include="Approval\Drivers\ContentButtonDriver.cs" />
-    <Compile Include="Fw\ServiceBase.cs" />
     <Compile Include="Approval\Migrations.cs" />
     <Compile Include="Approval\Parts\ApprovalPart.cs" />
     <Compile Include="Approval\Models\ApprovalSupportPartRecord.cs" />
     <Compile Include="Approval\Parts\IApprovalInfo.cs" />
     <Compile Include="OrchardShellEvents.cs" />
-    <Compile Include="OrchardUserExtension.cs" />
     <Compile Include="ResourceManifest.cs" />
     <Compile Include="Approval\Drivers\ApprovalSupportPartDriver.cs" />
     <Compile Include="Approval\Handlers\TitlePartHandler.cs" />

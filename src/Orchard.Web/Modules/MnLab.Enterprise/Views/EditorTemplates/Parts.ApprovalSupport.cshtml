@@ -20,6 +20,7 @@ Parts.ApprovalSupport
 }
 @if (ApprovalPartDriver.IsCurrentInApproval.Value == false)
 {
+    ApprovalPartDriver.IsCurrentInApproval.Value = false;
     if (status == ApprovalStatus.WaitingApproval)
     {
         <div>当前内容正在等待审批，您不能编辑</div>

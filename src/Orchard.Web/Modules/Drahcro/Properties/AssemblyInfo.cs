@@ -9,7 +9,7 @@ using System.Security;
 [assembly: AssemblyTitle("Drahcro")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("Orchard")]
+[assembly: AssemblyProduct("Drahcro")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

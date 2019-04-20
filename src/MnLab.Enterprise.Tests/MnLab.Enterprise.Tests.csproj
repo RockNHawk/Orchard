@@ -161,6 +161,10 @@
       <Name>Orchard.Core</Name>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\Orchard.Web\Modules\Drahcro\Drahcro.csproj">
+      <Project>{ce9ba046-d766-41d6-ad8d-8e7e832463e8}</Project>
+      <Name>Drahcro</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Orchard.Web\Modules\MnLab.Enterprise\MnLab.Enterprise.csproj">
       <Project>{54162f30-2d6c-63f9-0288-123690f26791}</Project>
       <Name>MnLab.Enterprise</Name>
