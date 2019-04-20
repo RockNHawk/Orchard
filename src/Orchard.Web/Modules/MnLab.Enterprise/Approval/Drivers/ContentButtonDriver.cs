@@ -5,7 +5,7 @@ using Orchard.Core.Contents.Settings;
 using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;
 
-namespace MnLab.Enterprise.Approval.Drivers  {
+namespace MnLab.Enterprise.Approval.Drivers {
     public class ContentButtonDriver : ContentPartDriver<ContentPart> {
         //protected override DriverResult Display(ContentPart part, string displayType, dynamic shapeHelper) {
         //    return Combined(
@@ -21,12 +21,22 @@ namespace MnLab.Enterprise.Approval.Drivers  {
         //}
 
         protected override DriverResult Editor(ContentPart part, dynamic shapeHelper) {
-            var results = new List<DriverResult> { };
-
-            if (part.TypeDefinition.Settings.GetModel<ContentTypeSettings>().Draftable)
+            // if (part.PartDefinition.Name == nameof(ApprovalSupportPart)) {
+            if (part.ContentItem.Has<ApprovalPart>()) {
+                var results = new List<DriverResult> { };
+                results.Add(ContentShape("Content_ApproveButton", publishButton => publishButton));
+                results.Add(ContentShape("Content_RejectButton", publishButton => publishButton));
+                return Combined(results.ToArray());
+            }
+            else if (part.ContentItem.Has<ApprovalSupportPart>()) {
+                var results = new List<DriverResult> { };
+                //   if (part.TypeDefinition.Settings.GetModel<ContentTypeSettings>().Draftable)
                 results.Add(ContentShape("Content_CommitButton", publishButton => publishButton));
-
-            return Combined(results.ToArray());
+                return Combined(results.ToArray());
+            }
+            else {
+                return null;
+            }
         }
 
         protected override DriverResult Editor(ContentPart part, IUpdateModel updater, dynamic shapeHelper) {

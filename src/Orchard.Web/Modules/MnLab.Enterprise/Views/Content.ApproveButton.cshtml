@@ -1,0 +1,10 @@
+﻿@using Orchard.ContentManagement;
+@using Orchard.Core.Contents;
+@using Orchard.Utility.Extensions;
+@{
+    var contentItem = (IContent)Model.ContentItem;
+    //var basePath = WorkContext.CurrentSite.BaseUrl;
+}
+<fieldset class="approval-button">
+    <button fn-form-ajax='{"url":"@(WorkContext.HttpContext.Request.ApplicationPath)Admin/MnLab.Enterprise/Approve/@(contentItem.Id)"}' type="submit" name="submit.Commit" value="submit.Commit">@T("Approve")</button>
+</fieldset>

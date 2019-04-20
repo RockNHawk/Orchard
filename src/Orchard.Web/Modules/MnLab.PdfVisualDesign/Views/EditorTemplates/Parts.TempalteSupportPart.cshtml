@@ -21,16 +21,16 @@ Edit for Parts.TempalteSupportPart
 {
 
 
-    <script src="~/Modules/MnLab.PdfVisualDesign/Scripts/TempalteSupport/index.js"></script>
+<script src="~/Modules/MnLab.PdfVisualDesign/Scripts/TempalteSupport/index.js"></script>
     if (contentId != null && contentId > 0)
     {
-        <script>
+<script>
          //   $("#LayoutPart_LayoutEditor_TemplateId").val("68")
             var url = '@(base.WorkContext.CurrentSite.BaseUrl)/Admin/MnLab.PdfVisualDesign/GetContentValueMap/@(contentId)';
             if (!localStorage.getItem('vsd.GetContentValueMap.disabled')) {
         syncContentPart(url,null,$("form[action='/Admin/Contents/Edit/@contentId']"));
             }
-        </script>
+</script>
     }
 
 }

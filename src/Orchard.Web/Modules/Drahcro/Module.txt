@@ -1,0 +1,10 @@
+﻿Name: Drahcro
+AntiForgery: enabled
+Author: The Orchard Team
+Website: https://orchardproject.net
+Version: 1.0
+OrchardVersion: 1.10.3
+Description: framework feature
+Features:
+    Drahcro:
+        Description: provide framework

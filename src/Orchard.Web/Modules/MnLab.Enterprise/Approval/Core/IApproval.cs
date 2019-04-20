@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval.Models;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 using Orchard.Security;
+using Orchard.Users.Models;
 
 namespace MnLab.Enterprise.Approval {
     public interface IApproval : IApprovalInfo {
@@ -14,9 +16,9 @@ namespace MnLab.Enterprise.Approval {
         //Type ApprovalType { get; set; }
         //string AuditOpinion { get; set; }
 
-        IUser AuditBy { get; set; }
+        UserPartRecord AuditBy { get; set; }
         DateTime? AuditDate { get; set; }
-        IUser CommitBy { get; set; }
+        UserPartRecord CommitBy { get; set; }
         DateTime CommitDate { get; set; }
         ContentItemRecord ContentRecord { get; set; }
         string ContentType { get; set; }

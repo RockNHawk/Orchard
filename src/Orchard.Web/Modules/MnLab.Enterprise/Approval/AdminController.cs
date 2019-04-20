@@ -36,11 +36,13 @@ using Orchard.Localization.Services;
 using Orchard.Core.Contents;
 using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;
+using Orchard.Users.Models;
+using Rhythm.Web;
 
 namespace MnLab.Enterprise.Approval.Controllers {
     //[Admin]
     [ValidateInput(false)]
-    public class AdminController : Controller, IUpdateModel {
+    public class AdminController : RhythmControllerBase {
 
 
         //public ILogger Logger { get; set; }
@@ -113,9 +115,24 @@ namespace MnLab.Enterprise.Approval.Controllers {
         //}
 
 
+        public ActionResult Approve(int id, string AuditOpinion, string returnUrl) {
+            var workContext = base.ControllerContext.GetWorkContext();
+            //var user = workContext.CurrentUser.As<UserPart>().Record;
+            _approvalService.Approve(workContext, id, AuditOpinion);
+            return Done("Approve");
+        }
+
+
+        public ActionResult Reject(int id, string AuditOpinion, string returnUrl) {
+            var workContext = base.ControllerContext.GetWorkContext();
+          //  var user = workContext.CurrentUser.As<UserPart>().Record;
+            _approvalService.Reject(workContext, id, AuditOpinion);
+            return Done("Reject");
+        }
+
         [ActionName("Create")]
         [Orchard.Mvc.FormValueRequired("submit.Commit")]
-        public ActionResult CreatePOST(string id, string returnUrl) {
+        public ActionResult Create(string id, string returnUrl) {
 
             // pass a dummy content to the authorization check to check for "own" variations
             var dummyContent = _contentManager.New(id);
@@ -124,20 +141,29 @@ namespace MnLab.Enterprise.Approval.Controllers {
                 return new HttpUnauthorizedResult();
 
             return CreatePOST(id, returnUrl, contentItem => {
-                _approvalService.CommmitApproval(base.ControllerContext.GetWorkContext(), contentItem, ApprovalType.Creation);
+                var workContext = base.ControllerContext.GetWorkContext();
+                var user = workContext.CurrentUser.As<UserPart>().Record;
+                _approvalService.CommmitApproval(workContext, new CreateApprovalCommand {
+                    ContentItem = contentItem,
+                    CommitBy = user,
+                    ApprovalType = ApprovalType.Creation,
+                });
             });
         }
 
         [ActionName("Edit")]
         [Orchard.Mvc.FormValueRequired("submit.Commit")]
-        public ActionResult EditPOST(int id, string returnUrl) {
+        public ActionResult Edit(int id, string returnUrl) {
 
             return EditPOST(id, returnUrl, contentItem => {
-
-                var approvalSupportPart = contentItem.As<ApprovalSupportPart>();
-
-                _approvalService.CommmitApproval(base.ControllerContext.GetWorkContext(), contentItem, ApprovalType.Modification);
-
+                //var approvalSupportPart = contentItem.As<ApprovalSupportPart>();
+                var workContext = base.ControllerContext.GetWorkContext();
+                var user = workContext.CurrentUser.As<UserPart>().Record;
+                _approvalService.CommmitApproval(workContext, new CreateApprovalCommand {
+                    ContentItem = contentItem,
+                    CommitBy = user,
+                    ApprovalType = ApprovalType.Modification,
+                });
                 //if (!contentItem.Has<IPublishingControlAspect>() && !contentItem.TypeDefinition.Settings.GetModel<ContentTypeSettings>().Draftable)
                 //    _contentManager.Publish(contentItem);
 
@@ -159,7 +185,8 @@ namespace MnLab.Enterprise.Approval.Controllers {
 
             if (!ModelState.IsValid) {
                 _transactionManager.Cancel();
-                return View(model);
+                //return View(model);
+                return Fail();
             }
 
             conditionallyPublish(contentItem);
@@ -168,10 +195,12 @@ namespace MnLab.Enterprise.Approval.Controllers {
                 ? T("Your content has been created.")
                 : T("Your {0} has been created.", contentItem.TypeDefinition.DisplayName));
             if (!string.IsNullOrEmpty(returnUrl)) {
-                return this.RedirectLocal(returnUrl);
+                // return this.RedirectLocal(returnUrl);
+                return Done().RedirectUrl(returnUrl);
             }
             var adminRouteValues = _contentManager.GetItemMetadata(contentItem).AdminRouteValues;
-            return RedirectToRoute(adminRouteValues);
+            // return RedirectToRoute(adminRouteValues);
+            return Done("Done");//.RedirectUrl(returnUrl);
         }
 
 
@@ -197,7 +226,8 @@ namespace MnLab.Enterprise.Approval.Controllers {
             var model = _contentManager.UpdateEditor(contentItem, this);
             if (!ModelState.IsValid) {
                 _transactionManager.Cancel();
-                return View("Edit", model);
+                //return View("~/Core/Contents/Views/Admin/Edit.cshtml", model);
+                return Fail();
             }
 
             conditionallyPublish(contentItem);
@@ -212,19 +242,20 @@ namespace MnLab.Enterprise.Approval.Controllers {
                 ? T("Your content has been saved.")
                 : T("Your {0} has been saved.", contentItem.TypeDefinition.DisplayName));
 
-            return this.RedirectLocal(returnUrl, () => RedirectToAction("Edit", new RouteValueDictionary { { "Id", contentItem.Id } }));
+            //return this.RedirectLocal(returnUrl, () => RedirectToAction("Edit", new RouteValueDictionary { { "Id", contentItem.Id } }));
+            return Done("Done");
         }
 
 
 
 
-        bool IUpdateModel.TryUpdateModel<TModel>(TModel model, string prefix, string[] includeProperties, string[] excludeProperties) {
-            return TryUpdateModel(model, prefix, includeProperties, excludeProperties);
-        }
+        //bool IUpdateModel.TryUpdateModel<TModel>(TModel model, string prefix, string[] includeProperties, string[] excludeProperties) {
+        //    return TryUpdateModel(model, prefix, includeProperties, excludeProperties);
+        //}
 
-        void IUpdateModel.AddModelError(string key, LocalizedString errorMessage) {
-            ModelState.AddModelError(key, errorMessage.ToString());
-        }
+        //void IUpdateModel.AddModelError(string key, LocalizedString errorMessage) {
+        //    ModelState.AddModelError(key, errorMessage.ToString());
+        //}
 
     }
 }

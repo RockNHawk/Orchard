@@ -10,7 +10,9 @@
 *************************************************/
 using MnLab.Enterprise.Approval;
 using Orchard.Security;
-using Rhythm;
+using Rhythm;using Drahcro.Data;
+using MnLab.Enterprise.Approval.Models;
+using Orchard.Users.Models;
 
 namespace MnLab.Enterprise.Approval
 {
@@ -29,14 +31,14 @@ namespace MnLab.Enterprise.Approval
         /// 审批开关
         /// </summary>
         public ApprovalSwitch ApprovalSwitch { get; set; }
-        /// <summary>
-        /// 此审批的提交者
-        /// </summary>
-        public IUser CommitUser { get; set; }
+        ///// <summary>
+        ///// 此审批的提交者
+        ///// </summary>
+        //public UserPartRecord CommitUser { get; set; }
         /// <summary>
         /// 此审批的审批者
         /// </summary>
-        public IUser ApprovalUser { get; set; }
+        public UserPartRecord ApprovalUser { get; set; }
         /// <summary>
         /// 审批意见
         /// </summary>

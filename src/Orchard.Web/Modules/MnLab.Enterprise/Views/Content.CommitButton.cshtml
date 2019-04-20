@@ -1,17 +1,32 @@
 ﻿@using Orchard.ContentManagement;
 @using Orchard.Core.Contents;
+@using Orchard.Data
 @using Orchard.Utility.Extensions;
-
+@using MnLab.Enterprise
+@using MnLab.Enterprise.Approval
+@using MnLab.Enterprise.Approval.Models
 @{
     var contentItem = (IContent)Model.ContentItem;
     //var basePath = WorkContext.CurrentSite.BaseUrl;
+
+    var approvalSupport = contentItem.As<ApprovalSupportPart>();
+    if (approvalSupport.Record == null)
+    {
+        var contentManager = WorkContext.Resolve<IContentManager>();
+        var repos = WorkContext.Resolve<IRepository<ApprovalSupportPartRecord>>();
+        approvalSupport.Record = repos.Get(x => x.ContentItemRecord.Id == approvalSupport.ContentItem.Id);
+    }
+    var status = approvalSupport.Status;
 }
 @*commit*@
 @if (Authorizer.Authorize(Permissions.CreateContent, contentItem))
 {
-    @*<input /?*@
-<fieldset class="publish-button">
-    <button fn-form-action="~/Admin/MnLab.Enterprise/@(contentItem.Id==0?$"Create":$"Edit")/@(contentItem.Id)" type="submit" name="submit.Commit" value="submit.Commit">@T("Commit Approval")</button>
-    @*<button fn-form-action="~/Admin/MnLab.Enterprise/Approval/@(contentItem.Id==0?$"Create":$"Edit")" type="submit" name="submit.Commit" value="submit.Commit">@T("Commit Approval")</button>*@
-</fieldset>
+    if (status != ApprovalStatus.WaitingApproval)
+    {
+        @*<input /?*@
+        <fieldset class="approval-button">
+            <button fn-form-ajax='{"url":"@(WorkContext.HttpContext.Request.ApplicationPath)Admin/MnLab.Enterprise/@(contentItem.Id==0?$"Create":$"Edit")/@(contentItem.Id)"}' type="submit" name="submit.Commit" value="submit.Commit">@T("Commit Approval")</button>
+            @*<button fn-form-ajax="~/Admin/MnLab.Enterprise/Approval/@(contentItem.Id==0?$"Create":$"Edit")" type="submit" name="submit.Commit" value="submit.Commit">@T("Commit Approval")</button>*@
+        </fieldset>
+    }
 }

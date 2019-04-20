@@ -7,6 +7,7 @@ using Orchard.ContentManagement.Aspects;
 using System;
 using System.Collections.Generic;
 
+using Orchard.Users.Models;
 
 using Orchard;
 using Orchard.ContentManagement;
@@ -17,18 +18,10 @@ using Orchard.Data;
 using Orchard.Security;
 using System.Linq;
 
-namespace MnLab.Enterprise.Approval {
+namespace MnLab.Enterprise.Approval.Models {
 
 
-    public class RelationshipApprovalStepsRecord {
-        public virtual int Id { get; set; }
-        public virtual ApprovalPartRecord ApprovalPartRecord { get; set; }
-        public virtual ApprovalStepRecord ApprovalStepRecord { get; set; }
-    }
-
-
-
-    public class ApprovalPartRecord : ContentPartVersionRecord, IApproval {
+    public class ApprovalPartRecord : ContentPartRecord, IApproval {
 
         [StringLength(1024)]
         public virtual string CommitOpinion { get; set; }
@@ -44,36 +37,34 @@ namespace MnLab.Enterprise.Approval {
         /// </summary>
         public virtual System.Type ApprovalType { get; set; }
 
+        public virtual string ContentType { get; set; }
 
-        string contentType;
-        /// <summary>
-        /// 内容的类型，NHibernate 根据此字段的值，去 Map 找对应的 Question 子类型，实现多态
-        /// </summary>
-        public virtual string ContentType {
-            get { return contentType; }
-            set {
-                // call ContentType beacuse maybe has lazy load
-                if (value != null && value != ContentType) {
-                    throw new InvalidOperationException("您不能更改 ContentType，它是由 Approval<`1> 的 class 类型自行决定的");
-                }
-                contentType = value;
-            }
-        }
+        //string contentType;
+        ///// <summary>
+        ///// 内容的类型，NHibernate 根据此字段的值，去 Map 找对应的 Question 子类型，实现多态
+        ///// </summary>
+        //public virtual string ContentType {
+        //    get { return contentType; }
+        //    set {
+        //        // call ContentType beacuse maybe has lazy load
+        //        if (value != null && value != ContentType) {
+        //            throw new InvalidOperationException("您不能更改 ContentType，它是由 Approval<`1> 的 class 类型自行决定的");
+        //        }
+        //        contentType = value;
+        //    }
+        //}
 
 
-        /// <summary>
-        /// Creating-1-n-and-n-n-relations
-        /// http://docs.orchardproject.net/en/latest/Documentation/Creating-1-n-and-n-n-relations/
-        /// </summary>
-        public virtual IList<RelationshipApprovalStepsRecord> RelationshipSteps { get; set; }
+       
+        //public virtual IList<RelationshipApprovalStepsRecord> RelationshipSteps { get; set; }
 
-        //public virtual IList<ApprovalStepRecord> Steps { get; set; }
-        public virtual IList<ApprovalStepRecord> Steps {
-            get => RelationshipSteps.Select(x => x.ApprovalStepRecord).ToList();
-            set {
-                this.RelationshipSteps = value.Select(x => new RelationshipApprovalStepsRecord { ApprovalPartRecord = this, ApprovalStepRecord = x }).ToList();
-            }
-        }
+        public virtual IList<ApprovalStepRecord> Steps { get; set; }
+        //public virtual IList<ApprovalStepRecord> Steps {
+        //    get => RelationshipSteps.Select(x => x.ApprovalStepRecord).ToList();
+        //    set {
+        //        this.RelationshipSteps = value.Select(x => new RelationshipApprovalStepsRecord { ApprovalPartRecord = this, ApprovalStepRecord = x }).ToList();
+        //    }
+        //}
 
         ApprovalStepRecord m_CurrentStep;
         public virtual ApprovalStepRecord CurrentStep {
@@ -99,7 +90,7 @@ namespace MnLab.Enterprise.Approval {
         /// <summary>
         /// 
         /// </summary>
-        public virtual IUser CommitBy { get; set; }
+        public virtual UserPartRecord CommitBy { get; set; }
 
         /// <summary>
         /// 
@@ -114,7 +105,7 @@ namespace MnLab.Enterprise.Approval {
         /// <summary>
         /// 
         /// </summary>
-        public virtual IUser AuditBy { get; set; }
+        public virtual UserPartRecord AuditBy { get; set; }
 
         /// <summary>
         /// 总行审批员执行审批的时间

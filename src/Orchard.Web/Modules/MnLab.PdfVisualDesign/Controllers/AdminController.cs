@@ -103,99 +103,99 @@ namespace MnLab.PdfVisualDesign.Controllers {
         //}
 
 
-        [HttpPost, ActionName("Create")]
-        [Orchard.Mvc.FormValueRequired("submit.Publish")]
-        public ActionResult CreateAndPublishPOST(string id, string returnUrl) {
+        //[HttpPost, ActionName("Create")]
+        //[Orchard.Mvc.FormValueRequired("submit.Publish")]
+        //public ActionResult CreateAndPublishPOST(string id, string returnUrl) {
 
-            // pass a dummy content to the authorization check to check for "own" variations
-            var dummyContent = _contentManager.New(id);
+        //    // pass a dummy content to the authorization check to check for "own" variations
+        //    var dummyContent = _contentManager.New(id);
 
-            if (!Services.Authorizer.Authorize(Permissions.PublishContent, dummyContent, T("Couldn't create content")))
-                return new HttpUnauthorizedResult();
+        //    if (!Services.Authorizer.Authorize(Permissions.PublishContent, dummyContent, T("Couldn't create content")))
+        //        return new HttpUnauthorizedResult();
 
-            return CreatePOST(id, returnUrl, contentItem => _contentManager.Publish(contentItem));
-        }
+        //    return CreatePOST(id, returnUrl, contentItem => _contentManager.Publish(contentItem));
+        //}
 
-        [HttpPost, ActionName("Commit")]
-        [Orchard.Mvc.FormValueRequired("submit.Commit")]
-        public ActionResult EditPOST(int id, string returnUrl) {
+        //[HttpPost, ActionName("Commit")]
+        //[Orchard.Mvc.FormValueRequired("submit.Commit")]
+        //public ActionResult EditPOST(int id, string returnUrl) {
 
-            return EditPOST(id, returnUrl, contentItem => {
-                //if (!contentItem.Has<IPublishingControlAspect>() && !contentItem.TypeDefinition.Settings.GetModel<ContentTypeSettings>().Draftable)
-                //    _contentManager.Publish(contentItem);
-
-
-            });
-        }
+        //    return EditPOST(id, returnUrl, contentItem => {
+        //        //if (!contentItem.Has<IPublishingControlAspect>() && !contentItem.TypeDefinition.Settings.GetModel<ContentTypeSettings>().Draftable)
+        //        //    _contentManager.Publish(contentItem);
 
 
-        private ActionResult CreatePOST(string id, string returnUrl, Action<ContentItem> conditionallyPublish) {
-            var contentItem = _contentManager.New(id);
-
-            if (!Services.Authorizer.Authorize(Permissions.EditContent, contentItem, T("Couldn't create content")))
-                return new HttpUnauthorizedResult();
-
-            _contentManager.Create(contentItem, VersionOptions.Draft);
-
-            var model = _contentManager.UpdateEditor(contentItem, this);
-
-            if (!ModelState.IsValid) {
-                _transactionManager.Cancel();
-                return View(model);
-            }
-
-            conditionallyPublish(contentItem);
-
-            Services.Notifier.Information(string.IsNullOrWhiteSpace(contentItem.TypeDefinition.DisplayName)
-                ? T("Your content has been created.")
-                : T("Your {0} has been created.", contentItem.TypeDefinition.DisplayName));
-            if (!string.IsNullOrEmpty(returnUrl)) {
-                return this.RedirectLocal(returnUrl);
-            }
-            var adminRouteValues = _contentManager.GetItemMetadata(contentItem).AdminRouteValues;
-            return RedirectToRoute(adminRouteValues);
-        }
+        //    });
+        //}
 
 
-        private ActionResult EditPOST(int id, string returnUrl, Action<ContentItem> conditionallyPublish) {
-            var contentItem = _contentManager.Get(id, VersionOptions.DraftRequired);
+        //private ActionResult CreatePOST(string id, string returnUrl, Action<ContentItem> conditionallyPublish) {
+        //    var contentItem = _contentManager.New(id);
 
-            if (contentItem == null)
-                return HttpNotFound();
+        //    if (!Services.Authorizer.Authorize(Permissions.EditContent, contentItem, T("Couldn't create content")))
+        //        return new HttpUnauthorizedResult();
 
-            if (!Services.Authorizer.Authorize(Permissions.EditContent, contentItem, T("Couldn't edit content")))
-                return new HttpUnauthorizedResult();
+        //    _contentManager.Create(contentItem, VersionOptions.Draft);
 
-            string previousRoute = null;
-            if (contentItem.Has<IAliasAspect>()
-                && !string.IsNullOrWhiteSpace(returnUrl)
-                && Request.IsLocalUrl(returnUrl)
-                // only if the original returnUrl is the content itself
-                && String.Equals(returnUrl, Url.ItemDisplayUrl(contentItem), StringComparison.OrdinalIgnoreCase)
-                ) {
-                previousRoute = contentItem.As<IAliasAspect>().Path;
-            }
+        //    var model = _contentManager.UpdateEditor(contentItem, this);
 
-            var model = _contentManager.UpdateEditor(contentItem, this);
-            if (!ModelState.IsValid) {
-                _transactionManager.Cancel();
-                return View("Edit", model);
-            }
+        //    if (!ModelState.IsValid) {
+        //        _transactionManager.Cancel();
+        //        return View(model);
+        //    }
 
-            conditionallyPublish(contentItem);
+        //    conditionallyPublish(contentItem);
 
-            if (!string.IsNullOrWhiteSpace(returnUrl)
-                && previousRoute != null
-                && !String.Equals(contentItem.As<IAliasAspect>().Path, previousRoute, StringComparison.OrdinalIgnoreCase)) {
-                returnUrl = Url.ItemDisplayUrl(contentItem);
-            }
+        //    Services.Notifier.Information(string.IsNullOrWhiteSpace(contentItem.TypeDefinition.DisplayName)
+        //        ? T("Your content has been created.")
+        //        : T("Your {0} has been created.", contentItem.TypeDefinition.DisplayName));
+        //    if (!string.IsNullOrEmpty(returnUrl)) {
+        //        return this.RedirectLocal(returnUrl);
+        //    }
+        //    var adminRouteValues = _contentManager.GetItemMetadata(contentItem).AdminRouteValues;
+        //    return RedirectToRoute(adminRouteValues);
+        //}
 
-            Services.Notifier.Information(string.IsNullOrWhiteSpace(contentItem.TypeDefinition.DisplayName)
-                ? T("Your content has been saved.")
-                : T("Your {0} has been saved.", contentItem.TypeDefinition.DisplayName));
 
-            return this.RedirectLocal(returnUrl, () => RedirectToAction("Edit", new RouteValueDictionary { { "Id", contentItem.Id } }));
-        }
+        //private ActionResult EditPOST(int id, string returnUrl, Action<ContentItem> conditionallyPublish) {
+        //    var contentItem = _contentManager.Get(id, VersionOptions.DraftRequired);
+
+        //    if (contentItem == null)
+        //        return HttpNotFound();
+
+        //    if (!Services.Authorizer.Authorize(Permissions.EditContent, contentItem, T("Couldn't edit content")))
+        //        return new HttpUnauthorizedResult();
+
+        //    string previousRoute = null;
+        //    if (contentItem.Has<IAliasAspect>()
+        //        && !string.IsNullOrWhiteSpace(returnUrl)
+        //        && Request.IsLocalUrl(returnUrl)
+        //        // only if the original returnUrl is the content itself
+        //        && String.Equals(returnUrl, Url.ItemDisplayUrl(contentItem), StringComparison.OrdinalIgnoreCase)
+        //        ) {
+        //        previousRoute = contentItem.As<IAliasAspect>().Path;
+        //    }
+
+        //    var model = _contentManager.UpdateEditor(contentItem, this);
+        //    if (!ModelState.IsValid) {
+        //        _transactionManager.Cancel();
+        //        return View("Edit", model);
+        //    }
+
+        //    conditionallyPublish(contentItem);
+
+        //    if (!string.IsNullOrWhiteSpace(returnUrl)
+        //        && previousRoute != null
+        //        && !String.Equals(contentItem.As<IAliasAspect>().Path, previousRoute, StringComparison.OrdinalIgnoreCase)) {
+        //        returnUrl = Url.ItemDisplayUrl(contentItem);
+        //    }
+
+        //    Services.Notifier.Information(string.IsNullOrWhiteSpace(contentItem.TypeDefinition.DisplayName)
+        //        ? T("Your content has been saved.")
+        //        : T("Your {0} has been saved.", contentItem.TypeDefinition.DisplayName));
+
+        //    return this.RedirectLocal(returnUrl, () => RedirectToAction("Edit", new RouteValueDictionary { { "Id", contentItem.Id } }));
+        //}
 
 
 

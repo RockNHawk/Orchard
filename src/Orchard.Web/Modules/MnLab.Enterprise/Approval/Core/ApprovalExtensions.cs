@@ -59,7 +59,7 @@ namespace MnLab.Enterprise.Approval
         /// </summary>
         /// <param name="approval"></param>
         /// <param name="content"></param>
-        public static void SetContent(this IApproval approval, ContentItem content)
+        public static void SetReferenceContent(this IApproval approval, ContentItem content)
         {
             approval.ContentRecord = content.Record;
         }
