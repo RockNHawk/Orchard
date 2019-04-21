@@ -1,4 +1,5 @@
-﻿using Rhythm;using Drahcro.Data;
+﻿using Rhythm;
+using Drahcro.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -46,7 +47,8 @@ using Orchard.Core.Contents;
 using MnLab.Enterprise.Approval;
 using MnLab.Enterprise.Approval;
 
-using Rhythm;using Drahcro.Data;
+using Rhythm;
+using Drahcro.Data;
 using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;
 using MnLab.Enterprise.Approval.Models;
@@ -812,9 +814,9 @@ namespace MnLab.Enterprise.Approval {
             var @event = new ApprovalRejectEvent {
                 Approval = approval,
                 ApprovalSwitch = approvalSwitch,
-                ApprovalUser = approvalUser,
+                AuditBy = approvalUser,
+                AuditOpinion = comments
                 //CommitUser = commitUser,
-                Comments = comments
             };
 
             using (var trace = wc.BeginTrace(@event)) {
@@ -829,6 +831,8 @@ namespace MnLab.Enterprise.Approval {
                 ValidateCurrentStep(approval, currentStep);
                 ValidateDepartment(@event, trace, approvalUser.Department(), currentStep.Department);
 
+                currentStep.AuditOpinion = comments;
+                approval.AuditOpinion = comments;
 
                 @event.Step = currentStep;
                 currentStep.Status = ApprovalStatus.Rejected;
@@ -836,7 +840,6 @@ namespace MnLab.Enterprise.Approval {
                 approval.CurrentStep = null;
 
                 approval.Status = ApprovalStatus.Rejected;
-                approval.AuditOpinion = comments;
                 approval.AuditDate = DateTime.Now;
 
                 {
@@ -873,7 +876,7 @@ namespace MnLab.Enterprise.Approval {
         /// </summary>
         /// <param name="content"></param>
         /// <param name="actionType"></param>
-        internal static void RejectContentChange(ContentItem content, System.Type actionType) {
+        internal static void RejectContentChange(ContentItem content, ApprovalType actionType) {
         }
 
 
@@ -1023,25 +1026,30 @@ namespace MnLab.Enterprise.Approval {
 
             var steps = approval.Steps;
             var currentStep = approval.CurrentStep;
-            ValidateCurrentStep(approval, currentStep);
 
             var @event = new ApprovalApprove {
                 Approval = approval,
                 ApprovalSwitch = approvalSwitch,
-                ApprovalUser = approvalUser,
+                AuditBy = approvalUser,
+                AuditOpinion = AuditOpinion,
                 //CommitUser = commitUser,
                 Step = currentStep,
-                Date = DateTime.Now
+                Date = DateTime.Now,
             };
 
+            NUnit.Framework.Assert.AreNotEqual(0, approval.Id);
+            ValidateCurrentStep(approval, currentStep);
+
             using (var trace = wc.BeginTrace(@event)) {
-                ValidateDepartment(@event, trace, approvalUser.Department(), currentStep.Department);
-                NUnit.Framework.Assert.AreNotEqual(0, approval.Id);
                 if (approval.Status != ApprovalStatus.WaitingApproval) {
                     throw trace.Error(ValidationApprovalCommentsTypeIncorrectError(ApprovalStatus.WaitingApproval, approval.Status));
                 }
+                ValidateDepartment(@event, trace, approvalUser.Department(), currentStep.Department);
 
+                currentStep.AuditOpinion = AuditOpinion;
                 currentStep.Status = ApprovalStatus.Approved;
+
+                approval.AuditOpinion = AuditOpinion;
 
                 // 如果到了最后一级审批
                 if (currentStep.Seq + 1 == steps.Count) {

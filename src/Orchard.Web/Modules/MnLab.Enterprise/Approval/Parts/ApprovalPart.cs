@@ -29,7 +29,7 @@ namespace MnLab.Enterprise.Approval {
         /// <summary>
         /// 内容的操作类型：新增、编辑、删除、自定义
         /// </summary>
-        public virtual System.Type ApprovalType { get { return Record.ApprovalType; } set { Record.ApprovalType = value; } }
+        public virtual ApprovalType ApprovalType { get { return Record.ApprovalType; } set { Record.ApprovalType = value; } }
 
 
        // string contentType;

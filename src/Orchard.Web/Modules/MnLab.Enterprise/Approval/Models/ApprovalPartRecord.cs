@@ -35,7 +35,7 @@ namespace MnLab.Enterprise.Approval.Models {
         /// <summary>
         /// 内容的操作类型：新增、编辑、删除、自定义
         /// </summary>
-        public virtual System.Type ApprovalType { get; set; }
+        public virtual ApprovalType ApprovalType { get; set; }
 
         public virtual string ContentType { get; set; }
 
@@ -108,12 +108,12 @@ namespace MnLab.Enterprise.Approval.Models {
         public virtual UserPartRecord AuditBy { get; set; }
 
         /// <summary>
-        /// 总行审批员执行审批的时间
+        /// 审批员执行审批的时间
         /// </summary>
         public virtual DateTime? AuditDate { get; set; }
 
         /// <summary>
-        /// 总行审批员的审批意见
+        /// 审批员的审批意见
         /// </summary>
         public virtual string AuditOpinion { get; set; }
 

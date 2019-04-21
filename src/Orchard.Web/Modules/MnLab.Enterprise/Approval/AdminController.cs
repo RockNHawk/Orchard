@@ -119,15 +119,15 @@ namespace MnLab.Enterprise.Approval.Controllers {
             var workContext = base.ControllerContext.GetWorkContext();
             //var user = workContext.CurrentUser.As<UserPart>().Record;
             _approvalService.Approve(workContext, id, AuditOpinion);
-            return Done("Approve");
+            return Done(T("Approved").Text);
         }
 
 
         public ActionResult Reject(int id, string AuditOpinion, string returnUrl) {
             var workContext = base.ControllerContext.GetWorkContext();
-          //  var user = workContext.CurrentUser.As<UserPart>().Record;
+            //  var user = workContext.CurrentUser.As<UserPart>().Record;
             _approvalService.Reject(workContext, id, AuditOpinion);
-            return Done("Reject");
+            return Done(T("Rejected").Text);
         }
 
         [ActionName("Create")]
@@ -173,7 +173,8 @@ namespace MnLab.Enterprise.Approval.Controllers {
         }
 
 
-        private ActionResult CreatePOST(string id, string returnUrl, Action<ContentItem> conditionallyPublish) {
+        private ActionResult CreatePOST(string id, string returnUrl, Action<ContentItem> callback) {
+
             var contentItem = _contentManager.New(id);
 
             if (!Services.Authorizer.Authorize(Permissions.EditContent, contentItem, T("Couldn't create content")))
@@ -189,22 +190,22 @@ namespace MnLab.Enterprise.Approval.Controllers {
                 return Fail();
             }
 
-            conditionallyPublish(contentItem);
+            callback(contentItem);
 
             Services.Notifier.Information(string.IsNullOrWhiteSpace(contentItem.TypeDefinition.DisplayName)
                 ? T("Your content has been created.")
                 : T("Your {0} has been created.", contentItem.TypeDefinition.DisplayName));
             if (!string.IsNullOrEmpty(returnUrl)) {
                 // return this.RedirectLocal(returnUrl);
-                return Done().RedirectUrl(returnUrl);
+                return Done(T("Commited").Text).RedirectUrl(returnUrl);
             }
             var adminRouteValues = _contentManager.GetItemMetadata(contentItem).AdminRouteValues;
-            // return RedirectToRoute(adminRouteValues);
-            return Done("Done");//.RedirectUrl(returnUrl);
+             //return RedirectToRoute(adminRouteValues);
+            return Done(T("Commited").Text).RedirectUrl(Url.RouteUrl(adminRouteValues));
         }
 
 
-        private ActionResult EditPOST(int id, string returnUrl, Action<ContentItem> conditionallyPublish) {
+        private ActionResult EditPOST(int id, string returnUrl, Action<ContentItem> callback) {
             var contentItem = _contentManager.Get(id, VersionOptions.DraftRequired);
 
             if (contentItem == null)
@@ -230,7 +231,7 @@ namespace MnLab.Enterprise.Approval.Controllers {
                 return Fail();
             }
 
-            conditionallyPublish(contentItem);
+            callback(contentItem);
 
             if (!string.IsNullOrWhiteSpace(returnUrl)
                 && previousRoute != null
@@ -243,7 +244,7 @@ namespace MnLab.Enterprise.Approval.Controllers {
                 : T("Your {0} has been saved.", contentItem.TypeDefinition.DisplayName));
 
             //return this.RedirectLocal(returnUrl, () => RedirectToAction("Edit", new RouteValueDictionary { { "Id", contentItem.Id } }));
-            return Done("Done");
+            return Done(T("Commited").Text);
         }
 
 

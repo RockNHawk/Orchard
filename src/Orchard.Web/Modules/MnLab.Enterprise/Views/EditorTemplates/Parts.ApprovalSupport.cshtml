@@ -9,6 +9,8 @@
 
 Parts.ApprovalSupport
 @{
+    /**/
+
     var approvalSupport = Model;
     if (approvalSupport.Record == null)
     {
@@ -18,9 +20,10 @@ Parts.ApprovalSupport
     }
     var status = approvalSupport.Status;
 }
-@if (ApprovalPartDriver.IsCurrentInApproval.Value == false)
+
+@if (base.WorkContext.GetState<int>("IsCurrentInApproval") == 0)
 {
-    ApprovalPartDriver.IsCurrentInApproval.Value = false;
+    //ApprovalPartDriver.IsCurrentInApproval.Value = false;
     if (status == ApprovalStatus.WaitingApproval)
     {
         <div>当前内容正在等待审批，您不能编辑</div>
@@ -32,12 +35,16 @@ Parts.ApprovalSupport
     using (Script.Foot())
     {
         <script>
-            $("fieldset.publish-button").remove();
+            $(function () {
+                $("fieldset.publish-button").remove();
+            });
         </script>
         if (status == ApprovalStatus.WaitingApproval)
         {
             <script>
-                $("fieldset.save-button").remove();
+                $(function () {
+                    $("fieldset.save-button").remove();
+                });
             </script>
         }
         else
@@ -49,17 +56,17 @@ Parts.ApprovalSupport
 
 
 @*<script>
-    // alert('ApprovalSupport');
-    $("button[fn-form-ajax]").on("click", function () {
-        var form = this.form || $('form')[0];
-        // debugger
-        if (form) {
-            var btnAction = $(this).attr("fn-form-ajax");
-            var rawAction = $(form).attr("action");
-            $(form).attr("action", btnAction);
-            setTimeout(function () {
-                $(form).attr("action", rawAction);
-            }, 10);
-        }
-    });
-</script>*@
+        // alert('ApprovalSupport');
+        $("button[fn-form-ajax]").on("click", function () {
+            var form = this.form || $('form')[0];
+            // debugger
+            if (form) {
+                var btnAction = $(this).attr("fn-form-ajax");
+                var rawAction = $(form).attr("action");
+                $(form).attr("action", btnAction);
+                setTimeout(function () {
+                    $(form).attr("action", rawAction);
+                }, 10);
+            }
+        });
+    </script>*@

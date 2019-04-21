@@ -172,7 +172,6 @@
     <Folder Include="NewFolder1\" />
     <Folder Include="Services\" />
     <Folder Include="Settings\" />
-    <Folder Include="Views\Admin\" />
     <Folder Include="Views\DefinitionTemplates\" />
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +185,7 @@
     <Compile Include="AdminMenu.cs" />
     <Compile Include="Approval\ApprovalSupportExtensions.cs" />
     <Compile Include="Approval\Core\ApprovalApproveEvent.cs" />
+    <Compile Include="Approval\Core\ApprovalEvent.cs" />
     <Compile Include="Approval\Core\ApprovalExtensions.cs" />
     <Compile Include="Approval\Core\ApprovalRejectEventArgs.cs" />
     <Compile Include="Approval\Models\ApprovalStepRecord.cs" />
@@ -233,6 +233,7 @@
     <Content Include="Views\EditorTemplates\Parts.ApprovalPart.cshtml" />
     <Content Include="Views\Content.RejectButton.cshtml" />
     <Content Include="Views\Content.ApproveButton.cshtml" />
+    <Content Include="Views\Web.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

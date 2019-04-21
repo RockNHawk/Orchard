@@ -164,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdminMenu.cs" />
+    <Compile Include="Fw\PrefixUtility.cs" />
     <Compile Include="Fw\ContentPartRepository.cs" />
     <Compile Include="Fw\DrahcroModule.cs" />
     <Compile Include="Fw\Formats.cs" />

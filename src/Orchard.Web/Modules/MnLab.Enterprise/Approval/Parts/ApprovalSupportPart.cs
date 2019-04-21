@@ -11,7 +11,8 @@ namespace MnLab.Enterprise.Approval {
         public string CommitOpinion { get { return Record?.CommitOpinion; } set { Record.CommitOpinion = value; } }
         public string AuditOpinion { get { return Record?.AuditOpinion; } set { Record.AuditOpinion = value; } }
         public ApprovalStatus Status { get { return Record?.Status ?? default(ApprovalStatus); } set { Record.Status = value; } }
-        public Type ApprovalType { get { return Record?.ApprovalType; } set { Record.ApprovalType = value; } }
+        public ApprovalType ApprovalType { get { return Record == null ? default(ApprovalType) : Record.ApprovalType; } set { Record.ApprovalType = value; } }
+        //public ApprovalType ApprovalType { get { return Record == null ? default(ApprovalType) : Record.ApprovalType; } set { Record.ApprovalType = value; } }
         public ApprovalPartRecord Current { get { return Record?.Current; } set { Record.Current = value; } }
 
         //public virtual string ApprovalComments { get; set; }

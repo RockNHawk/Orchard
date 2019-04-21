@@ -12,13 +12,16 @@ using System;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;
 
-namespace MnLab.Enterprise.Approval
-{
+namespace MnLab.Enterprise.Approval {
     /// <summary>
     /// </summary>
-    public static class ApprovalExtensions
-    {
+    public static class ApprovalExtensions {
         static readonly System.Type approvalType = typeof(IApproval);
+
+
+        public static bool IsAssignableFrom(this ApprovalType left, ApprovalType right) {
+            return right.HasFlag(left);
+        }
 
 
         public static string GetDisplayName(this ApprovalStatus obj) {
@@ -30,8 +33,7 @@ namespace MnLab.Enterprise.Approval
         /// </summary>
         /// <param name="approval"></param>
         /// <param name="version"></param>
-        public static void SetContentOldVersion(this IApproval approval, ContentItemVersionRecord version)
-        {
+        public static void SetContentOldVersion(this IApproval approval, ContentItemVersionRecord version) {
             approval.OldContentVersion = version;
         }
 
@@ -40,8 +42,7 @@ namespace MnLab.Enterprise.Approval
         /// </summary>
         /// <param name="approval"></param>
         /// <param name="version"></param>
-        public static void SetContentNewVersion(this IApproval approval, ContentItemVersionRecord version)
-        {
+        public static void SetContentNewVersion(this IApproval approval, ContentItemVersionRecord version) {
             approval.NewContentVersion = version;
         }
 
@@ -59,8 +60,7 @@ namespace MnLab.Enterprise.Approval
         /// </summary>
         /// <param name="approval"></param>
         /// <param name="content"></param>
-        public static void SetReferenceContent(this IApproval approval, ContentItem content)
-        {
+        public static void SetReferenceContent(this IApproval approval, ContentItem content) {
             approval.ContentRecord = content.Record;
         }
 
@@ -108,8 +108,7 @@ namespace MnLab.Enterprise.Approval
         /// </summary>
         /// <param name="approval"></param>
         /// <returns></returns>
-        public static ContentItemVersionRecord GetContentOldVersion(this IApproval approval)
-        {
+        public static ContentItemVersionRecord GetContentOldVersion(this IApproval approval) {
             return approval.OldContentVersion;
         }
 
@@ -118,14 +117,13 @@ namespace MnLab.Enterprise.Approval
         /// </summary>
         /// <param name="approval"></param>
         /// <returns></returns>
-        public static ContentItemVersionRecord GetContentNewVersion(this IApproval approval)
-        {
+        public static ContentItemVersionRecord GetContentNewVersion(this IApproval approval) {
             return approval.NewContentVersion;
         }
- 
 
-        public static ContentItemVersionRecord GetDraftVersion(this ContentItem content,IContentManager _contentManager) {
-         var con=    _contentManager.Get(content.Id,VersionOptions.Draft);
+
+        public static ContentItemVersionRecord GetDraftVersion(this ContentItem content, IContentManager _contentManager) {
+            var con = _contentManager.Get(content.Id, VersionOptions.Draft);
             return con.VersionRecord;
         }
 

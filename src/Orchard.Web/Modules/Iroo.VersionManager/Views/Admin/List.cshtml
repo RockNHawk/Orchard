@@ -1,8 +1,10 @@
 ﻿@using Orchard.ContentManagement;
 @using Orchard.ContentManagement.Records;
+@using System.Linq
 @model IEnumerable<ContentItem>
 @{
-    var contentItem = Model.First();
+    var list = Model;
+    var contentItem = list.First();
     var pageTitle = T("Manage versions of content item #{0}", contentItem.Id);
 }
 
@@ -23,13 +25,13 @@
 
 <h1>@Html.TitleForPage(pageTitle)</h1>
 
-<p>@T("There is a total of {0} versions of the content item.", Model.Count())</p>
+<p>@T("There is a total of {0} versions of the content item.", list.Count())</p>
 <p>@T("Parts that have multiple versions: {0}", string.Join(", ", contentItem.Parts.Where(p => IsPartVersionable(p)).Select(p => p.PartDefinition.Name).OrderBy(s => s)))</p>
 <p>@T("Parts that have a single version: {0}", string.Join(", ", contentItem.Parts.Where(p => !IsPartVersionable(p)).Select(p => p.PartDefinition.Name).OrderBy(s => s))) </p>
 
 <fieldset class="contentItems bulk-items">
 <ul>
- @foreach(var item in Model) {
+ @foreach(var item in list) {
  <li>
   <div class="summary" itemscope="itemscope" itemid="@contentItem.Id" itemtype="http://orchardproject.net/data/ContentItem">
    <div class="primary">

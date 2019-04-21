@@ -31,10 +31,34 @@ namespace Drahcro.Data {
         public TRecord Fill<TRecord>(ContentPart<TRecord> part)
           where TRecord : ContentPartRecord {
             if (part.Record == null) {
-                var repository = container.GetContext().Resolve<IRepository<TRecord>>();
-                part.Record = repository.Get(x => x.ContentItemRecord.Id == part.Id);
+                part.Record = Fill(part.Record, part.Id);
             }
             return part.Record;
+        }
+
+        public TRecord Fill<TRecord>(TRecord record, int partId) where TRecord : ContentPartRecord {
+            var repository = container.GetContext().Resolve<IRepository<TRecord>>();
+            return repository.Get(x => x.ContentItemRecord.Id == partId);
+        }
+
+
+        public void Update<TRecord>(TRecord record) {
+            var repository = container.GetContext().Resolve<IRepository<TRecord>>();
+            repository.Update(record);
+        }
+
+        public void Create<TRecord>(TRecord record) {
+            var repository = container.GetContext().Resolve<IRepository<TRecord>>();
+            repository.Create(record);
+        }
+
+        public void Update<TRecord>(ContentPart<TRecord> part) {
+            Update(part.Record);
+        }
+
+
+        public void Create<TRecord>(ContentPart<TRecord> part) {
+            Create(part.Record);
         }
 
 

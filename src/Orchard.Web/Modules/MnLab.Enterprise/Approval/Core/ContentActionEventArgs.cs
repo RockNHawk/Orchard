@@ -19,7 +19,7 @@ namespace MnLab.Enterprise.Approval {
         /// </summary>
         public UserPartRecord CommitBy { get; set; }
 
-        public virtual System.Type ApprovalType { get; set; }
+        public virtual ApprovalType ApprovalType { get; set; }
         ///// <summary>
         ///// 内容 Id
         ///// </summary>

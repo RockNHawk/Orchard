@@ -18,4 +18,12 @@
 
     <Match DisplayType="DetailAdmin">
     </Match>
+
+
+
+    <Match DisplayType="SummaryAdmin">
+        <!--<Place ContentPicker_SummaryAdmin="Content:after"/>-->
+        <!--<Place Fields_ContentPicker_SummaryAdmin="Content:after"/>-->
+    </Match>
+    
 </Placement>
