@@ -1,0 +1,11 @@
+﻿Name: Rijkshuisstijl.PerformanceMonitor
+AntiForgery: enabled
+Author: CIBG
+Website: http://www.cibg.nl
+Version: 0.1
+OrchardVersion: 1.7
+Category: Performance
+Description: Module for monitoring performance data.
+Features:
+    Rijkshuisstijl.PerformanceMonitor:
+        Description: Module for monitoring performance data.

@@ -212,13 +212,14 @@ namespace Ljosland.Localization.TagCloud.Services
             var tagsPart = contentItem.As<TagsPart>();
 
             // delete orphan tags (for each tag, if there is no other contentItem than the one being deleted, it's an orphan)
-            foreach (var tag in tagsPart.CurrentTags)
-            {
-                if (_contentTagRepository.Count(x => x.TagsPartRecord.Id != contentItem.Id) == 0)
-                {
-                    _tagRepository.Delete(tag);
-                }
-            }
+            //foreach (var tag in tagsPart.CurrentTags)
+            //{
+            //    if (_contentTagRepository.Count(x => x.TagsPartRecord.Id != contentItem.Id) == 0)
+            //    {
+            //        _tagRepository.Delete(tag);
+            //    }
+            //}
+            tagsPart.CurrentTags = new List<string>(); 
 
             // delete tag links with this contentItem (ContentTagRecords)
             foreach (var record in _contentTagRepository.Fetch(x => x.TagsPartRecord.Id == contentItem.Id))

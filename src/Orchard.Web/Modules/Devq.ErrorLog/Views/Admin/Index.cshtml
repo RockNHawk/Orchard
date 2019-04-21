@@ -1,0 +1,44 @@
+﻿@model Devq.ErrorLog.ViewModels.IndexViewModel
+
+@{
+    Style.Include("laughlin-errorlog.css");
+}
+
+@using (Html.BeginFormAntiForgeryPost())
+{
+    <span>View:</span>
+    @Html.DropDownList("SelectedLogFileName", Model.Dates, new { @class = "log-refresh-trigger" })
+    <span>Type:</span>
+    @Html.DropDownList("SelectedType", Model.Types, new { @class = "log-refresh-trigger" })
+}
+
+<hr/>
+
+<ul class="error-overview">
+    @foreach (var item in Model.LogItems)
+    {
+        <li class="error-item">
+            <a class="error-toggle" href="#">@item.Date - @item.Preview</a>
+            <div class="error-content" style="display:none;">@item.Text</div>
+        </li>
+    }
+</ul>
+
+@using (Script.Foot())
+{
+    <script type="text/javascript">
+        $(function () {
+            $(".log-refresh-trigger").change(function () {
+                var selectedItem = $(this).val();
+                if (selectedItem) {
+                    $(this).closest("form").submit();
+                }
+            });
+
+            $("a.error-toggle").click(function (e) {
+                $(this).next(".error-content").slideToggle();
+                e.preventDefault();
+            });
+        });
+    </script>
+}

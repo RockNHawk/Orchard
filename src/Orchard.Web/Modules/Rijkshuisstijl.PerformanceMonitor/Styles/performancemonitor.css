@@ -1,0 +1,33 @@
+﻿.metadata pre {
+    font-family: Consolas, monospace;
+    font-size: 11px;
+}
+
+#performancecounterstable .matched a { color: green; }
+#performancecounterstable .not-matched a { color: red; }
+
+#performancecounterstable {
+    table-layout: auto;
+    width: 100%;
+}
+
+#button {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#toggleButton {
+  color: #d3d3d3;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#toggleButton.down {
+  color: green;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#performancecounterstable th.status-column { width: 10px; }
+
+

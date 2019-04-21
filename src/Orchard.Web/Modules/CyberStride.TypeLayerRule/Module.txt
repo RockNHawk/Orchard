@@ -1,0 +1,10 @@
+Name: CyberStride.TypeLayerRule
+AntiForgery: enabled
+Author: CyberStride
+Website: http://cyberstride.net
+Version: 0.5.3
+OrchardVersion: 1.0
+Description: This is a simple layer rule filter that allows for content type rules. The rule format is Type "YourFilteredType". Other features are coming such as content item specific filters (via a dropdown list) and rules based on those overrides (ignore, append, etc).
+Features:
+    CyberStride.LayerRules:
+        Description: This is a simple layer rule filter that allows for content type rules. The rule format is Type "YourFilteredType". Other features are coming such as content item specific filters (via a dropdown list) and rules based on those overrides (ignore, append, etc).

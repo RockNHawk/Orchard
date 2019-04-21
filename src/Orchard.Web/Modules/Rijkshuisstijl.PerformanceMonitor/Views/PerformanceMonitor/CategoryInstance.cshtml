@@ -1,0 +1,42 @@
+﻿@using System.Globalization
+@using Rijkshuisstijl.PerformanceMonitor.Models
+@using Rijkshuisstijl.PerformanceMonitor.ViewModels.PerformanceMonitor
+
+@model Rijkshuisstijl.PerformanceMonitor.ViewModels.PerformanceMonitor.CategoryInstanceViewModel
+
+@{
+    Script.Require("jQuery");
+    Layout.Title = T("New performance counter");
+    Style.Include("performancemonitor.css");
+}
+
+<div id="performancecounter">
+
+    <div class="errormessages">
+        @Html.ValidationSummary()
+    </div>
+
+    @using (Html.BeginFormAntiForgeryPost("CategoryInstance"))
+    {
+        SelectList selectListOfInstanceNames = Model.InstanceList;
+        var categoryName = Model.CategoryName;
+
+        <fieldset>
+            <legend>Select an instance and click "Next"</legend><br/>
+        
+            @Html.HiddenFor(m => m.CategoryName)
+
+            @Html.Label(T("Instance").Text, new {@class = "editor-label"}) 
+
+            @Html.DropDownListFor(m => m.InstanceName, selectListOfInstanceNames, "--Select an instance--", null)
+            <br/><br/>  
+
+            <input class="button primaryAction"  type="submit" value="@T("Next")"></input>
+        </fieldset>
+    }
+</div>
+
+<br /><br />      
+
+
+

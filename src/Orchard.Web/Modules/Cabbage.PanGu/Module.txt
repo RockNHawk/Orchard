@@ -1,0 +1,8 @@
+﻿Name: Cabbage.PanGu
+AntiForgery: disabled
+Author: 深圳聚乾科技开发有限公司
+Website: http://www.cnblogs.com/cabbage
+Version: 1.1
+OrchardVersion: 1.4
+Description: 盘古分词
+Category: Search

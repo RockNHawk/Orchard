@@ -1,0 +1,10 @@
+Name: Error Log Viewer
+AntiForgery: enabled
+Author: Devqon
+Website: https://github.com/Devqon/Devq.ErrorLog
+Version: 1.0
+OrchardVersion: 1.0
+Description: Shows the error logs in the dashboard
+Category: Logging
+Features:
+    Devq.ErrorLog:

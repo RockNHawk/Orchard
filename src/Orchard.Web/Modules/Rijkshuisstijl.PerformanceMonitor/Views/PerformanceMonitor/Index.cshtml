@@ -1,0 +1,236 @@
+﻿@using Orchard.UI.Resources
+@*@using Rijkshuisstijl.ApplicationFramework.Helpers*@
+@using Rijkshuisstijl.PerformanceMonitor.Models
+@using Rijkshuisstijl.PerformanceMonitor.WorkerServices
+
+@model Rijkshuisstijl.PerformanceMonitor.ViewModels.PerformanceMonitor.IndexViewModel
+
+@{
+    Script.Require("jQuery");
+    Script.Require("DataTables");
+    Layout.Title = "Performance Monitor";
+    Style.Require("DataTables");
+    Style.Include("performancemonitor.css");
+
+    string StatusIsEnabledText = "Collecting data";
+    string StatusIsNotEnabledText = "Stopped";
+
+    bool IsInstanceRunning = false;
+    if (Model == null || Model.PerformanceMonitorRecords == null)
+    {
+    }
+    else
+    {
+        foreach (PerformanceMonitorRecord monitorRecord in Model.PerformanceMonitorRecords)
+        {
+            if (monitorRecord.IsEnabled)
+            {
+                IsInstanceRunning = true;
+            }
+        }
+    }
+}
+
+@if (IsInstanceRunning)
+{
+}
+else
+{
+  @Html.ActionLink("New counter", "Category", null, new { @class = "button" }) 
+}
+<br /><br />
+
+    <table id="performancecounterstable">
+        <thead>
+            <tr>
+                <th class="performanceobject-column">Object</th>
+                <th class="instance-column">Instance</th>
+                <th class="performancecounter-column">Counter</th>
+                <th class="node-column">Node</th>
+                <th class="duration-column">Duration (hrs)</th>
+                <th class="interval-column">Interval (m)</th>
+                <th class="created-column">Created (start time)</th>
+                <th class="endtime-column">End time</th>
+                <th class="createdby-column">Runtime</th>
+                <th class="lastvalue-column">Initial</th>
+                <th class="lastvalue-column">Last</th>
+                <th class="threshold-column">Threshold</th>
+                <th class="status-column">Status</th>
+                <th class="actioncolumn">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model == null || Model.PerformanceMonitorRecords == null)
+            {
+            }
+            else
+            {
+                foreach (PerformanceMonitorRecord monitorRecord in Model.PerformanceMonitorRecords)
+                {
+                    string runtimeText = string.Empty;
+                    string durationText = string.Empty;
+                    string createdText = string.Empty;
+                    string endtimeText = string.Empty;
+                    string thresholdWhenText = string.Empty;
+                    
+                    if (monitorRecord.DurationCount == null)
+                    { 
+                    }
+                    else
+                    {
+                        string durationCount = monitorRecord.DurationCount.ToString();
+                        long durationCountLong = long.Parse(durationCount);
+                        TimeSpan durationRuntime = TimeSpan.FromTicks(durationCountLong);
+                        runtimeText = durationRuntime.ToString(@"hh\:mm\:ss");
+                    }
+                    
+                    if (monitorRecord.Duration == null)
+                    {
+                    }
+                    else
+                    {
+                        string duration = monitorRecord.Duration.ToString();
+                        long durationLong = long.Parse(duration);
+                        TimeSpan durationFixed = TimeSpan.FromTicks(durationLong);
+                        durationText = durationFixed.TotalHours.ToString();
+                    }
+                    
+                    if (monitorRecord.ThresholdWhen == false)
+                    {
+                        thresholdWhenText = ">";
+                    }
+                    else
+                    {
+                        thresholdWhenText = "<";
+                    }
+
+                    DateTime created = monitorRecord.Created;
+                    createdText = created.ToString("yyyy-MM-dd HH:mm:ss");
+
+                    DateTime endtime = monitorRecord.EndTime;
+                    endtimeText = endtime.ToString("yyyy-MM-dd HH:mm:ss");
+                    
+                    <tr>
+                     <td>
+                         @monitorRecord.CategoryName.ToString()
+                     </td>
+                    <td>
+                        @if (monitorRecord.InstanceName == null)
+                        {}
+                        else
+                        {
+                            @monitorRecord.InstanceName.ToString()
+                        }
+                    </td>
+                     <td>
+                         @monitorRecord.CounterName.ToString()
+                    </td>
+                    <td>
+                        @monitorRecord.NodeName.ToString()
+                    </td>
+                    <td>
+                        @Html.Raw(@durationText)
+                    </td>
+                    <td>
+                        @monitorRecord.SampleInterval.ToString()
+                    </td>
+                    <td>
+                        @Html.Raw(@createdText)
+                    </td>
+                    <td>
+                        @Html.Raw(@endtimeText)
+                    </td>
+                    <td>
+                        @Html.Raw(@runtimeText)
+                    </td>
+                    <td>
+                        @if (monitorRecord.InitialValue == null)
+                        {
+                        }
+                        else
+                        {
+                            @monitorRecord.InitialValue.ToString()
+                        }
+
+                    </td>
+                    <td>
+                        @if (monitorRecord.LastValue == null)
+                        {                            
+                        }
+                        else
+                        {
+                            @monitorRecord.LastValue.ToString()
+                        }
+                    </td>
+                    <td>
+                        @if (monitorRecord.Threshold == null || monitorRecord.Threshold == 0)
+                        {
+                            @T(" - ")
+                        }
+                        else
+                        {
+                            @Html.Raw(@thresholdWhenText)
+                            @monitorRecord.Threshold.ToString()
+                        }
+                    </td>
+                    <td>
+                        @if (monitorRecord.IsEnabled)
+                        {
+                            @Html.Raw(@StatusIsEnabledText)
+                        }
+                        else
+                        {
+                            @Html.Raw(@StatusIsNotEnabledText)
+                        }
+                    </td>
+                    <td>                                                                        
+                        @if (monitorRecord.IsEnabled)
+                        {
+                            @Html.ActionLink(T("Stop").Text, "StopCounter", new { performanceMonitorRecordId = monitorRecord.Id }) 
+                            @T(" | ")
+                        }
+                        else
+                        {
+                            @Html.ActionLink(T("Delete").Text, "Delete", new { id = monitorRecord.Id })
+                            @T(" | ")
+                        }                    
+                        @Html.ActionLink("Show details", "Show", "PerformanceMonitor", new { area = "Rijkshuisstijl.PerformanceMonitor", PerformanceMonitorRecord_Id = monitorRecord.Id }, null)
+                    </td>
+                </tr>
+                }
+             }
+        </tbody>
+    </table>
+
+@using (Script.Foot())
+{
+    <script type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function () {
+            $('#performancecounterstable').dataTable({
+                "aaSorting": [[6, 'desc']],
+                "aoColumns": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    { "bSearchable": false, "bSortable": false }
+                ],
+                "bAutoWidth": true,
+                "bPaginate": true,
+                "sPaginationType": "full_numbers"
+            });
+        });
+        //]]>
+    </script>
+ }
+

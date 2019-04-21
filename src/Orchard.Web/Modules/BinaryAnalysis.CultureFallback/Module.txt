@@ -1,0 +1,9 @@
+Name: Culture Fallback
+AntiForgery: enabled
+Author: BinaryAnalysis
+Website: http://binaryanalysis.net
+Version: 0.1
+OrchardVersion: 1.0
+Description: Fallback to default language if body part is empty
+Dependencies: Orchard.CulturePicker, Orchard.Localization
+Category: Localization

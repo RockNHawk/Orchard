@@ -36,7 +36,8 @@ namespace Ljosland.Localization.Search.Services
                 : new NullSearchBuilder();
         }
 
-        IPageOfItems<T> ISearchService.Query<T>(string query, int page, int? pageSize, bool filterCulture, string[] searchFields, Func<ISearchHit, T> shapeResult) {
+        //IPageOfItems<T> ISearchService.Query<T>(string query, int page, int? pageSize, bool filterCulture, string[] searchFields, Func<ISearchHit, T> shapeResult) {
+        IPageOfItems<T> ISearchService.Query<T>(string query, int page, int? pageSize, bool filterCulture, string index, string[] searchFields, Func<ISearchHit, T> shapeResult) { 
 
             if (string.IsNullOrWhiteSpace(query))
                 return new PageOfItems<T>(Enumerable.Empty<T>());

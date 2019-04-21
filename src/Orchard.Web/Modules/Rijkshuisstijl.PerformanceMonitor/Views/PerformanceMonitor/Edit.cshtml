@@ -1,0 +1,76 @@
+﻿@using System.Globalization
+@using Rijkshuisstijl.PerformanceMonitor.Models
+@using Rijkshuisstijl.PerformanceMonitor.ViewModels.PerformanceMonitor
+
+@model Rijkshuisstijl.PerformanceMonitor.ViewModels.PerformanceMonitor.EditViewModel
+
+@{
+    Script.Require("jQuery");
+    
+    Layout.Title = T("Edit performance counter");
+    Style.Include("performancemonitor.css");
+}
+
+<div id="performancecounter">
+
+    <div class="errormessages">
+        @Html.ValidationSummary()
+    </div>
+
+    @using (Html.BeginFormAntiForgeryPost("Edit"))
+    {
+        SelectList selectListOfPerformanceCounters = Model.CounterList;
+
+        SelectList selectListOfThresholdWhen = Model.ThresholdWhenList;
+
+        var categoryText = Model.CategoryName;
+        var instanceText = Model.InstanceName;
+        
+        <fieldset>
+            <legend>@Html.Raw(@categoryText) 
+            @if (Model.InstanceName != "none")
+            {
+                @T(" : ")
+                @Html.Raw(@instanceText)    
+            }
+            </legend><br/>
+        
+            @Html.HiddenFor(m => m.Id)
+            @Html.HiddenFor(m => m.CategoryName)
+            @Html.HiddenFor(m => m.InstanceName)
+ 
+            @Html.Label(T("Counter").Text, new {@class = "editor-label"}) 
+            @Html.DropDownListFor(m => m.CounterName, selectListOfPerformanceCounters, "--Choose a counter--", new { @class = "textMedium" })
+            <br/><br/> 
+        
+            <label for="@Html.FieldIdFor(m => m.Duration)"><strong>@T("Duration")</strong></label>
+            <span class="hint">@T("(in hours, with a maximum of 24 hours)")</span>
+            @Html.TextBoxFor(m => m.Duration, new { @class = "textMedium" })
+            @Html.ValidationMessageFor(model => model.Duration)
+            <br /><br />      
+
+            <label for="@Html.FieldIdFor(m => m.SampleInterval)"><strong>@T("Sample Interval")</strong></label>
+            <span class="hint">@T("(in minutes with a minimum of 1 minute and maximum of 60 minutes)")</span>
+            @Html.TextBoxFor(m => m.SampleInterval, new { @class = "textMedium" })
+            @Html.ValidationMessageFor(model => model.SampleInterval)
+            <br /><br /> 
+            
+            <label for="@Html.FieldIdFor(m => m.Threshold)"><strong>@T("Threshold")</strong></label>
+            <span class="hint">@T("( optional)a limit value to indicate when the countervalue exceeds (or reaches below) this value")</span>
+            @Html.TextBoxFor(m => m.Threshold, new { @class = "textMedium" })
+            <br /><br />         
+
+            @Html.Label(T("Indicate when threshold value is:").Text, new { @class = "editor-label" })
+            @Html.DropDownListFor(m => m.ThresholdWhen, selectListOfThresholdWhen, new { @class = "textMedium" })
+            <br /><br /> 
+
+            <input class="button primaryAction"  type="submit" value="@T("Save")"></input>
+        </fieldset>
+    }
+</div>
+
+<br /><br />    
+   
+
+
+

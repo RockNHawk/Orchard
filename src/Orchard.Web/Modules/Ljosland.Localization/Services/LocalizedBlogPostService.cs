@@ -44,7 +44,7 @@ namespace Ljosland.Localization.Services
             return GetBlogQuery(blogPart, versionOptions).List().Select(ci => ci.As<BlogPostPart>());
         }
 
-        private IContentQuery<ContentItem, CommonPartRecord> GetBlogQuery(ContentPart<BlogPartRecord> blog, VersionOptions versionOptions)
+        private IContentQuery<ContentItem, CommonPartRecord> GetBlogQuery(BlogPart blog, VersionOptions versionOptions)
         {
             //var currentCulture = _cultureManager.GetCultureByName(_cultureManager.GetCurrentCulture(_workContextAccessor.GetContext().HttpContext));
             var currentBlogLocalization = _contentManager.Query("Blog")
@@ -52,7 +52,7 @@ namespace Ljosland.Localization.Services
                 .Where(x => x.Id == blog.ContentItem.Id).List<LocalizationPart>().SingleOrDefault();
 
             //also look in current selected blog
-            var blogids = new HashSet<int> { blog.Record.ContentItemRecord.Id };
+            var blogids = new HashSet<int> { blog.ContentItem.Record.Id };
 
             //and look in master blog if current blog is a translation
             _contentManager.Query("Blog")
@@ -147,7 +147,7 @@ namespace Ljosland.Localization.Services
         {
             var query =
                 from bar in _blogArchiveRepository.Table
-                where bar.BlogPart == blogPart.Record
+                where bar.BlogPart == blogPart.ContentItem.Record
                 orderby bar.Year descending, bar.Month descending
                 select bar;
 

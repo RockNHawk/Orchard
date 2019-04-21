@@ -1,0 +1,294 @@
+﻿@using Orchard.UI.Resources
+@*@using Rijkshuisstijl.ApplicationFramework.Helpers*@
+@using Rijkshuisstijl.PerformanceMonitor.Models
+@using Rijkshuisstijl.PerformanceMonitor.WorkerServices
+
+@model Rijkshuisstijl.PerformanceMonitor.ViewModels.PerformanceMonitor.ShowViewModel
+
+@{
+    Layout.Title = "Performance Monitor : Counter statistics";
+    Script.Require("jQuery");
+    Style.Include("performancemonitor.css");
+
+    //jquerymin (supplied with jqplot) required for jqplot graph
+    Script.Require("jquerymin");
+    Script.Require("jqplot");
+    Script.Require("excanvas");
+
+    Script.Require("jqplotcursor");
+    Script.Require("jqplothighlighter");
+    Script.Require("jqplotcanvasoverlay");
+    Style.Require("jqplot");
+
+    Script.Require("DataTables");
+    Style.Require("DataTables");
+
+    string thresholdText = Model.Threshold.ToString();
+    string thresholdWhenText = string.Empty;
+    if (Model.ThresholdWhen == false)
+    {
+        thresholdWhenText = ">";
+    }
+    else
+    {
+        thresholdWhenText = "<";
+    }
+
+    string meanText = string.Empty;
+    if (Model.MeanValue == 0)
+    {
+        meanText = "-";
+    }
+    else
+    {
+        meanText = Model.MeanValue.ToString();
+    }
+
+    string minimumText = string.Empty;
+    if (Model.MinimumValue == 0)
+    {
+        minimumText = "-";
+    }
+    else
+    {
+        minimumText = Model.MinimumValue.ToString();
+    }
+
+    string maximumText = string.Empty;
+    if (Model.MaximumValue == 0)
+    {
+        maximumText = "-";
+    }
+    else
+    {
+        maximumText = Model.MaximumValue.ToString();
+    }
+}
+
+<input id="__requesttoken" type="hidden" value="@Html.AntiForgeryTokenValueOrchard()" />
+
+<a id="button" title="Refresh now">Refresh Now</a>@T(" | ")
+@if (Model.AutoRefresh == false)
+{
+    <a id="toggleButton" title="Auto refresh every interval" style="color: #d3d3d3">Auto Refresh</a>
+}
+else
+{
+    <a id="toggleButton" title="Auto refresh every interval" style="color: green">Auto Refresh</a>
+}
+
+<center><div id="chart1" align="center" style="height:600px;width:800px; "></div></center>
+
+@T("Threshold : ")
+@if (Model.Threshold == null || Model.Threshold == 0)
+{
+    @T(" - ")
+}
+else
+{
+    @Html.Raw(@thresholdWhenText)
+    @Html.Raw(@thresholdText)
+}
+@T(" | ")
+@T("Mean : ")
+@Html.Raw(@meanText)
+@T(" | ")
+@T("Minimum : ")
+@Html.Raw(@minimumText)
+@T(" | ")
+@T("Maximum : ")
+@Html.Raw(@maximumText)
+  
+<table id="performancedatarecordstable">
+    <thead>
+        <tr>
+            <th class="heartbeat-column">Date</th>
+            <th class="heartbeat-column">Time</th>
+            <th class="count-column">@Model.LabelCounter</th>
+            <th class="duration-column">Runtime</th>
+            <th class="threshold-column">Threshold exceeded</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model == null || Model.PerformanceMonitorDataRecords == null)
+        {
+        }
+        else
+        {
+            foreach (PerformanceMonitorDataRecord monitorDataRecord in Model.PerformanceMonitorDataRecords)
+            {
+                string durationText = string.Empty;
+                string durationCount = string.Empty;
+                string heartbeatDateText = string.Empty;
+                string heartbeatTimeText = string.Empty;
+
+                if (monitorDataRecord.Ticks == null)
+                { }
+                else
+                {
+                    durationCount = monitorDataRecord.Ticks.ToString();
+                    long durationCountLong = long.Parse(durationCount);
+                    TimeSpan duration = TimeSpan.FromTicks(durationCountLong);
+                    durationText = duration.ToString(@"hh\:mm\:ss");
+                }
+
+                DateTime heartbeat = monitorDataRecord.HeartBeat;
+                heartbeatDateText = heartbeat.ToString("yyyy-MM-dd");
+                heartbeatTimeText = heartbeat.ToString("HH:mm:ss");
+
+                <tr>
+                    <td>
+                        @Html.Raw(@heartbeatDateText)
+                    </td>
+                    <td>
+                        @Html.Raw(@heartbeatTimeText)
+                    </td>
+                    <td>
+                        @monitorDataRecord.Count.ToString()
+                    </td>
+                    <td>
+                        @Html.Raw(@durationText)
+                    </td>
+                    <td>
+                        @if (monitorDataRecord.PassedThreshold == false)
+                        {
+                            @T(" - ")
+                        }
+                        else
+                        {
+                            @monitorDataRecord.PassedThresholdValue.ToString()
+                        }
+
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+        
+@using (Script.Foot())
+{
+    <script type="text/javascript">
+    //<![CDATA[
+
+    $(document).ready(function () {
+        var autoRefresh = false;
+        var autoRefreshInterval = @Model.SampleInterval * 60000;   //mili seconds
+        var autoRefreshModelValue = @Html.Raw(Json.Encode(Model.AutoRefresh));
+
+        $('a#button').click(function () {
+            location.reload();
+        });
+
+        $('a#toggleButton').click(function () {
+            $(this).css('color', 'green');
+            if (autoRefreshModelValue)
+            {
+                autoRefresh = false;
+                var url = "@Url.Action("SetAutorefreshValue", "PerformanceMonitor", new { id = @Html.Raw(Json.Encode(Model.PerformanceMonitorRecord_Id)), autorefresh = false })";
+                url = url.replace('&amp;',"&");
+                window.location.replace(url);
+            }
+            else
+            {
+                autoRefresh = true;
+            }
+        });
+
+        if (autoRefreshModelValue)
+        {
+            setTimeout(function() {
+                autoRefresh = true;
+            }, 1000);
+        }
+
+        var refresh = function () {
+            if (autoRefresh) {
+                var url = "@Url.Action("SetAutorefreshValue", "PerformanceMonitor", new { id = @Html.Raw(Json.Encode(Model.PerformanceMonitorRecord_Id)), autorefresh = true })";
+                url = url.replace('&amp;',"&");
+
+                window.location.replace(url);
+            }
+            setTimeout(refresh, autoRefreshInterval);
+        };
+
+        refresh();
+    });
+
+    $(document).ready(function () {
+        $('#performancedatarecordstable').dataTable(
+            {
+                "bAutoWidth": false,
+                "bFilter": false,
+                "bInfo": false,
+                "aaSorting": [[0, 'desc'], [1, 'desc']],
+                "aoColumns": [
+                    { "bSortable": true, "sWidth": '150px' },
+                    { "bSortable": true, "sWidth": '150px' },
+                    { "bSortable": true, "sWidth": '150px' },
+                    { "bSortable": true, "sWidth": '150px' },
+                    { "bSortable": true }
+                ],
+                "bPaginate": true,
+                "sPaginationType": "full_numbers",
+                "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                    // Bold the grade for all 'A' grade browsers
+                    if (aData[4] != "-") {
+                        $(nRow).css('color', 'red')
+                    }
+                }
+            });
+    });
+
+    (function ($) {
+        var dataArray = [];
+        @foreach (var item in Model.data)
+            {
+                long ticksLong = long.Parse(item.Ticks.ToString());
+                string durationRuntime = TimeSpan.FromTicks(ticksLong).TotalMinutes.ToString();
+                string durationRuntimeFormatted = durationRuntime.Split(',')[0].Trim();
+
+                //runtime in minutes as an basic scale for the graph's x-axis
+                int runtimeCounter = int.Parse(durationRuntimeFormatted);
+
+                var value = item.Value;
+                <text>dataArray.push([@runtimeCounter,@value]);</text>
+            }
+
+        $.jqplot('chart1', [dataArray],
+            {
+                title: 'Counter statistics',
+                series: [{ color: '#5FAB78' }],
+                seriesDefaults: {
+                    rendererOptions: {
+                        smooth: false
+                    }
+                },
+                axes: {
+                    xaxis: {
+                        label: "Runtime (minutes)",
+                        min: 0
+                    },
+                    yaxis: {
+                        label: "<text>@Model.LabelAxisY</text>"
+                    }
+                },
+                highlighter: {
+                    show: true,
+                    sizeAdjust: 7.5
+                },
+                cursor: {
+                    show: true,
+                    zoom: true,
+                    showTooltip: false
+                }
+            });
+    })(jQuery);
+    //]]>
+</script>
+}
+
+
+
+
+
