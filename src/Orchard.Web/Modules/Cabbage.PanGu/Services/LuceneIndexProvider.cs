@@ -40,7 +40,7 @@ namespace Cabbage.PanGu.Services
             _basePath = _appDataFolder.Combine("Sites", shellSettings.Name, "Indexes");
 
             //TODO:下面两句是初始化盘古分词
-            var panguXml = System.Web.Hosting.HostingEnvironment.MapPath("/Modules/Cabbage.PanGu/PanGu/PanGu.xml");
+            var panguXml = System.Web.Hosting.HostingEnvironment.MapPath("~/Modules/Cabbage.PanGu/PanGu/PanGu.xml");
             global::PanGu.Segment.Init(panguXml);
 
 
