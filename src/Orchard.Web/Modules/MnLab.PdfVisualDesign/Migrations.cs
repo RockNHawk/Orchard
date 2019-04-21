@@ -1,9 +1,11 @@
+using MnLab.PdfVisualDesign.Models;
 using Orchard.ContentManagement.MetaData;
 using Orchard.Core.Contents.Extensions;
 using Orchard.Data.Migration;
 
 namespace MnLab.PdfVisualDesign {
     public class Migrations : DataMigrationImpl {
+
         public int Create() {
 
             SchemaBuilder.CreateTable(nameof(TempalteSupportPartRecord),
@@ -35,6 +37,7 @@ namespace MnLab.PdfVisualDesign {
               .WithDescription("Provides a tempalte support for your content item."));
             return 2;
         }
+
 
 
     }

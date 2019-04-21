@@ -371,7 +371,7 @@ module RhythmAjaxForm {
                                         //window.location.replace();
                                         window.location.href = resp.redirect;
                                     }
-                                }, resp.messageShowTime ? resp.messageShowTime : (resp.message ? 1500 : 1));
+                                }, <any>(resp.messageShowTime ? resp.messageShowTime : (resp.message ? 1500 : 1)));
                             }
                             break;
                         case OperationStatus.failure:

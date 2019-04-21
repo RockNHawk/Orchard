@@ -1,0 +1,85 @@
+﻿@using Orchard.ContentManagement;
+@{
+    ContentItem contentItem = Model.ContentItem;
+
+
+}
+
+@if (contentItem.ContentType.Equals("NHProductManualTemplate"))
+{
+    <style>
+        .content-picker-tab {
+            width: 100% !important;
+        }
+
+        .properties {
+            width: 280px;
+            height: 280px;
+            line-height: 0;
+            overflow: hidden;
+            float: left;
+            margin-right: 40px;
+            border: 1px solid #eee;
+        }
+
+        .title h2 {
+            font-size: 24px !important;
+            font-weight: 400 !important;
+            margin-top: 15px !important;
+            margin-bottom: 18px !important;
+        }
+
+        .contentItems {
+            border: 1px solid #403c3c;
+        }
+
+            .contentItems li {
+                border-bottom: 1px solid #403c3c;
+            }
+
+            .contentItems .related {
+                text-align: initial !important;
+            }
+    </style>
+    <div class="summary" itemscope="itemscope" itemid="@contentItem.Id" itemtype="http://orchardproject.net/data/ContentItem">
+        @*<input type="checkbox" class="content-picker-itemCheck" />*@
+        <div class="content-picker-item">
+            <div class="properties">
+                @if (Model.Content.Items.Count > 0)
+                {
+                    for (int i = 0; i < Model.Content.Items.Count; i++)
+                    {
+                        if (Model.Content.Items[i].Metadata.Type == "Fields_MediaLibraryPicker_SummaryAdmin")
+                        {
+                            <div style="display:inline"><img src=" @(Model.Content.Items[i].ContentField.FirstMediaUrl)" /></div>
+                        }
+
+                    }
+                }
+            </div>
+            <div>
+                <div class="title">
+                    <h2>@Html.ItemDisplayText(contentItem)</h2>
+                    @*- <div class="contentType">@contentItem.TypeDefinition.DisplayName</div>*@
+                </div>
+                <div class="related"
+                     data-display-text="@Html.ItemDisplayText(contentItem)"
+                     data-id="@contentItem.Id"
+                     data-edit-link="@Html.Encode(Html.ItemEditLink(contentItem))"
+                     data-edit-url="@Html.Encode(Url.ItemEditUrl(contentItem))"
+                     data-admin-url="@Html.Encode(Url.ItemAdminUrl(contentItem))"
+                     data-display-link="@Html.Encode(Html.ItemDisplayLink(contentItem))"
+                     data-published="@contentItem.VersionRecord.Published.ToString().ToLower()">
+                    @Html.Link(T("Select").Text, "#", new { @class = "button select" })
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+else
+{
+    Html.RenderPartial("~/Modules/Orchard.ContentPicker/Views/ContentPicker.SummaryAdmin.cshtml", (object)Model);
+
+}
+
