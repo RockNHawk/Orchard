@@ -12,7 +12,7 @@ using Autofac.Core;
 using Orchard.Layouts.Framework.Display;
 using Orchard.Environment.Configuration;
 using Orchard.Environment.ShellBuilders;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 using MnLab.Enterprise.Approval.Models;
 
 namespace MnLab.Enterprise {

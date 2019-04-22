@@ -41,12 +41,12 @@ using Orchard.Settings;
 using Orchard.Utility.Extensions;
 using Orchard.Localization.Services;
 using Orchard.Core.Contents;
-using MnLab.Enterprise.Approval;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 using Rhythm;
 using Drahcro.Data;
 using MnLab.Enterprise;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 using MnLab.Enterprise.Approval.Models;
 using Orchard.Events;
 

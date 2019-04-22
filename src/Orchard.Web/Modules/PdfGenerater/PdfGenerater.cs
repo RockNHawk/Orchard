@@ -16,14 +16,14 @@ namespace PdfGenerater {
         /// <param name="destFile"></param>
         /// <param name="pdfOptionsJson"></param>
         /// <returns></returns>
-        public async Task GenerateWithWeekReference(string url, string destFile, string launchOptionsJson, string pdfOptionsJson) {
+        public async Task GenerateWithWeekReference(string url, string destFile, string launchOptionsJson, string viewPortOptionsJson, string pdfOptionsJson) {
 
-            var launchOptions = new LaunchOptions {
-                ExecutablePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules/chromium/win-x64/chrome.exe"),
-                Headless = true
-            };
+            //var launchOptions = new LaunchOptions {
+            //    ExecutablePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules/chromium/win-x64/chrome.exe"),
+            //    Headless = true
+            //};
 
-            //LaunchOptions launchOptions = Newtonsoft.Json.JsonConvert.DeserializeObject<LaunchOptions>(pdfOptionsJson);
+            LaunchOptions launchOptions = Newtonsoft.Json.JsonConvert.DeserializeObject<LaunchOptions>(pdfOptionsJson);
 
             /**
              *
@@ -51,37 +51,39 @@ namespace PdfGenerater {
 }
              *
              */
-            PdfOptions pdfOptions = new PdfOptions() {
-                DisplayHeaderFooter = true,
-                PrintBackground = true,
-                HeaderTemplate = "<b style='font-size: 6px'>南华机电有限公司</b>",
-                FooterTemplate = "<b style='border-top: 1px solid #000;margin: 0 auto;'><div style='padding-top: 5px;'><span  style='font-size: 8px;'>上海南华机电有限公司</span><span  style='font-size: 6px'> 电话：+86 021-39126868 传真： +86 021-39126868 分机 808/818 网址：www.nanhua.com；E-mail:sales@nanhua.com 地址：上海嘉定区北路1755号9号楼 邮编：201802</span></div>" +
-              "<div style='width: 100%;text-align: center;padding-top: 5px;'> <span  style='font-size:12px;color: red;'>南华机电版权所有，如无南华书面授权，任何部分不得以任何形式复制或传播</span></div><div style='float: right;'><span class=\"pageNumber\" style='font-size: 8px'></span><span  style='font-size: 8px'>/<span><span class=\"totalPages\" style='font-size: 8px'></span></div></b>",
-                Format = PaperFormat.A4,
-                MarginOptions = new MarginOptions {
-                    Top = "100px",
-                    Bottom = "200px",
-                    Right = "30px",
-                    Left = "30px",
-                }
-            };
+            //PdfOptions pdfOptions = new PdfOptions() {
+            //    DisplayHeaderFooter = true,
+            //    PrintBackground = true,
+            //    HeaderTemplate = "<b style='font-size: 6px'>南华机电有限公司</b>",
+            //    FooterTemplate = "<b style='border-top: 1px solid #000;margin: 0 auto;'><div style='padding-top: 5px;'><span  style='font-size: 8px;'>上海南华机电有限公司</span><span  style='font-size: 6px'> 电话：+86 021-39126868 传真： +86 021-39126868 分机 808/818 网址：www.nanhua.com；E-mail:sales@nanhua.com 地址：上海嘉定区北路1755号9号楼 邮编：201802</span></div>" +
+            //  "<div style='width: 100%;text-align: center;padding-top: 5px;'> <span  style='font-size:12px;color: red;'>南华机电版权所有，如无南华书面授权，任何部分不得以任何形式复制或传播</span></div><div style='float: right;'><span class=\"pageNumber\" style='font-size: 8px'></span><span  style='font-size: 8px'>/<span><span class=\"totalPages\" style='font-size: 8px'></span></div></b>",
+            //    Format = PaperFormat.A4,
+            //    MarginOptions = new MarginOptions {
+            //        Top = "100px",
+            //        Bottom = "200px",
+            //        Right = "30px",
+            //        Left = "30px",
+            //    }
+            //};
 
             //  PaperFormat.A4
-            //PdfOptions pdfOptions = Newtonsoft.Json.JsonConvert.DeserializeObject<PdfOptions>(pdfOptionsJson);
+            PdfOptions pdfOptions = Newtonsoft.Json.JsonConvert.DeserializeObject<PdfOptions>(pdfOptionsJson);
 
-            if (pdfOptions!=null) {
-                pdfOptions.Format = PaperFormat.A4;
-            }
+            ViewPortOptions viewPortOptions = Newtonsoft.Json.JsonConvert.DeserializeObject<ViewPortOptions>(viewPortOptionsJson);
+
+            //if (pdfOptions!=null) {
+            //    pdfOptions.Format = PaperFormat.A4;
+            //}
 
             //var json = Newtonsoft.Json.JsonConvert.SerializeObject(pdfOptions);
             //Console.WriteLine(json);
 
             //Path.Combine(Directory.GetCurrentDirectory(), "google.pdf")
 
-            await Generate(url, destFile, launchOptions, pdfOptions);
+            await Generate(url, destFile, launchOptions, viewPortOptions, pdfOptions);
         }
 
-        public async Task Generate(string url, string destFile, LaunchOptions launchOptions, PdfOptions pdfOptions) {
+        public async Task Generate(string url, string destFile, LaunchOptions launchOptions, ViewPortOptions viewPortOptions, PdfOptions pdfOptions) {
 
             //Console.WriteLine("下载chromium");
             //  await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
@@ -93,9 +95,11 @@ namespace PdfGenerater {
 
                 //Console.WriteLine("导出 PDF");
                 await page.EmulateMediaAsync(MediaType.Screen);
-                ViewPortOptions vpos = new ViewPortOptions();
-                vpos.IsMobile = true;
-                await page.SetViewportAsync(vpos);
+                //  ViewPortOptions viewPortOptions = new ViewPortOptions();
+                //  vpos.IsMobile = true;
+                if (viewPortOptions != null) {
+                    await page.SetViewportAsync(viewPortOptions);
+                }
                 await page.SetJavaScriptEnabledAsync(true);
                 //await page.WaitForSelectorAsync()
                 //await page.setDefaultNavigationTimeout（timeout）

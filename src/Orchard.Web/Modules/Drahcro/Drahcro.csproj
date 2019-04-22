@@ -175,7 +175,7 @@
     <Compile Include="Web\Drivers\WebCoreSupportPartDriver.cs" />
     <Compile Include="Web\Migrations.cs" />
     <Compile Include="Web\Models\ApprovalSupportPartRecord.cs" />
-    <Compile Include="Web\Parts\WebCoreSupportPart.cs" />
+    <Compile Include="Web\Models\WebCoreSupportPart.cs" />
     <Compile Include="Web\NewFolder1\RhythmControllerBase.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +215,7 @@
   <ItemGroup>
     <Folder Include="Views\Admin\" />
     <Folder Include="Views\DefinitionTemplates\" />
+    <Folder Include="Web\Parts\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\jquery.d.ts" />

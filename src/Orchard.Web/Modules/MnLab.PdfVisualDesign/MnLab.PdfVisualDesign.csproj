@@ -445,6 +445,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets.json" />
+    <Content Include="Assets\PdfGenerater\viewPortOptions.json" />
+    <Content Include="Assets\PdfGenerater\pdfOptions.json" />
+    <Content Include="Assets\PdfGenerater\launchOptions.json" />
     <None Include="packages.config" />
     <Content Include="Views\EditorTemplates\Property.Property.cshtml" />
     <Content Include="Scripts\handsontable\handsontable.css.map" />

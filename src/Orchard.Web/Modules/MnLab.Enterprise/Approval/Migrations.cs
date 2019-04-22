@@ -2,7 +2,7 @@ using Orchard.ContentManagement.MetaData;
 using Orchard.Core.Contents.Extensions;
 using Orchard.Data.Migration;
 using MnLab.Enterprise;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 using System;
 using MnLab.Enterprise.Approval.Models;
 

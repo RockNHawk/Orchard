@@ -4,7 +4,7 @@ using Orchard.ContentManagement;
 using Orchard.ContentManagement.Aspects;
 //using Drahcro.Models;
 
-namespace Drahcro.Web {
+namespace Drahcro.Web.Models {
     public class WebCoreSupportPart : ContentPart {
 
     }

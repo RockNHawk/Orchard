@@ -6,7 +6,7 @@ using AutoMapper;
 using MnLab.PdfVisualDesign.Binding.Elements;
 using MnLab.PdfVisualDesign.ViewModels;
 using MnLab.Enterprise;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 using Orchard.Environment;
 using Autofac;
 using Autofac.Builder;
@@ -40,7 +40,7 @@ namespace MnLab.PdfVisualDesign {
         public OrchardShellEvents(IWorkContextAccessor workContextAccessor, IOrchardHost orchardHost, ShellSettings settings) {
             this._workContextAccessor = workContextAccessor;
 
-              ContentApprovalService.Approved += OnApproved;
+           //   ContentApprovalService.Approved += OnApproved;
             Logger = NullLogger.Instance;
             T = NullLocalizer.Instance;
 

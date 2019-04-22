@@ -11,7 +11,7 @@ using System.Web.Instrumentation;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Autofac;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 using Orchard.Environment.Extensions;
 using Orchard.Layouts.Framework.Display;
 using Orchard.Mvc.Extensions;

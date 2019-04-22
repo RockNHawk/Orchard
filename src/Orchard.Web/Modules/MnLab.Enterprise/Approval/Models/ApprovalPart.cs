@@ -13,11 +13,11 @@ using Orchard.ContentManagement.Utilities;
 using Orchard.Core;
 using Orchard.Data;
 using Orchard.Security;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 using MnLab.Enterprise.Approval.Models;
 using Orchard.Users.Models;
 
-namespace MnLab.Enterprise.Approval {
+namespace MnLab.Enterprise.Approval.Models {
 
     public class ApprovalPart : ContentPart<ApprovalPartRecord>, IApproval {
 

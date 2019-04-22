@@ -3,6 +3,7 @@ using Orchard.ContentManagement.Drivers;
 using Orchard.ContentManagement.Handlers;
 using Drahcro.Web;
 using Orchard.Localization;
+using Drahcro.Web.Models;
 
 namespace Drahcro.Web.Drivers {
     public class WebCoreSupportPartDriver : ContentPartDriver<WebCoreSupportPart> {

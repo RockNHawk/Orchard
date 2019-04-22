@@ -3,7 +3,7 @@ using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
 using Orchard.Core.Contents.Settings;
 using MnLab.Enterprise;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 
 namespace MnLab.Enterprise.Approval.Drivers {
     public class ContentButtonDriver : ContentPartDriver<ContentPart> {

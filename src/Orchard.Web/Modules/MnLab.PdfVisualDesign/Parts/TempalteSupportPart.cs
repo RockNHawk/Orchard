@@ -2,8 +2,7 @@
 using Orchard.ContentManagement;
 using System.Collections.Generic;
 
-namespace MnLab.PdfVisualDesign
-{
+namespace MnLab.PdfVisualDesign.Models {
     public class TempalteSupportPart : ContentPart<TempalteSupportPartRecord>
     {
       

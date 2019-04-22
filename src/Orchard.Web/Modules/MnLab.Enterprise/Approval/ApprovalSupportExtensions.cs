@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
+using MnLab.Enterprise.Approval.Models;
 
 namespace MnLab.Enterprise.Approval {
     public static class ApprovalSupportExtensions {

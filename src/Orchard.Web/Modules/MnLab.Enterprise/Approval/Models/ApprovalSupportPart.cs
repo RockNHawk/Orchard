@@ -5,7 +5,7 @@ using Orchard.ContentManagement;
 using Orchard.ContentManagement.Aspects;
 using MnLab.Enterprise.Approval.Models;
 
-namespace MnLab.Enterprise.Approval {
+namespace MnLab.Enterprise.Approval.Models {
     public class ApprovalSupportPart : ContentPart<ApprovalSupportPartRecord>, IApprovalInfo {
 
         public string CommitOpinion { get { return Record?.CommitOpinion; } set { Record.CommitOpinion = value; } }

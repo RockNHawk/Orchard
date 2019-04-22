@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MnLab.Enterprise;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 using MnLab.Enterprise.Approval.Models;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Records;

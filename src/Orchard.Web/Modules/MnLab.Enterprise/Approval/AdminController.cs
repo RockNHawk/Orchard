@@ -35,7 +35,7 @@ using Orchard.Utility.Extensions;
 using Orchard.Localization.Services;
 using Orchard.Core.Contents;
 using MnLab.Enterprise;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 using Orchard.Users.Models;
 using Rhythm.Web;
 

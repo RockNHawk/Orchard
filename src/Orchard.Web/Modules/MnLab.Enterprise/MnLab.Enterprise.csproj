@@ -169,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Ajax\" />
+    <Folder Include="Approval\Parts\" />
     <Folder Include="NewFolder1\" />
     <Folder Include="Services\" />
     <Folder Include="Settings\" />
@@ -210,14 +211,14 @@
     <Compile Include="Approval\Drivers\ApprovalPartDriver.cs" />
     <Compile Include="Approval\Drivers\ContentButtonDriver.cs" />
     <Compile Include="Approval\Migrations.cs" />
-    <Compile Include="Approval\Parts\ApprovalPart.cs" />
+    <Compile Include="Approval\Models\ApprovalPart.cs" />
     <Compile Include="Approval\Models\ApprovalSupportPartRecord.cs" />
-    <Compile Include="Approval\Parts\IApprovalInfo.cs" />
+    <Compile Include="Approval\Models\IApprovalInfo.cs" />
     <Compile Include="OrchardShellEvents.cs" />
     <Compile Include="ResourceManifest.cs" />
     <Compile Include="Approval\Drivers\ApprovalSupportPartDriver.cs" />
     <Compile Include="Approval\Handlers\TitlePartHandler.cs" />
-    <Compile Include="Approval\Parts\ApprovalSupportPart.cs" />
+    <Compile Include="Approval\Models\ApprovalSupportPart.cs" />
     <Compile Include="Approval\Models\ApprovalPartRecord.cs" />
     <Compile Include="EnterpriseModule.cs" />
   </ItemGroup>

@@ -10,9 +10,9 @@
 *************************************************/
 using Rhythm;
 using Drahcro.Data;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 using System;
-using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 using MnLab.Enterprise.Approval.Models;
 using Orchard.Users.Models;
 

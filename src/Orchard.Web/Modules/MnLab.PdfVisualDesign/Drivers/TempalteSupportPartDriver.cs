@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using MnLab.PdfVisualDesign.Binding.Drivers;
 using MnLab.PdfVisualDesign.Drivers;
+using MnLab.PdfVisualDesign.Models;
 using Orchard;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;

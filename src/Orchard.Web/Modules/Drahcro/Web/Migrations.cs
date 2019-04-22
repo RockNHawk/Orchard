@@ -4,6 +4,7 @@ using Orchard.Data.Migration;
 using System;
 using Drahcro;
 using Drahcro.Web;
+using Drahcro.Web.Models;
 
 namespace Drahcro.Web {
     public class Migrations : DataMigrationImpl {
