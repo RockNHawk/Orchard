@@ -13,7 +13,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>MnLab.PdfVisualDesign</RootNamespace>
     <AssemblyName>MnLab.PdfVisualDesign</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -63,6 +63,8 @@
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
       <Private>True</Private>
@@ -421,10 +423,10 @@
     <Compile Include="Models\ValueBindingInfo.cs" />
     <Compile Include="Migrations.cs" />
     <Compile Include="Hooks\OrchardShellEvents.cs" />
-    <Compile Include="Parts\PdfPart.cs" />
+    <Compile Include="Parts\PdfGeneratePart.cs" />
     <Compile Include="Parts\TempalteSupportPart.cs" />
     <Compile Include="Drivers\TempalteSupportPartDriver.cs" />
-    <Compile Include="Parts\PdfPartRecord.cs" />
+    <Compile Include="Parts\PdfGeneratePartRecord.cs" />
     <Compile Include="Parts\TempalteSupportPartRecord.cs" />
     <Compile Include="ResourceManifest.cs" />
     <Compile Include="ViewModels\PropertyBindViewModel.cs" />

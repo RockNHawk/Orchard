@@ -9,6 +9,9 @@ using MnLab.Enterprise.Approval.Events;
 using Orchard.Mvc.Html;
 using Orchard.ContentManagement;
 using Orchard;
+using System.Web.Routing;
+using PdfGenerater1 = PdfGenerater.PdfGenerater;
+using Orchard.Logging;
 
 namespace MnLab.PdfVisualDesign.Services {
     /// <summary>
@@ -18,8 +21,19 @@ namespace MnLab.PdfVisualDesign.Services {
 
         public static string dir1 = "App_Data/Sites/Default/PDF";
 
+
+        IWorkContextAccessor _workContextAccessor;
+        IOrchardServices _services;
+
+        public ApprovalEventHandler(IWorkContextAccessor workContextAccessor, IOrchardServices services) {
+            this._services = services;
+            this._workContextAccessor = workContextAccessor;
+        }
+
+
         public void Approve(ApprovalApproveCommand command) {
-            OnApproved(command);
+            OnApproved(command, _workContextAccessor,Logger);
+            _services.TransactionManager.Cancel();
         }
 
         public void Commit(CreateApprovalCommand command) {
@@ -29,19 +43,24 @@ namespace MnLab.PdfVisualDesign.Services {
         }
 
 
-        public static void OnApproved(ApprovalApproveCommand command) {
+        public static void OnApproved(ApprovalApproveCommand command, IWorkContextAccessor workContextAccessor, ILogger Logger) {
             var content = command.ContentItem;
 
-            if (!content.Has<PdfGeneratePart>()) {
+            //if (!content.Has<PdfGeneratePart>()) {
+            //    return;
+            //}
+
+            if (!content.TypeDefinition.Parts.Any(x => x.PartDefinition.Name == nameof(PdfGeneratePart))) {
                 return;
             }
 
-            var part = content.As<PdfGeneratePart>();
-
-            var url = ContentItemExtensions.ItemDisplayUrl(new System.Web.Mvc.UrlHelper(), command.ContentItem);
+            var rq = new RequestContext(workContextAccessor.GetContext().HttpContext, new RouteData());
+            var urlHelper = new System.Web.Mvc.UrlHelper(rq);
+            var url = ContentItemExtensions.ItemDisplayUrl(urlHelper, command.ContentItem);
+            var absoluteUrl = $"{workContextAccessor.GetContext().CurrentSite.BaseUrl}{url}";
 
             var dir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dir1);
-            if (Directory.Exists(dir)) {
+            if (!Directory.Exists(dir)) {
                 Directory.CreateDirectory(dir);
             }
             var destFileName = $"{content.Id}_{content.Version}.pdf";
@@ -49,17 +68,52 @@ namespace MnLab.PdfVisualDesign.Services {
             if (File.Exists(destFilePath)) {
                 File.Move(destFilePath, Path.Combine($"duplicate-{Guid.NewGuid().ToString("N")}-{destFilePath}"));
             }
-            var ge = new PdfGenerater.PdfGenerater();
+
+            var pdfOptions = new {
+                Scale = 1,
+                DisplayHeaderFooter = true,
+                HeaderTemplate = "<b style='font-size: 6px'>南华机电有限公司</b>",
+                FooterTemplate = "<b style='border-top: 1px solid #000;margin: 0 auto;'><div style='padding-top: 5px;'><span  style='font-size: 8px;'>上海南华机电有限公司</span><span  style='font-size: 6px'> 电话：+86 021-39126868 传真： +86 021-39126868 分机 808/818 网址：www.nanhua.com；E-mail:sales@nanhua.com 地址：上海嘉定区北路1755号9号楼 邮编：201802</span></div><div style='width: 100%;text-align: center;padding-top: 5px;'> <span  style='font-size:12px;color: red;'>南华机电版权所有，如无南华书面授权，任何部分不得以任何形式复制或传播</span></div><div style='float: right;'><span class=\"pageNumber\" style='font-size: 8px'></span><span  style='font-size: 8px'>/<span><span class=\"totalPages\" style='font-size: 8px'></span></div></b>",
+                PrintBackground = true,
+                Landscape = false,
+                PageRanges = "",
+                //Format = new {
+                //    Width = 8.27,
+                //    Height = 11.7
+                //},
+                //Width = null,
+                //Height = null,
+                MarginOptions = new {
+                    Top = "100px",
+                    Left = "30px",
+                    Bottom = "200px",
+                    Right = "30px"
+                },
+                PreferCSSPageSize = false
+            };
+
+            var launchOptions = new {
+                ExecutablePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules/chromium/win-x64/chrome.exe".Replace('/', System.IO.Path.DirectorySeparatorChar)),
+                Headless = true
+            };
 
             try {
-                Task.Run(() => ge.Generate1(url, destFilePath, null)).Wait();
+                PdfGenerater1 ge = new PdfGenerater1();
+                Task.Run(() => ge.GenerateWithWeekReference(absoluteUrl, destFilePath, Newtonsoft.Json.JsonConvert.SerializeObject(launchOptions), Newtonsoft.Json.JsonConvert.SerializeObject(pdfOptions))).Wait();
             }
             catch (Exception ex) {
+               Logger?.Log(Orchard.Logging.LogLevel.Error, ex, "Generate Fail {0}", ex.Message);
                 throw;
+            }
+
+            var part = content.As<PdfGeneratePart>();
+            if (part == null) {
+                part = new PdfGeneratePart();
             }
 
             part.FileName = destFileName;
             part.CreatedUtc = DateTime.UtcNow;
+
         }
 
 

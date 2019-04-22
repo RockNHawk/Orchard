@@ -239,6 +239,7 @@ namespace MnLab.Enterprise.Approval.Controllers {
                 returnUrl = Url.ItemDisplayUrl(contentItem);
             }
 
+
             Services.Notifier.Information(string.IsNullOrWhiteSpace(contentItem.TypeDefinition.DisplayName)
                 ? T("Your content has been saved.")
                 : T("Your {0} has been saved.", contentItem.TypeDefinition.DisplayName));

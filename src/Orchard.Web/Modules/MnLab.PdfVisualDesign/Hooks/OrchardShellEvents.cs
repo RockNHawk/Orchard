@@ -20,6 +20,8 @@ using Orchard;
 using System.IO;
 using System.Threading.Tasks;
 using MnLab.PdfVisualDesign.Services;
+using Orchard.Logging;
+using Orchard.Localization;
 
 namespace MnLab.PdfVisualDesign {
 
@@ -29,9 +31,18 @@ namespace MnLab.PdfVisualDesign {
     /// </summary>
     public class OrchardShellEvents : IOrchardShellEvents {
 
-        public OrchardShellEvents(IOrchardHost orchardHost, ShellSettings settings) {
 
-            ContentApprovalService.Approved += OnApproved;
+        IWorkContextAccessor _workContextAccessor;
+        public Localizer T { get; set; }
+
+        public ILogger Logger { get; set; }
+
+        public OrchardShellEvents(IWorkContextAccessor workContextAccessor, IOrchardHost orchardHost, ShellSettings settings) {
+            this._workContextAccessor = workContextAccessor;
+
+              ContentApprovalService.Approved += OnApproved;
+            Logger = NullLogger.Instance;
+            T = NullLocalizer.Instance;
 
             /*
             Cannot resolve parameter  ShellContext 
@@ -63,7 +74,7 @@ namespace MnLab.PdfVisualDesign {
 
         private void OnApproved(object sender, ApprovalApproveCommand e) {
             var command = e;
-            ApprovalEventHandler.OnApproved(command);
+            ApprovalEventHandler.OnApproved(command, _workContextAccessor,Logger);
         }
 
 
