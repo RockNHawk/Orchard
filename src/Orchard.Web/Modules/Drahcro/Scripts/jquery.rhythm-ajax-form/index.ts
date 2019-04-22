@@ -168,9 +168,9 @@ module RhythmAjaxForm {
         isDisabled?: boolean,
         noIframe?: boolean,
         url?: string,
-        callbacks?: AjaxCallbacks,
+        callbacks?: AjaxHandlers,
     }
-    export interface AjaxCallbacks {
+    export interface AjaxHandlers {
         //target?: HTMLIFrameElement;
         submit?: (context: AjaxContext) => void;
         lock?: (isLock: boolean, context: AjaxContext) => void;
@@ -278,7 +278,7 @@ module RhythmAjaxForm {
     /**
     * 默认的服务器返回结果处理程序，外部也可以自定义、替换处理程序。
     */
-    export class Handler implements AjaxCallbacks {
+    export class Handler implements AjaxHandlers {
 
         public static cancel(context: AjaxContext) {
             var args = arguments;
@@ -492,6 +492,8 @@ module RhythmAjaxForm {
                 Handler.cancel.apply(form, [context]);
                 return false;
             }
+
+           // debugger
             if (Utility.isRequireLock(callbacks.lock)) {
                 callbacks.lock.apply(this, [true, context]);
             }

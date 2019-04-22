@@ -139,7 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Module.txt" />
-    <Content Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Orchard\Orchard.Framework.csproj">
@@ -184,6 +184,7 @@
     <Compile Include="Approval\AdminController.cs" />
     <Compile Include="AdminMenu.cs" />
     <Compile Include="Approval\ApprovalSupportExtensions.cs" />
+    <Compile Include="Approval\Business\IApprovalEventHandler.cs" />
     <Compile Include="Approval\Core\ApprovalApproveEvent.cs" />
     <Compile Include="Approval\Core\ApprovalEvent.cs" />
     <Compile Include="Approval\Core\ApprovalExtensions.cs" />

@@ -52,13 +52,16 @@ using Drahcro.Data;
 using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;
 using MnLab.Enterprise.Approval.Models;
+using Orchard.Events;
+using MnLab.Enterprise.Approval.Events;
 
 namespace Rhythm {
 
 }
 
-namespace MnLab.Enterprise.Approval {
 
+
+namespace MnLab.Enterprise.Approval {
 
     //public class ApprovalPartContentRepository : ContentRepository<MnLab.Approval.Models.ApprovalPart> {
     //    public ApprovalPartContentRepository(IContentManager contentManager) : base(contentManager) { }
@@ -112,12 +115,20 @@ namespace MnLab.Enterprise.Approval {
         readonly IContentPartRepository<ApprovalPart, ApprovalPartRecord> _approvalRepository;
         readonly IRepository<ApprovalStepRecord> ApprovalStepRepository;
 
+
+        IApprovalEventHandler eventHandler;
+
+        public static event EventHandler<CreateApprovalCommand> Commited;
+        public static event EventHandler<ApprovalApproveCommand> Approved;
+        public static event EventHandler<ApprovalRejectCommand> Rejected;
+
         public ContentApprovalService(
             IContentPartRepository<ApprovalPart, ApprovalPartRecord> approvalRepository,
          //  ContentRepository<ApprovalStepRecord> ApprovalStepRepository,
          IRepository<ApprovalStepRecord> approvalStepRepository,
             IRepository<ApprovalPartRecord> approvalPartRecordRepos,
               IRepository<ApprovalSupportPartRecord> approvalSupportRepos,
+               IApprovalEventHandler eventHandler,
         IOrchardServices orchardServices,
             IContentManager contentManager,
             IContentDefinitionManager contentDefinitionManager,
@@ -127,18 +138,19 @@ namespace MnLab.Enterprise.Approval {
             ICultureManager cultureManager,
         ICultureFilter cultureFilter) {
 
+            this.eventHandler = eventHandler;
             this._approvalSupportRepos = approvalSupportRepos;
             this._approvalRepository = approvalRepository;
             this._approvalPartRecordRepos = approvalPartRecordRepos;
             this.ApprovalStepRepository = approvalStepRepository;
 
-            Services = orchardServices;
-            _contentManager = contentManager;
-            _contentDefinitionManager = contentDefinitionManager;
-            _transactionManager = transactionManager;
-            _siteService = siteService;
-            _cultureManager = cultureManager;
-            _cultureFilter = cultureFilter;
+            this.Services = orchardServices;
+            this._contentManager = contentManager;
+            this._contentDefinitionManager = contentDefinitionManager;
+            this._transactionManager = transactionManager;
+            this._siteService = siteService;
+            this._cultureManager = cultureManager;
+            this._cultureFilter = cultureFilter;
 
 
 
@@ -553,6 +565,11 @@ namespace MnLab.Enterprise.Approval {
 
             UpdateCurrentApproval(contentApproval, approval);
 
+            eventHandler.Commit(command);
+
+            Commited?.Invoke(this, command);
+
+
             //contentApproval.CurrentApproval = approval.Record;
 
             //SetContentWaitingApproval(wc, content, command.ApprovalType);
@@ -811,15 +828,21 @@ namespace MnLab.Enterprise.Approval {
                 throw new ArgumentNullException(nameof(approvalUser));
             }
 
-            var @event = new ApprovalRejectEvent {
+            var ContentRecord = approval.ContentRecord;
+            var content = ContentRecord.GetContentItem(_contentManager);
+            var contentApproval = GetContentApprovalSupport(content);
+
+            NUnit.Framework.Assert.IsNotNull(content);
+            var command = new ApprovalRejectCommand {
                 Approval = approval,
+                ContentItem = content,
                 ApprovalSwitch = approvalSwitch,
                 AuditBy = approvalUser,
                 AuditOpinion = comments
                 //CommitUser = commitUser,
             };
 
-            using (var trace = wc.BeginTrace(@event)) {
+            using (var trace = wc.BeginTrace(command)) {
                 var steps = approval.Steps;
                 var currentStep = approval.CurrentStep;
 
@@ -829,12 +852,12 @@ namespace MnLab.Enterprise.Approval {
                     throw ValidationApprovalCommentsTypeIncorrectError(ApprovalStatus.WaitingApproval, approval.Status);
                 }
                 ValidateCurrentStep(approval, currentStep);
-                ValidateDepartment(@event, trace, approvalUser.Department(), currentStep.Department);
+                ValidateDepartment(command, trace, approvalUser.Department(), currentStep.Department);
 
                 currentStep.AuditOpinion = comments;
                 approval.AuditOpinion = comments;
 
-                @event.Step = currentStep;
+                command.Step = currentStep;
                 currentStep.Status = ApprovalStatus.Rejected;
                 ApprovalStepRepository.Update(currentStep);
                 approval.CurrentStep = null;
@@ -847,10 +870,7 @@ namespace MnLab.Enterprise.Approval {
                     NUnit.Framework.Assert.IsNotNull(contentReflectedType, StringUtility.Format("the Approval#{0}.ContentType is null.", approval.Id));
                     // var contentRepository = RepositoryManager.Default.Of(approval.GetContentRecordType());
                     //var content = approval.ContentRecord;
-                    var ContentRecord = approval.ContentRecord;
-                    var content = ContentRecord.GetContentItem(_contentManager);
-                    var contentApproval = GetContentApprovalSupport(content);
-                    NUnit.Framework.Assert.IsNotNull(content);
+
                     //contentApproval.Status = ApprovalStatus.Rejected;
                     //contentApproval.ApprovalType = approval.ApprovalType;
                     contentApproval.AuditOpinion = comments;
@@ -865,8 +885,14 @@ namespace MnLab.Enterprise.Approval {
                 //approvalRepository.Update(approval);
 
                 // 发布审批驳回事件
-                PublishEvent(@event);
+                PublishEvent(command);
             }
+
+            eventHandler.Reject(command);
+
+            Rejected?.Invoke(this, command);
+
+
             return approval;
         }
 
@@ -1027,8 +1053,13 @@ namespace MnLab.Enterprise.Approval {
             var steps = approval.Steps;
             var currentStep = approval.CurrentStep;
 
-            var @event = new ApprovalApprove {
+            var ContentRecord = approval.ContentRecord;
+            var content = ContentRecord.GetContentItem(_contentManager);
+            var contentApproval = GetContentApprovalSupport(content);
+
+            var command = new ApprovalApproveCommand {
                 Approval = approval,
+                ContentItem = content,
                 ApprovalSwitch = approvalSwitch,
                 AuditBy = approvalUser,
                 AuditOpinion = AuditOpinion,
@@ -1040,11 +1071,11 @@ namespace MnLab.Enterprise.Approval {
             NUnit.Framework.Assert.AreNotEqual(0, approval.Id);
             ValidateCurrentStep(approval, currentStep);
 
-            using (var trace = wc.BeginTrace(@event)) {
+            using (var trace = wc.BeginTrace(command)) {
                 if (approval.Status != ApprovalStatus.WaitingApproval) {
                     throw trace.Error(ValidationApprovalCommentsTypeIncorrectError(ApprovalStatus.WaitingApproval, approval.Status));
                 }
-                ValidateDepartment(@event, trace, approvalUser.Department(), currentStep.Department);
+                ValidateDepartment(command, trace, approvalUser.Department(), currentStep.Department);
 
                 currentStep.AuditOpinion = AuditOpinion;
                 currentStep.Status = ApprovalStatus.Approved;
@@ -1061,7 +1092,7 @@ namespace MnLab.Enterprise.Approval {
                     _approvalPartRecordRepos.Update(approval.Record);
 
                     ApprovalStepRepository.Update(currentStep);
-                    @event.IsCompleted = true;
+                    command.IsCompleted = true;
                 }
                 else {
                     ApprovalStepRepository.Update(currentStep);
@@ -1074,6 +1105,11 @@ namespace MnLab.Enterprise.Approval {
                 //// 发布审批通过事件
                 //trace.Success();
             }
+
+            eventHandler.Approve(command);
+
+            Approved?.Invoke(this, command);
+
             return approval;
         }
 

@@ -349,6 +349,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cabbage.PanGu", "Orchard.We
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Useful", "Useful", "{73C7E80B-52FE-4038-837A-6E7759F0A8A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PdfGenerater", "Orchard.Web\Modules\PdfGenerater\PdfGenerater.csproj", "{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeCoverage|Any CPU = CodeCoverage|Any CPU
@@ -2381,6 +2383,24 @@ Global
 		{354F6279-59E6-47EE-B996-5B8185AC3BA7}.Staging AR|Any CPU.Build.0 = Release|Any CPU
 		{354F6279-59E6-47EE-B996-5B8185AC3BA7}.Staging|Any CPU.ActiveCfg = Release|Any CPU
 		{354F6279-59E6-47EE-B996-5B8185AC3BA7}.Staging|Any CPU.Build.0 = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.CodeCoverage|Any CPU.ActiveCfg = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.CodeCoverage|Any CPU.Build.0 = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Coverage|Any CPU.ActiveCfg = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Coverage|Any CPU.Build.0 = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Dev|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Dev|Any CPU.Build.0 = Debug|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.FxCop|Any CPU.ActiveCfg = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.FxCop|Any CPU.Build.0 = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Stage|Any CPU.ActiveCfg = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Stage|Any CPU.Build.0 = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Staging AR|Any CPU.ActiveCfg = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Staging AR|Any CPU.Build.0 = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Staging|Any CPU.ActiveCfg = Release|Any CPU
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9}.Staging|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2502,9 +2522,10 @@ Global
 		{57C665C2-B345-4632-9E5A-4282946A4ED9} = {73C7E80B-52FE-4038-837A-6E7759F0A8A3}
 		{354F6279-59E6-47EE-B996-5B8185AC3BA7} = {73C7E80B-52FE-4038-837A-6E7759F0A8A3}
 		{73C7E80B-52FE-4038-837A-6E7759F0A8A3} = {37371259-B7D0-4D34-8DC0-983825CA50D7}
+		{3BA00AA7-8056-4E7A-BFA0-1F009755CAE9} = {BD190832-BC8B-4112-847C-5263BED2B065}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPath = packages\TransientFaultHandling.Core.5.1.1209.1\lib\NET4
 		SolutionGuid = {3585D970-275B-4363-9F61-CD37CFC9DCD3}
+		EnterpriseLibraryConfigurationToolBinariesPath = packages\TransientFaultHandling.Core.5.1.1209.1\lib\NET4
 	EndGlobalSection
 EndGlobal

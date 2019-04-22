@@ -428,6 +428,7 @@ var RhythmAjaxForm;
                 Handler.cancel.apply(form, [context]);
                 return false;
             }
+            // debugger
             if (Utility.isRequireLock(callbacks.lock)) {
                 callbacks.lock.apply(this, [true, context]);
             }

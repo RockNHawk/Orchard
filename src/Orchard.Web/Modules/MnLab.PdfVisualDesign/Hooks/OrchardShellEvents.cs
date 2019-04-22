@@ -5,6 +5,8 @@ using System.Web;
 using AutoMapper;
 using MnLab.PdfVisualDesign.Binding.Elements;
 using MnLab.PdfVisualDesign.ViewModels;
+using MnLab.Enterprise;
+using MnLab.Enterprise.Approval;
 using Orchard.Environment;
 using Autofac;
 using Autofac.Builder;
@@ -12,6 +14,12 @@ using Autofac.Core;
 using Orchard.Layouts.Framework.Display;
 using Orchard.Environment.Configuration;
 using Orchard.Environment.ShellBuilders;
+using Orchard.Mvc.Html;
+using Orchard.ContentManagement;
+using Orchard;
+using System.IO;
+using System.Threading.Tasks;
+using MnLab.PdfVisualDesign.Services;
 
 namespace MnLab.PdfVisualDesign {
 
@@ -22,6 +30,8 @@ namespace MnLab.PdfVisualDesign {
     public class OrchardShellEvents : IOrchardShellEvents {
 
         public OrchardShellEvents(IOrchardHost orchardHost, ShellSettings settings) {
+
+            ContentApprovalService.Approved += OnApproved;
 
             /*
             Cannot resolve parameter  ShellContext 
@@ -46,9 +56,17 @@ namespace MnLab.PdfVisualDesign {
                 cfg.CreateMap<ValueBindItemElement, ValueDef>();
 
                 cfg.CreateMap<ValueBindGridElement, ValueBindGridViewModel>();
-
             });
+
+
         }
+
+        private void OnApproved(object sender, ApprovalApproveCommand e) {
+            var command = e;
+            ApprovalEventHandler.OnApproved(command);
+        }
+
+
 
         public void Terminating() {
             //Do nothing

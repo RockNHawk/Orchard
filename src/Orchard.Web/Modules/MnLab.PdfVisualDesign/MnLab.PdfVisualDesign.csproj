@@ -350,7 +350,7 @@
     <Content Include="Web.config" />
     <Content Include="Views\Web.config" />
     <Content Include="Scripts\Web.config" />
-    <Content Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Module.txt" />
     <TypeScriptCompile Include="Scripts\TempalteSupport\index.ts" />
   </ItemGroup>
@@ -363,6 +363,14 @@
       <Project>{9916839C-39FC-4CEB-A5AF-89CA7E87119F}</Project>
       <Name>Orchard.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Drahcro\Drahcro.csproj">
+      <Project>{ce9ba046-d766-41d6-ad8d-8e7e832463e8}</Project>
+      <Name>Drahcro</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MnLab.Enterprise\MnLab.Enterprise.csproj">
+      <Project>{dbe6b463-2f1d-47a3-828c-c56262e91911}</Project>
+      <Name>MnLab.Enterprise</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Orchard.Fields\Orchard.Fields.csproj">
       <Project>{3787dde5-e5c8-4841-bda7-dcb325388064}</Project>
       <Name>Orchard.Fields</Name>
@@ -370,6 +378,10 @@
     <ProjectReference Include="..\Orchard.Layouts\Orchard.Layouts.csproj">
       <Project>{6bd8b2fa-f2e3-4ac8-a4c3-2925a653889a}</Project>
       <Name>Orchard.Layouts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PdfGenerater\PdfGenerater.csproj">
+      <Project>{3ba00aa7-8056-4e7a-bfa0-1f009755cae9}</Project>
+      <Name>PdfGenerater</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -401,15 +413,18 @@
     <Compile Include="Extensions\ModelBindingUtility.cs" />
     <Compile Include="Fields\TempalteSupportFieldDriver.cs" />
     <Compile Include="Fields\TempalteSupportField.cs" />
+    <Compile Include="Hooks\ApprovalEventHandler.cs" />
     <Compile Include="Hooks\CustomElementDisplay.cs" />
     <Compile Include="Hooks\ElementEventHandler.cs" />
     <Compile Include="Hooks\VsdModule.cs" />
     <Compile Include="Models\IValueBindingInfo.cs" />
     <Compile Include="Models\ValueBindingInfo.cs" />
     <Compile Include="Migrations.cs" />
-    <Compile Include="OrchardShellEvents.cs" />
+    <Compile Include="Hooks\OrchardShellEvents.cs" />
+    <Compile Include="Parts\PdfPart.cs" />
     <Compile Include="Parts\TempalteSupportPart.cs" />
     <Compile Include="Drivers\TempalteSupportPartDriver.cs" />
+    <Compile Include="Parts\PdfPartRecord.cs" />
     <Compile Include="Parts\TempalteSupportPartRecord.cs" />
     <Compile Include="ResourceManifest.cs" />
     <Compile Include="ViewModels\PropertyBindViewModel.cs" />

@@ -10,6 +10,7 @@
 *************************************************/
 using System;
 using MnLab.Enterprise.Approval.Models;
+using Orchard.ContentManagement;
 using Orchard.Users.Models;
 using Rhythm;
 
@@ -19,6 +20,8 @@ namespace MnLab.Enterprise.Approval {
         /// 审批信息
         /// </summary>
         public ApprovalPart/*<TContentPart>*/ Approval { get; set; }
+
+        public ContentItem ContentItem { get; set; }
 
         public ApprovalStepRecord Step { get; set; }
 

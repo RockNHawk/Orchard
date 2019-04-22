@@ -22,7 +22,7 @@ namespace MnLab.Enterprise.Approval {
     /// 定义审批通过事件
     /// </summary>
     [TypeDisplay(Name = "审批通过")]
-    public class ApprovalApprove : ApprovalEvent {
+    public class ApprovalApproveCommand : ApprovalEvent {
         //IApproval IApprovalApproveEvent.Approval {
         //    get {
         //        return this.Approval;

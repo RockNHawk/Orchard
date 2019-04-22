@@ -8,7 +8,7 @@ using PuppeteerSharp.Media;
 namespace PdfGenerater {
     public class PdfGenerater {
 
-        public async Task Generate(string url, string destFile, string pdfOptionsJson) {
+        public async Task Generate1(string url, string destFile, string pdfOptionsJson) {
             var launchOptions = new LaunchOptions {
                 Headless = true
             };

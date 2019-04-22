@@ -56,7 +56,7 @@ declare var ModalEffects;
 
 
     // ajax Form  全局处理程序
-    var handler: RhythmAjaxForm.AjaxCallbacks = $.fn.ajaxForm.handler;
+    var handler: RhythmAjaxForm.AjaxHandlers = $.fn.ajaxForm.handler;
     handler.success = function (response, context) {
         //response.redirect = null;
         if (response.message) {
@@ -222,7 +222,7 @@ declare var ModalEffects;
         if ($form.hasClass("noajax")) {
             return;
         }
-        var defaultOptions = {
+        var defaultOptions: RhythmAjaxForm.AjaxFormOptions = {
             callbacks: {
                 submit: function (context) {
                     //setTimeout(function () {
@@ -231,6 +231,7 @@ declare var ModalEffects;
                 },
                 cancel: function (context) { },
                 lock: function (isLock, context) {
+                  //  debugger
                     return ajaxLocks.all.apply(this, arguments);
                 },
                 success: function (response, context) {

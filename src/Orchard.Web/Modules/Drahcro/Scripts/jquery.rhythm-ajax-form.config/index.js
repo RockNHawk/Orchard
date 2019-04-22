@@ -216,6 +216,7 @@
                 },
                 cancel: function (context) { },
                 lock: function (isLock, context) {
+                    //  debugger
                     return ajaxLocks.all.apply(this, arguments);
                 },
                 success: function (response, context) {

@@ -20,7 +20,7 @@ namespace MnLab.Enterprise.Approval
     /// 定义审批驳回事件
     /// </summary>
     [TypeDisplay(Name = "审批驳回")]
-    public class ApprovalRejectEvent : ApprovalEvent //, IApprovalRejectEvent
+    public class ApprovalRejectCommand : ApprovalEvent //, IApprovalRejectEvent
                                                      // where TContentPart : class, IContentPart/*<TContentPart>*/, new()
     {
         ///// <summary>
