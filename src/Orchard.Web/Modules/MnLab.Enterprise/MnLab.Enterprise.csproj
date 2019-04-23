@@ -227,15 +227,16 @@
       <SubType>Designer</SubType>
     </Content>
     <None Include="packages.config" />
-    <Content Include="Views\EditorTemplates\Parts.ApprovalSupport.cshtml" />
     <Content Include="Views\Parts.ApprovalSupport.cshtml" />
     <Content Include="Views\Parts.ApprovalSupport_Summary.cshtml" />
     <Content Include="Views\Parts.ApprovalSupport_SummaryAdmin.cshtml" />
     <Content Include="Views\Content.CommitButton.cshtml" />
-    <Content Include="Views\EditorTemplates\Parts.ApprovalPart.cshtml" />
+    <Content Include="Views\EditorTemplates\Parts.ApprovalSupport.Edit.Foot.cshtml" />
     <Content Include="Views\Content.RejectButton.cshtml" />
     <Content Include="Views\Content.ApproveButton.cshtml" />
     <Content Include="Views\Web.config" />
+    <Content Include="Views\EditorTemplates\Parts.ApprovalSupport.Edit.Head.cshtml" />
+    <Content Include="Views\EditorTemplates\Parts.ApprovalPart.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

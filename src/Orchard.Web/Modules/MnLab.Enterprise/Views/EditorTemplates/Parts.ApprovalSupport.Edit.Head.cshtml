@@ -6,8 +6,6 @@
 @using MnLab.Enterprise.Approval.Drivers
 @using MnLab.Enterprise.Approval.Models
 @model ApprovalSupportPart
-
-Parts.ApprovalSupport
 @{
     /**/
 
@@ -21,16 +19,34 @@ Parts.ApprovalSupport
     var status = approvalSupport.Status;
 }
 
+@*Parts.ApprovalSupport.Head*@
+
+@using (Script.Head())
+{
+    <style>
+        fieldset.approval-button {
+            margin: 0 12px 0 0;
+            padding: 0 12px;
+            border-right: 1px solid #ccc;
+            clear: none;
+            float: left;
+        }
+    </style>
+}
 @if (base.WorkContext.GetState<int>("IsCurrentInApproval") == 0)
 {
     //ApprovalPartDriver.IsCurrentInApproval.Value = false;
     if (status == ApprovalStatus.WaitingApproval)
     {
-        <div>当前内容正在等待审批，您不能编辑</div>
+        <div class="approval-notify-box">
+            <b class="approval-notify-msg">当前内容正在等待审批，您不能编辑</b>
+        </div>
     }
     else if (status == ApprovalStatus.Rejected)
     {
-        <div>当前内容审批被驳回，原因：@(approvalSupport.AuditOpinion)</div>
+        <div class="approval-notify-box">
+            <b class="approval-notify-msg">当前内容审批被驳回，原因：@(approvalSupport.AuditOpinion)</b>
+        </div>
     }
     using (Script.Foot())
     {
@@ -53,20 +69,3 @@ Parts.ApprovalSupport
         }
     }
 }
-
-
-@*<script>
-        // alert('ApprovalSupport');
-        $("button[fn-form-ajax]").on("click", function () {
-            var form = this.form || $('form')[0];
-            // debugger
-            if (form) {
-                var btnAction = $(this).attr("fn-form-ajax");
-                var rawAction = $(form).attr("action");
-                $(form).attr("action", btnAction);
-                setTimeout(function () {
-                    $(form).attr("action", rawAction);
-                }, 10);
-            }
-        });
-    </script>*@

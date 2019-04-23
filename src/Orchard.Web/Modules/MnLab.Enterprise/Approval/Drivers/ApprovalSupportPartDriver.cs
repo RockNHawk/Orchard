@@ -7,7 +7,7 @@ using Orchard.Localization;
 namespace MnLab.Enterprise.Approval.Drivers {
     public class ApprovalSupportPartDriver : ContentPartDriver<ApprovalSupportPart> {
 
-        private const string TemplateName = "Parts.ApprovalSupport";
+        //private const string TemplateName = "Parts.ApprovalSupport";
 
         public Localizer T { get; set; }
 
@@ -28,8 +28,16 @@ namespace MnLab.Enterprise.Approval.Drivers {
 
         protected override DriverResult Editor(ApprovalSupportPart part, dynamic shapeHelper) {
 
-            return ContentShape("Parts_ApprovalSupport_Edit",
-                () => shapeHelper.EditorTemplate(TemplateName: TemplateName, Model: part, Prefix: Prefix));
+            //return ContentShape("Parts_ApprovalSupport_Edit",
+            //    () => shapeHelper.EditorTemplate(TemplateName: TemplateName, Model: part, Prefix: Prefix));
+
+            return Combined(
+                ContentShape("Content_CommitButton", publishButton => publishButton),
+                ContentShape("Parts_ApprovalSupport_Edit_Head",
+                () => shapeHelper.EditorTemplate(TemplateName: "Parts.ApprovalSupport.Edit.Head", Model: part, Prefix: Prefix)),
+                ContentShape("Parts_ApprovalSupport_Edit_Foot",
+                () => shapeHelper.EditorTemplate(TemplateName: "Parts.ApprovalSupport.Edit.Foot", Model: part, Prefix: Prefix))
+                );
         }
 
         protected override DriverResult Editor(ApprovalSupportPart part, IUpdateModel updater, dynamic shapeHelper) {
