@@ -15,11 +15,12 @@
     </Match>-->
 
 
-    <Place Content_CommitButton="Sidebar:24.2"/>
+    <Place Content_CommitButton="Sidebar:24"/>
     <Place Content_ApproveButton="Sidebar:24.2"/>
     <Place Content_RejectButton="Sidebar:24.2"/>
 
-    <Place Parts_ApprovalSupport_Edit="Content:before"/>
+    <Place Parts_ApprovalSupport_Edit_Head="Content:before"/>
+    <Place Parts_ApprovalSupport_Edit_Foot="Content:after"/>
 
     <Place Parts_ApprovalPart_Edit="Content:after"/>
 

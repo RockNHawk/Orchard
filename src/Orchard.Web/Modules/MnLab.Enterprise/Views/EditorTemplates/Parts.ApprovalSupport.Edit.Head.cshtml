@@ -1,0 +1,81 @@
+﻿@using Orchard
+@using Orchard.Data
+@using Orchard.ContentManagement
+@using MnLab.Enterprise
+@using MnLab.Enterprise.Approval
+@using MnLab.Enterprise.Approval.Drivers
+@using MnLab.Enterprise.Approval.Models
+@model ApprovalSupportPart
+@{
+    /**/
+
+    var contentManager = WorkContext.Resolve<IContentManager>();
+    var approvalSupport = Model;
+    if (approvalSupport.Record == null)
+    {
+        //var contentManager = WorkContext.Resolve<IContentManager>();
+        var repos = WorkContext.Resolve<IRepository<ApprovalSupportPartRecord>>();
+        approvalSupport.Record = repos.Get(x => x.ContentItemRecord.Id == approvalSupport.ContentItem.Id);
+    }
+    var status = approvalSupport.Status;
+    var approval = approvalSupport.Current;
+}
+
+@*Parts.ApprovalSupport.Head*@
+
+@using (Script.Head())
+{
+    <style>
+        fieldset.approval-button {
+            margin: 0 12px 0 0;
+            padding: 0 12px;
+            border-right: 1px solid #ccc;
+            clear: none;
+            float: left;
+        }
+    </style>
+}
+@if (base.WorkContext.GetState<int>("IsCurrentInApproval") == 0)
+{
+    if (approval != null)
+    {
+        var approvalPart = contentManager.Get(approval.ContentItemRecord.Id);
+        var approvalEditUrl = Url.ItemEditUrl(approvalPart);
+        @*<a target="_blank" href="@(Url.ItemDisplayUrl(content))">@(T("View"))</a>*@
+
+        //ApprovalPartDriver.IsCurrentInApproval.Value = false;
+        if (status == ApprovalStatus.WaitingApproval)
+        {
+            <div class="approval-notify-box">
+                <b class="approval-notify-msg">当前内容正在等待<a target="_blank" href="@approvalEditUrl">审批</a>，您不能编辑</b>
+            </div>
+        }
+        else if (status == ApprovalStatus.Rejected)
+        {
+            <div class="approval-notify-box">
+                <b class="approval-notify-msg">当前内容<a target="_blank" href="@approvalEditUrl">审批</a>被驳回，原因：@(approvalSupport.AuditOpinion)</b>
+            </div>
+        }
+    }
+    using (Script.Foot())
+    {
+        <script>
+            $(function () {
+                $("fieldset.publish-button").remove();
+            });
+        </script>
+        if (status == ApprovalStatus.WaitingApproval)
+        {
+            Html.RenderPartial("_DisableEdit", (object)null);
+            <script>
+                $(function () {
+                    $("fieldset.save-button").remove();
+                });
+            </script>
+        }
+        else
+        {
+
+        }
+    }
+}

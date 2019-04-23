@@ -1,12 +1,14 @@
 ﻿using Orchard.ContentManagement;
 using Orchard.ContentManagement.Drivers;
 using Orchard.ContentManagement.Handlers;
-using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
+using MnLab.Enterprise.Approval;
+using MnLab.Enterprise.Approval.Models;
 using Orchard.Localization;
 using MnLab.Enterprise.Approval.Models;
 using Drahcro.Data;
 using Drahcro;
 using Orchard;
+using System.Collections.Generic;
 
 namespace MnLab.Enterprise.Approval.Drivers {
 
@@ -101,20 +103,30 @@ namespace MnLab.Enterprise.Approval.Drivers {
                 var contentEditor = _contentManager.BuildEditor(content);
                 vm.ContentEditor = contentEditor;
 
-                if (updater.TryUpdateModel(part.Record, PrefixUtility.GetPrefix(Prefix, nameof(ApprovalViewModel.ApprovalPart)), new[] { nameof(ApprovalPartRecord.AuditOpinion) }, null)) {
-                    if (part.Record.AuditOpinion != null) {
-                        contentPartRepository.Update(part);
-                    }
-                }
-
                 if (updater != null) {
-                    _contentManager.UpdateEditor(content, updater);
+                    if (updater.TryUpdateModel(part.Record, PrefixUtility.GetPrefix(Prefix, nameof(ApprovalViewModel.ApprovalPart)), new[] { nameof(ApprovalPartRecord.AuditOpinion) }, null)) {
+                        //if (updater.TryUpdateModel(part.Record, Prefix, new[] { nameof(ApprovalPartRecord.AuditOpinion) }, null)) {
+                        if (part.Record.AuditOpinion != null) {
+                            contentPartRepository.Update(part);
+                        }
+                    }
+
+                    _contentManager.UpdateEditor(content, updater,Prefix);
                     //updater.TryUpdateModel(part, Prefix, null, null);
                 }
             }
 
-            return ContentShape("Parts_ApprovalPart_Edit",
-                () => shapeHelper.EditorTemplate(TemplateName: TemplateName, Model: vm, Prefix: Prefix));
+            var results = new List<DriverResult> { };
+
+            if (part.Status == ApprovalStatus.WaitingApproval) {
+                results.Add(ContentShape("Content_ApproveButton", publishButton => publishButton));
+                results.Add(ContentShape("Content_RejectButton", publishButton => publishButton));
+            }
+
+            results.Add(ContentShape("Parts_ApprovalPart_Edit",
+                () => shapeHelper.EditorTemplate(TemplateName: TemplateName, Model: vm, Prefix: Prefix)));
+
+            return Combined(results.ToArray());
         }
 
         //protected override void Importing(ApprovalPart part, ImportContentContext context) {

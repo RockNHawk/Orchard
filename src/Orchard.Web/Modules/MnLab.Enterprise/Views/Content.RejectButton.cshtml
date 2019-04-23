@@ -5,6 +5,6 @@
     var contentItem = (IContent)Model.ContentItem;
     //var basePath = WorkContext.CurrentSite.BaseUrl;
 }
-<fieldset class="approval-button">
+<fieldset class="approval-button reject">
     <button fn-form-ajax='{"url":"@(WorkContext.HttpContext.Request.ApplicationPath)Admin/MnLab.Enterprise/Reject/@(contentItem.Id)"}' type="submit" name="submit.Commit" value="submit.Commit">@T("Reject")</button>
 </fieldset>

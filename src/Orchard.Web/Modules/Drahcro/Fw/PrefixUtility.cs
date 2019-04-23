@@ -8,11 +8,11 @@ namespace Drahcro {
     public class PrefixUtility {
 
         public static string GetPrefix(ElementEditorContext context, string name) {
-            return $"{(string.IsNullOrEmpty(context.Prefix) ? null : ".")}{name}";
+            return $"{(string.IsNullOrEmpty(context.Prefix) ? null : $"{context.Prefix}.")}{name}";
         }
 
         public static string GetPrefix(string prefix, string name) {
-            return $"{(string.IsNullOrEmpty(prefix) ? null : ".")}{name}";
+            return $"{(string.IsNullOrEmpty(prefix) ? null : $"{prefix}.")}{name}";
         }
 
 
