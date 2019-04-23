@@ -1,0 +1,14 @@
+﻿@using (Script.Foot())
+{
+    <script>
+        $(function () {
+            $("fieldset.save-button").remove();
+            $(".edit-item-content input,.edit-item-content textarea,.edit-item-content select").attr("disabled", "disabled").attr("readonly", "readonly");
+        });
+    </script>
+    <style>
+        .layout-panel, .layout-toolbox-wrapper {
+            display: none !important;
+        }
+    </style>
+}

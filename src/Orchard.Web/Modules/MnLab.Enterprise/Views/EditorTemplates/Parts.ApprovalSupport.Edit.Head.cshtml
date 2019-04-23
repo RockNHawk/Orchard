@@ -9,14 +9,16 @@
 @{
     /**/
 
+    var contentManager = WorkContext.Resolve<IContentManager>();
     var approvalSupport = Model;
     if (approvalSupport.Record == null)
     {
-        var contentManager = WorkContext.Resolve<IContentManager>();
+        //var contentManager = WorkContext.Resolve<IContentManager>();
         var repos = WorkContext.Resolve<IRepository<ApprovalSupportPartRecord>>();
         approvalSupport.Record = repos.Get(x => x.ContentItemRecord.Id == approvalSupport.ContentItem.Id);
     }
     var status = approvalSupport.Status;
+    var approval = approvalSupport.Current;
 }
 
 @*Parts.ApprovalSupport.Head*@
@@ -35,18 +37,25 @@
 }
 @if (base.WorkContext.GetState<int>("IsCurrentInApproval") == 0)
 {
-    //ApprovalPartDriver.IsCurrentInApproval.Value = false;
-    if (status == ApprovalStatus.WaitingApproval)
+    if (approval != null)
     {
-        <div class="approval-notify-box">
-            <b class="approval-notify-msg">当前内容正在等待审批，您不能编辑</b>
-        </div>
-    }
-    else if (status == ApprovalStatus.Rejected)
-    {
-        <div class="approval-notify-box">
-            <b class="approval-notify-msg">当前内容审批被驳回，原因：@(approvalSupport.AuditOpinion)</b>
-        </div>
+        var approvalPart = contentManager.Get(approval.ContentItemRecord.Id);
+        var approvalEditUrl = Url.ItemEditUrl(approvalPart);
+        @*<a target="_blank" href="@(Url.ItemDisplayUrl(content))">@(T("View"))</a>*@
+
+        //ApprovalPartDriver.IsCurrentInApproval.Value = false;
+        if (status == ApprovalStatus.WaitingApproval)
+        {
+            <div class="approval-notify-box">
+                <b class="approval-notify-msg">当前内容正在等待<a target="_blank" href="@approvalEditUrl">审批</a>，您不能编辑</b>
+            </div>
+        }
+        else if (status == ApprovalStatus.Rejected)
+        {
+            <div class="approval-notify-box">
+                <b class="approval-notify-msg">当前内容<a target="_blank" href="@approvalEditUrl">审批</a>被驳回，原因：@(approvalSupport.AuditOpinion)</b>
+            </div>
+        }
     }
     using (Script.Foot())
     {
@@ -57,6 +66,7 @@
         </script>
         if (status == ApprovalStatus.WaitingApproval)
         {
+            Html.RenderPartial("_DisableEdit", (object)null);
             <script>
                 $(function () {
                     $("fieldset.save-button").remove();

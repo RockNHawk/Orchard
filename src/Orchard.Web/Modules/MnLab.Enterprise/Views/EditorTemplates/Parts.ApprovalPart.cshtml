@@ -18,9 +18,9 @@
 }
 
 <fieldset>
-    <a href="@(Url.ItemEditUrl(content))">@(T("Edit"))</a>
+    <a target="_blank" href="@(Url.ItemEditUrl(content))">@(T("Edit"))</a>
     @*<a href="@(Url.ItemDisplayUrl(content))">@(T("View"))</a>*@
-    <a href="@(Url.ItemDisplayUrl(content))">@(T("View"))</a>
+    <a target="_blank" href="@(Url.ItemDisplayUrl(content))">@(T("View"))</a>
 </fieldset>
 
 @Display(contentEditor)
@@ -70,21 +70,11 @@
     </script>
     if (ApprovalPart.Status != ApprovalStatus.WaitingApproval)
     {
-        <script>
-            $(function () {
-                $("fieldset.save-button").remove();
-                $(".edit-item-content input,.edit-item-content textarea,.edit-item-content select").attr("disabled", "disabled").attr("readonly", "readonly");
-            });
-        </script>
-        <style>
-            .layout-panel, .layout-toolbox-wrapper {
-                display: none !important;
-            }
-        </style>
+        Html.RenderPartial("_DisableEdit", (object)null);
     }
     else
     {
-       
+
     }
 
     @*<script>

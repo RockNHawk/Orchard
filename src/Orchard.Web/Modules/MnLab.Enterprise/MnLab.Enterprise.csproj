@@ -237,6 +237,7 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\EditorTemplates\Parts.ApprovalSupport.Edit.Head.cshtml" />
     <Content Include="Views\EditorTemplates\Parts.ApprovalPart.cshtml" />
+    <Content Include="Views\_DisableEdit.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

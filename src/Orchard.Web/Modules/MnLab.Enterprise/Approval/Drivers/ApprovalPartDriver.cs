@@ -104,14 +104,14 @@ namespace MnLab.Enterprise.Approval.Drivers {
                 vm.ContentEditor = contentEditor;
 
                 if (updater != null) {
-                    //   if (updater.TryUpdateModel(part.Record, PrefixUtility.GetPrefix(Prefix, nameof(ApprovalViewModel.ApprovalPart)), new[] { nameof(ApprovalPartRecord.AuditOpinion) }, null)) {
                     if (updater.TryUpdateModel(part.Record, PrefixUtility.GetPrefix(Prefix, nameof(ApprovalViewModel.ApprovalPart)), new[] { nameof(ApprovalPartRecord.AuditOpinion) }, null)) {
+                        //if (updater.TryUpdateModel(part.Record, Prefix, new[] { nameof(ApprovalPartRecord.AuditOpinion) }, null)) {
                         if (part.Record.AuditOpinion != null) {
                             contentPartRepository.Update(part);
                         }
                     }
 
-                    _contentManager.UpdateEditor(content, updater);
+                    _contentManager.UpdateEditor(content, updater,Prefix);
                     //updater.TryUpdateModel(part, Prefix, null, null);
                 }
             }
