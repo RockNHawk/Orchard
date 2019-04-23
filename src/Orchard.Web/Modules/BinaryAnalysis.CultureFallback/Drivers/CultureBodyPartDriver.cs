@@ -26,7 +26,7 @@ namespace BinaryAnalysis.CultureFallback.Drivers {
             ILocalizationService locService,
             IOrchardServices services, 
             ICultureManager cutureManager,
-            IEnumerable<IHtmlFilter> htmlFilters) : base(services, htmlFilters) {
+            IEnumerable<IHtmlFilter> htmlFilters) : base(services, htmlFilters,requestContext) {
             _locService = locService;
             _services = services;
             _cutureManager = cutureManager;

@@ -123,7 +123,7 @@
       <Name>Drahcro</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Modules\MnLab.Enterprise\MnLab.Enterprise.csproj">
-      <Project>{54162f30-2d6c-63f9-0288-123690f26791}</Project>
+      <Project>{dbe6b463-2f1d-47a3-828c-c56262e91911}</Project>
       <Name>MnLab.Enterprise</Name>
     </ProjectReference>
   </ItemGroup>
