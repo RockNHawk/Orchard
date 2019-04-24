@@ -12,7 +12,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NHVSDAdmin</RootNamespace>
     <AssemblyName>NHVSDAdmin</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -62,7 +62,10 @@
     </Reference>
     <Reference Include="Rhythm.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Rhythm\src\packages\Rhythm.Core.dll</HintPath>
+      <HintPath>..\..\..\Rhythm\src\packages\net472\Rhythm.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Rhythm.Web.Mvc">
+      <HintPath>..\..\..\Rhythm\src\packages\net472\Rhythm.Web.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations">
@@ -103,7 +106,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ThemeZonePreview.png" />
-    <Content Include="Views\ErrorDisplayForward.aspx" />
+    <Content Include="Views\ErrorDisplay\CustomError.js" />
+    <Content Include="Views\ErrorDisplay\ErrorDisplayForward.aspx" />
     <Content Include="Web.config" />
     <Content Include="Scripts\Web.config" />
     <Content Include="Styles\Web.config" />
@@ -148,6 +152,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\ErrorPage.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ErrorDisplay\Ajax_ModelState.cshtml" />
+    <Content Include="Views\ErrorDisplay\CustomError.Default.cshtml" />
+    <Content Include="Views\ErrorDisplay\CustomError.Http.404.cshtml" />
+    <Content Include="Views\ErrorDisplay\CustomError.Http.500.cshtml" />
+    <Content Include="Views\ErrorDisplay\ExceptionStack.cshtml" />
+    <Content Include="Views\ErrorDisplay\Web.config" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

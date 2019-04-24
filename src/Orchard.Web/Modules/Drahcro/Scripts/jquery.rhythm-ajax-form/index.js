@@ -368,7 +368,6 @@ var RhythmAjaxForm;
     })(jQuery, document, history); /* eof jQuery ajaxForm */
     function bindFormAjax($, form, options, history) {
         var $form = $(form);
-        $("<input value='XMLHttpRequest' name='X-Requested-With' type='hidden' /><input value='RhythmAjaxForm' name='X-Requested-With-Rhythm-Ajax-Form' type='hidden' />").appendTo($form);
         // 获取自定义 options
         var inlineOptionsAttr = $form.attr("on-ajax") || $form.attr("fn-ajax");
         var inlineOptions = inlineOptionsAttr ? Drahcro.ObjectUtility.parseJSON(Drahcro.StringUtility.htmlDecode(inlineOptionsAttr)) : null;
@@ -388,15 +387,19 @@ var RhythmAjaxForm;
         //    historyLength++;
         //});
         // Submit listener.
+        var $ajaxInputs = $("<input class='' value='XMLHttpRequest' name='X-Requested-With' type='hidden' /><input value='RhythmAjaxForm' name='X-Requested-With-Rhythm-Ajax-Form' type='hidden' />");
         $form.submit(function () {
             //debugger
             if (_options.isDisabled)
                 return;
+            $ajaxInputs.appendTo($form);
             var form = this;
             var originalTarget = form.target;
             form.target = target.id;
             setTimeout(function () {
                 form.target = originalTarget;
+                $ajaxInputs.remove();
+                //$form.remove($ajaxInputs);
             }, 0);
             var url = _options.url;
             if (url) {

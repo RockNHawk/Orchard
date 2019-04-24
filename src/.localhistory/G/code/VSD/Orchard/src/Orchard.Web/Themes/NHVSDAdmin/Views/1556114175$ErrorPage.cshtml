@@ -1,0 +1,120 @@
+﻿@using System;
+@using Rhythm;
+@using Rhythm.ErrorHandling;
+@using Drahcro.Web;
+@using Rhythm.Web;
+@functions{
+    // public IErrorDisplayResult GetDisplay(System.Web.HttpApplication app, HttpContextBase context, Exception exception)
+    public IErrorDisplayResult GetDisplay(Exception exception, HttpContextBase context)
+    {
+        //var workContext = context == null ? null : context.WorkContext();
+        //    var workContext = context == null ? null : new Rhythm.WorkContext(this.Context);
+        var workContext = context;
+        var exists = workContext == null ? null : (IErrorDisplayResult)workContext.Items["ErrorDisplayResult"];
+        if (exists != null)
+        {
+            return exists;
+        }
+        else
+        {
+            var errorDisplayDriver = ErrorDisplayDriver.Instance;
+            if (errorDisplayDriver == null)
+            {
+                errorDisplayDriver = new ErrorDisplayDriver(
+                    new ErrorDisplayHandler()
+                    {
+                        Process = (errorDisplay) =>
+                    {
+                        return new HttpErrorDisplayResult(this.Html.Partial("ErrorDisplay/ExceptionStack", errorDisplay).ToString())
+                        {
+                            HttpStatusCode = 500,
+                            ContentType = "text/html",
+                        };
+                    }
+                    },
+                    new ErrorDisplayHandler()
+                    {
+                        Process = (errorDisplay) =>
+                    {
+                        return new HttpErrorDisplayResult(this.Html.Partial("ErrorDisplay/ExceptionStack", errorDisplay).ToString())
+                        {
+                            ContentType = "application/json",
+                            HttpStatusCode = 200
+                        };
+                    }
+                    },
+                    new ErrorDisplayHandler()
+                    {
+                        Process = (errorDisplay) =>
+                    {
+                        return new HttpErrorDisplayResult(RenderErrorToHtml(errorDisplay.Exception).ToString())
+                        {
+                            HttpStatusCode = 500,
+                            ContentType = "text/html",
+                        };
+                    }
+                    });
+            }
+            if (errorDisplayDriver != null)
+            {
+                var ee = new ErrorDisplayContext
+                {
+                    //  Configuration = ErrorDisplayConfigurationUtility.GetConfiguration(),
+                    //  Configuration = ErrorDisplayConfigurationUtility.GetConfiguration(),
+                    Exception = exception,
+                    //  WorkContext = workContext,
+                    IsLocal = context.Request.IsLocal,
+                };
+                return errorDisplayDriver.Display(ee);
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+
+
+}
+
+@helper RenderErrorToHtml(Exception renderException)
+{
+    <!DOCTYPE html>
+    <!--
+        An error occured, but faild to execute ErrorDisplayDriver:
+        <%=renderException.ToString()%>
+                        @(renderException)
+                    -->
+    <html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>呃...</title>
+    </head>
+    <body>
+        An error occured but unable to display.
+    </body>
+</html>
+}
+
+
+@{
+    try
+    {
+        Exception exception = Model.Exception ?? HttpApplicationUtility.GetException(this.ApplicationInstance, this.Context);
+        var display = GetDisplay(exception, this.Context);
+        if (display != null)
+        {
+            @*@display.ToString();
+                ErrorDisplayUtility.SetResponse(display, this.Response);*@
+            ErrorDisplayUtility.WriteResponse(display, this.Response);
+            //this.Response.End();
+        }
+    }
+    catch (Exception renderException)
+    {
+        @RenderErrorToHtml(renderException);
+    }
+
+}

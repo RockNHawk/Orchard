@@ -1,0 +1,4 @@
+﻿@model ErrorDisplayContext
+@using Rhythm.Web
+@using Rhythm.ErrorHandling
+@{var result = new AjaxActionResult(); AjaxActionResultExtensions.SetError(result,Model.Exception);}@(Raw(result.ToString()))

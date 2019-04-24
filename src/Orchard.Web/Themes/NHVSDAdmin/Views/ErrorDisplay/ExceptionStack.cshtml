@@ -1,0 +1,1236 @@
+﻿@model ErrorDisplayContext
+@using Rhythm
+@using Rhythm.Text
+@using Rhythm.ErrorHandling
+@using System.Runtime.InteropServices
+@using System.Text
+@using System.Globalization
+@using System.Diagnostics
+@using System.Configuration
+@using System.Web
+@using System.CodeDom.Compiler
+@functions {
+    public class StackFrameInfo
+    {
+        public string FileName { get; set; }
+        public string FilePath { get; set; }
+        public StringContent FileContent { get; set; }
+        public int LineNumber { get; set; }
+        public StackFrame Frame { get; set; }
+        public System.Type Type { get; set; }
+        public string Namespace { get; set; }
+        public System.Reflection.MethodBase Method { get; set; }
+        public System.Reflection.Assembly Assembly { get; set; }
+        public bool IsShowCodeOnStack { get; set; }
+    }
+    public class ExceptionStackTraceInfo
+    {
+        public StackTrace StackTrace { get; set; }
+        //public StackFrame[] StackFrames { get; set; }
+        public StackFrameInfo[] StackFrameInfos { get; set; }
+        public Exception Exception { get; set; }
+    }
+
+    public static ExceptionStackTraceInfo[] GetExceptionStackTraceInfos(List<Exception> exceptions)
+    {
+        var codegenDir = HttpRuntime.CodegenDir;
+        var exCount = exceptions.Count;
+        var infos = new ExceptionStackTraceInfo[exceptions.Count];
+        //for (int i = _exStack.Count - 1; i >= 0; i--)
+        for (int i = 0; i < exCount; i++)
+        {
+            var exception = (Exception)exceptions[i];
+            infos[i] = GetExceptionStackTraceInfo(exception);
+        }
+        return infos;
+    }
+
+    public static ExceptionStackTraceInfo GetExceptionStackTraceInfo(Exception exception)
+    {
+        var stackTrace = new StackTrace(exception, true);
+        var stackFrames = stackTrace.GetFrames();
+        var frameInfos = new StackFrameInfo[stackFrames == null ? 0 : stackFrames.Length];
+        for (int j = 0; j < frameInfos.Length; j++)
+        {
+            var frame = stackFrames[(j)];
+            frameInfos[j] = GetnStackFrameInfo(frame);
+        }
+        return new ExceptionStackTraceInfo
+        {
+            Exception = exception,
+            StackTrace = stackTrace,
+            StackFrameInfos = frameInfos,
+        };
+    }
+
+    public static StackFrameInfo GetnStackFrameInfo(StackFrame frame)
+    {
+        var codegenDir = HttpRuntime.CodegenDir;
+        string fileName = ErrorDisplayUtility.GetFileName(frame);
+        string filePath = fileName == null ? null : ErrorDisplayUtility.ResolveHttpFileName(fileName);
+        //var isSelfCode = IsSelfCode(stackTrace, frame, declaringType, method);
+        var fileContent = TryGetFileContent(filePath);
+        var isSelfCode = fileContent != null;
+        var lineNumber = frame.GetFileLineNumber();
+        var method = frame.GetMethod();
+        // var parameters = method.GetParameters();
+        Type declaringType = method.DeclaringType;
+        var ns = declaringType == null ? null : declaringType.Namespace;
+        var assembly = declaringType == null ? null : declaringType.Assembly;
+        string assemblyLocation;
+        try
+        {
+            assemblyLocation = assembly == null ? null : assembly.Location ?? null;
+        }
+        catch
+        {
+            assemblyLocation = null;
+        }
+        bool showCodeOnStack = assemblyLocation != null && string.Compare(Path.GetDirectoryName(assemblyLocation), codegenDir, StringComparison.OrdinalIgnoreCase) == 0 && frame.GetNativeOffset() > 0;
+
+        return new StackFrameInfo
+        {
+            FileContent = fileContent,
+            FileName = fileName,
+            FilePath = filePath,
+            Frame = frame,
+            Method = method,
+            LineNumber = lineNumber,
+            Type = declaringType,
+            Assembly = assembly,
+            Namespace = ns,
+            IsShowCodeOnStack = showCodeOnStack,
+        };
+    }
+
+    public static bool IsSelfCode(StackTrace stackTrace, StackFrame frame, System.Type type, System.Reflection.MethodBase method)
+    {
+        if (type == null) return false;
+        var ns = type.Namespace;
+        if ((ns.StartsWith("Rhythm") || ns.StartsWith("Bitlab"))) return true;
+        return false;
+    }
+    public static StringContent TryGetFileContent(string path)
+    {
+        System.IO.FileInfo f;
+        try
+        {
+            f = new System.IO.FileInfo(path);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+        string content;
+        try
+        {
+            content = System.IO.File.ReadAllText(path, Encoding.UTF8);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+        return StringContent.FromString(content);
+    }
+    public static string FormatPathHref(string path)
+    {
+        var p1 = Rhythm.Runtime.IsMono ? path.Replace('\\', '/') : path.Replace('/', '\\');
+        return System.Web.HttpUtility.HtmlAttributeEncode(p1);
+    }
+    // System.Web.Util.StringUtil
+
+    public static CompilerError GetFirstCompileError(CompilerErrorCollection errors)
+    {
+        {
+            if (errors == null || !errors.HasErrors)
+            {
+                return null;
+            }
+            var cd = HttpRuntime.CodegenDir;
+            CompilerError compilerError = null;
+            foreach (CompilerError compilerError2 in errors)
+            {
+                if (!compilerError2.IsWarning)
+                {
+                    if (cd != null && compilerError2.FileName != null && !compilerError2.FileName.StartsWith(cd, StringComparison.OrdinalIgnoreCase))
+                    {
+                        compilerError = compilerError2;
+                        break;
+                    }
+                    if (compilerError == null)
+                    {
+                        compilerError = compilerError2;
+                    }
+                }
+            }
+            return compilerError;
+        }
+    }
+}
+@helper RenderHttpCompileException(HttpCompileException ex)
+{
+    var results = ex.Results;
+
+
+    <fieldset class="list-stack">
+        <legend>HttpCompileException 动态编译错误</legend>
+        <div>
+            <p>@(ex.Message)</p>
+            <p class="selfcode">
+                <span>ErrorCode:</span>
+                <span>0x@(ex.ErrorCode.ToString("x", CultureInfo.CurrentCulture))</span>
+            </p>
+            @{
+                var errors = results.Errors;
+                if (results != null)
+                {
+                    if (errors != null)
+                    {
+                        var firstError = GetFirstCompileError(errors);
+                        var sourceCode = ex.SourceCode;
+                        string filePath = null;
+                        if (sourceCode == null)
+                        {
+                            if (firstError != null && firstError.FileName != null)
+                            {
+                                filePath = firstError.FileName;
+                                try
+                                {
+                                    sourceCode = StringContent.FromFile(filePath).Content;
+                                }
+                                catch (Exception)
+                                {
+                                }
+                            }
+                        }
+
+                        if (sourceCode != null)
+                        {
+                            var codeLines = sourceCode.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+                            <fieldset class="list-stack">
+                                <legend>源代码:</legend>
+                                <div>
+                                    @if (filePath != null)
+                                    {
+                                        <p class="selfcode">
+                                            <span class="b">源文件:</span>
+                                            <span class='sourcecode-file'><a href='file:///@(FormatPathHref(filePath))'>@(filePath)</a>&nbsp;<span>第 @(firstError.Line) 行</span></span>
+                                        </p>
+                                    }
+                                    @RenderCompilerError(errors, codeLines)
+                                </div>
+                            </fieldset>
+                        }
+                        else
+                        {
+                            if (filePath != null)
+                            {
+                                <p class="selfcode">
+                                    <span class="b">源文件:</span>
+                                    <span class='sourcecode-file'><a href='file:///@(FormatPathHref(filePath))'>@(filePath)</a>&nbsp;<span>第 @(firstError.Line) 行</span></span>
+                                </p>
+                            }
+                        }
+                    }
+                }
+            }
+        </div>
+    </fieldset>
+
+}
+
+@helper RenderCompilerError(System.CodeDom.Compiler.CompilerErrorCollection errors, string[] codeLines)
+{
+    var list = new CompilerError[errors.Count];
+    {
+        int j = 0;
+        foreach (System.CodeDom.Compiler.CompilerError item in errors)
+        {
+            //var lineNumber = item.Line;
+            //var startLine = lineNumber - displayLineCount;
+            //var endLine = lineNumber + displayLineCount;
+            //startLine = startLine > -1 ? startLine : 0;
+            //endLine = endLine < codeLines.Length ? endLine : codeLines.Length - 1;
+            list[j++] = item;
+        }
+    }
+    var nolineErrors = list.Where(x => x.IsWarning == false && x.Line == 0).ToArray();
+    var minErrorLine = list.Min(x => x.Line);
+    var maxErrorLine = list.Max(x => x.Line);
+
+    const int range = 10;
+    var startIndex = minErrorLine <= 0 ? ((maxErrorLine - range) <= 0 ? 0 : (maxErrorLine - range)) : minErrorLine - 1;
+    var endIndex = (maxErrorLine + range) > codeLines.Length ? codeLines.Length - 1 : maxErrorLine + range;
+
+    if (nolineErrors != null && nolineErrors.Length > 0)
+    {
+        <ul class="exception-message-list">
+            @for (int i = 0; i < nolineErrors.Length; i++)
+            {
+                var e = nolineErrors[i];
+                <li class="exception-message">@(e.ErrorNumber) : @(e.ErrorText)</li>
+            }
+        </ul>
+    }
+    <p class="error-source-code">
+<pre>
+@for (int i = startIndex; i < endIndex; i++)
+        {
+            var num = i + 1;
+            var text = codeLines[i];
+            var lineErrors = list.Where(x=>x.Line==num).ToArray();
+            if (lineErrors!=null&& lineErrors.Length>0)
+            {
+                var firstColumnErr = lineErrors.Where(x=>x.Column!=0).FirstOrDefault();
+                for (int k = 0; k < lineErrors.Length; k++)
+                {
+                    var le = lineErrors[k];
+<span class='code-line-ex code-line'>错误号 '@(le.ErrorNumber)' : @(le.ErrorText)</span>
+        }
+<span class="code-line-error code-line">行号 @(num.ToString("G", CultureInfo.CurrentCulture)): @(text)@(firstColumnErr==null?null:","+ firstColumnErr.Column.ToStringInvariant())</span>  
+    }
+    else
+    {
+<span class="code-line-normal code-line">行号 @(num.ToString("G", CultureInfo.CurrentCulture)): @(text)</span>
+    }
+} 
+</pre>
+    </p>
+}
+@helper RenderConfigurationErrorsException(ConfigurationErrorsException ex)
+{
+    if (ex != null && ex.Errors != null && ex.Errors.Count > 1)
+    {
+        <text></text>
+        <fieldset>
+            <legend>ConfigurationErrorsException</legend>
+            <div>
+                @{
+                    int num = 0;
+                    foreach (ConfigurationException ex2 in ex.Errors)
+                    {
+                        if (num > 0)
+                        {
+                            @(ex2.Message)
+                        }
+                        num++;
+                    }
+                }
+            </div>
+        </fieldset>
+    }
+}
+@helper CN(string str)
+{
+    <text>(@str)</text>
+}
+@helper RenderFusion(Exception exception)
+{
+    for (Exception ex = exception; ex != null; ex = ex.InnerException)
+    {
+        string text = null;
+        string text2 = null;
+        FileNotFoundException ex2 = ex as FileNotFoundException;
+        if (ex2 != null)
+        {
+            text = ex2.FusionLog;
+            text2 = ex2.FileName;
+        }
+        FileLoadException ex3 = ex as FileLoadException;
+        if (ex3 != null)
+        {
+            text = ex3.FusionLog;
+            text2 = ex3.FileName;
+        }
+        BadImageFormatException ex4 = ex as BadImageFormatException;
+        if (ex4 != null)
+        {
+            text = ex4.FusionLog;
+            text2 = ex4.FileName;
+        }
+        if (text != null)
+        {
+            <text>
+                <p>@(text)<hr />@(text2)</p></text>
+        }
+    }
+
+}
+@helper RenderStackFrameCodeLine(StackFrameInfo frameInfo, Exception exception, bool isSelfCodeLastFrame)
+{
+    var code = frameInfo.FileContent.Content;
+    var lineNumber = frameInfo.LineNumber;
+    const int displayLineCount = 10;
+    using (var textReader = new StringReader(code))
+    {
+        int num = 1;
+<pre>
+    @while (true)
+    {
+        string text = textReader.ReadLine();
+        if (text == null) { break; }
+        if (!(num >= lineNumber - displayLineCount && num <= lineNumber + displayLineCount))
+        {
+            num++;
+            continue;
+        }
+        if (num == lineNumber)
+        {
+            if (exception != null)
+            {
+                if (isSelfCodeLastFrame)
+                {
+<span class='code-line-ex'>调用此外部方法时发生 '@(exception.GetType().Name)' 异常 (@(exception.Message))</span>
+                }
+                else
+                {
+<span class='code-line-ex code-line'>此处发生 '@(exception.GetType().Name)' 异常 (@(exception.Message))</span>    
+                }
+            }
+@*<span class="code-line-error code-line">行号 @(num.ToString("G", CultureInfo.CurrentCulture)): @(text)</span>*@
+<span class="code-line-error code-line"><a href='file:///@(FormatPathHref(frameInfo.FilePath))'>行号 @(num.ToString("G", CultureInfo.CurrentCulture)): @(text)</a></span>
+        }else{
+<span class="code-line-normal code-line">行号 @(num.ToString("G", CultureInfo.CurrentCulture)): @(text)</span>
+        }
+        if (num > lineNumber + displayLineCount)
+        {
+            break;
+        }
+    num++;
+    }
+</pre>
+
+    }
+}
+@helper RenderExceptionStack(ExceptionStackTraceInfo[] exInfos)
+{
+    var codegenDir = HttpRuntime.CodegenDir;
+    var exCount = exInfos.Length;
+    //for (int i = _exStack.Count - 1; i >= 0; i--)
+    for (int ei = 0; ei < exCount; ei++)
+    {
+        var sf = exInfos[ei];
+        var exc = sf.Exception;
+        var stackFrameInfos = sf.StackFrameInfos;
+        var stackFrameCount = stackFrameInfos.Length;
+        <fieldset>
+            <legend>
+                @if (exCount > 1)
+                {
+                    if (ei == exCount - 1)
+                    {
+                        <text>[@("底层/根异常")]</text>
+                    }
+                    else if (ei == 0)
+                    {
+                        <text>[@("顶层异常")]</text>
+                    }
+                    else
+                    {
+                        <text>[@("第 " + ei.ToString() + " 层")]</text>
+                    }
+                }
+                @{<text></text>}
+                @(exc.GetType().Name)
+                @{
+                    var extEx = exc as ExternalException;
+                    if (extEx != null && extEx.ErrorCode != 0)
+                    {
+                        <text>(ErrorCode:0x@(extEx.ErrorCode.ToString("x", CultureInfo.CurrentCulture)))</text>
+                    }
+
+                    if (exc.Message != null && exc.Message.Length > 0)
+                    {
+                        @(": " + exc.Message)
+                    }
+                }
+                @{<text></text>}
+            </legend>
+            <ul class="stack-list">
+                @for (int si = stackFrameCount - 1; si >= 0; si--)
+                {
+                    var frameInfo = stackFrameInfos[si];
+                    var frame = frameInfo.Frame;
+                    var fileName = frameInfo.FileName;
+                    var filePath = frameInfo.FilePath;
+                    var isSelfCode = !ReferenceEquals(frameInfo.FileContent, null);
+                    var isLastFrame = si == 0;
+                    bool isSelfCodeLastFrame = false;
+                    if (isSelfCode)
+                    {
+                        if (!isLastFrame)
+                        {
+                            bool hasNextFrame = false;
+                            for (int k = si - 1; k >= 0; k--)
+                            {
+                                if (!ReferenceEquals(stackFrameInfos[k].FileContent, null))
+                                {
+                                    hasNextFrame = true;
+                                    break;
+                                }
+                            }
+                            isSelfCodeLastFrame = !hasNextFrame;
+                        }
+                    }
+
+                    var method = frameInfo.Method;
+                    var declaringType = frameInfo.Type;
+                    var ns = frameInfo.Namespace;
+
+                    var isIgnore = declaringType != null && ((declaringType.Name == "Interceptor" && ns == "Rhythm.Wrapper") || (declaringType.Name == "ExceptionHandlerManager" && ns == "Rhythm.ErrorHandling"));
+
+                    var parameters = method.GetParameters();
+                    string parametersStr = "";
+                    for (int k = 0; k < parameters.Length; k++)
+                    {
+                        parametersStr += (((k != 0) ? ", " : string.Empty) + parameters[k].ParameterType.Name + " " + parameters[k].Name);
+                    }
+                    string methodCall = string.Format("{0}({1})", method.Name, parametersStr);
+                    string invocation;
+                    if (declaringType != null)
+                    {
+                        invocation = string.Format("{0}.{1}.{2}", ns, declaringType.Name, methodCall);
+                    }
+                    else
+                    {
+                        invocation = methodCall;
+                    }
+                    <li class="stack-item">
+                        @if (isSelfCode && !isIgnore)
+                        {
+                            <div class="">
+                                <div class="item selfcode">
+                                    <span class='sourcecode-file'><a href='file:///@(FormatPathHref(frameInfo.FilePath))'>@(frameInfo.FilePath)</a>&nbsp;<span>第 @(frameInfo.LineNumber) 行</span></span>
+                                </div>
+                                <fieldset style="padding:0;margin:5px 0 10px 0;" class="list-stack">
+                                    <legend style="padding:0;margin:0;">源代码:</legend>
+                                    <div>
+                                        <p>namespace @(declaringType.Namespace) {</p>
+                                        <p>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            @(declaringType.IsVisible ? "public " : "")@(declaringType.IsEnum ? "enum " : declaringType.IsValueType ? "struct " : "class ")<span class="code-line-key">@(declaringType.Name)</span> {
+                                        </p>
+                                        <p>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            @(method.IsPrivate ? "private " : method.IsFamily ? "internal " : "public ")
+                                            @(method.ReflectedType == null ? "void " : method.ReflectedType.Name)
+                                            <span class="code-line-key">@(methodCall)</span> {
+                                        </p>
+                                        <p class="error-source-code">@(RenderStackFrameCodeLine(frameInfo, isLastFrame || isSelfCodeLastFrame ? exc : null, isSelfCodeLastFrame))</p>
+                                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</p>
+                                        <p>&nbsp;&nbsp;&nbsp;&nbsp;}</p>
+                                        <p>}</p>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        }
+                        else
+                        {
+                            @* 有 pdb 因此 FilePath 有，但是源代码文件部署在服务器上，源代码不存在的情况 *@
+                            if (frameInfo.FilePath != null)
+                            {
+                                <div class="item-no-code">
+                                    <div class='sourcecode-file'>
+                                        <a href='file:///@(FormatPathHref(frameInfo.FilePath))'>@(frameInfo.FilePath)</a>&nbsp;
+                                        @if (frameInfo.LineNumber != 0)
+                                        {
+                                            <span>第 @(frameInfo.LineNumber) 行</span>
+                                        }
+                                        <p>@(invocation)</p>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="item-no-code">
+                                    @if (frameInfo.LineNumber != 0)
+                                    {
+                                        <span>@(invocation) 第 @(frameInfo.LineNumber) 行</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@(invocation + " +" + frame.GetNativeOffset())</span>
+                                    }
+                                </span>
+                            }
+                        }
+                    </li>
+                }
+            </ul>
+        </fieldset>
+    }
+}
+@helper RenderRequest(HttpRequest request)
+{
+    {
+        var nv = new System.Collections.Specialized.NameValueCollection(5);
+        nv.Add("URL", request.Url.ToString());
+        nv.Add("Http Method", request.HttpMethod);
+        //nv.Add("UrlReferrer", request.UrlReferrer.ToString());
+        if (nv != null && nv.Count > 0)
+        {
+            @RenderNameValueCollection2(nv, "General")
+        }
+    }
+    {
+        var nv = request.Headers;
+        if (nv != null && nv.Count > 0)
+        {
+            @RenderNameValueCollection2(nv, "Headers")
+        }
+    }
+    {
+        var nv = request.Cookies;
+        if (nv != null && nv.Count > 0)
+        {
+            @RenderHttpCookieCollection(nv)
+        }
+    }
+    {
+        var nv = request.QueryString;
+        if (nv != null && nv.Count > 0)
+        {
+            @RenderNameValueCollection2(nv, "QueryString")
+        }
+    }
+    {
+        var nv = request.Form;
+        if (nv != null && nv.Count > 0)
+        {
+            @RenderNameValueCollection2(nv, "Form")
+        }
+    }
+
+    {
+        var nv = request.ServerVariables;
+        if (nv != null && nv.Count > 0)
+        {
+            @RenderNameValueCollection2(nv, "Server Variables")
+        }
+    }
+
+}
+@helper RenderHttpCookieCollection(HttpCookieCollection cookies)
+{
+    if (cookies == null || cookies.Count == 0)
+    {
+        return;
+    }
+
+    var items = (from i in Enumerable.Range(0, cookies.Count)
+                 select new
+                 {
+                     Index = i,
+                     Cookie = cookies[i],
+                 });
+    <fieldset>
+        <legend>Cookies</legend>
+        <div class="scroll-view">
+            <table cellspacing="0" style="border-collapse:collapse;" class="table table-condensed table-striped">
+                <tr>
+                    <th class="name-col" style="white-space:nowrap;">Name</th>
+                    <th class="value-col" style="white-space:nowrap;">Value</th>
+                    <th class="value-col" style="white-space:nowrap;">Expires</th>
+                    <th class="value-col" style="white-space:nowrap;">Path</th>
+                    <th class="value-col" style="white-space:nowrap;">Domain</th>
+                    <th class="value-col" style="white-space:nowrap;">HttpOnly</th>
+                    <th class="value-col" style="white-space:nowrap;">Secure</th>
+                </tr>
+                @foreach (var item in items)
+                {
+                    var cookie = item.Cookie;
+                    <tr class="@(item.Index % 2 == 0 ? "even" : "odd")">
+                        <td class="key-col">@cookie.Name</td>
+                        <td class="value-col">@cookie.Value</td>
+                        <td class="value-col">@cookie.Expires</td>
+                        <td class="value-col">@cookie.Path</td>
+                        <td class="value-col">@cookie.Domain</td>
+                        <td class="value-col">@cookie.HttpOnly</td>
+                        <td class="value-col">@cookie.Secure</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </fieldset>
+}
+@helper RenderNameValueCollection2(System.Collections.Specialized.NameValueCollection nv, string title)
+{
+    if (nv != null && nv.Count > 0)
+    {
+        <fieldset>
+            <legend>@title</legend>
+            @RenderNameValueCollection(nv)
+        </fieldset>
+    }
+}
+@helper RenderNameValueCollection(System.Collections.Specialized.NameValueCollection nv)
+{
+    var items = (from i in Enumerable.Range(0, nv.Count)
+                 select new
+                 {
+                     Index = i,
+                     Key = nv.GetKey(i),
+                     Value = nv[i],
+                 });
+
+
+    @*
+        // Some values can be large and add scroll bars to the page
+        // as well as ruin some formatting. So we encapsulate the
+        // table into a scrollable view that is controlled via the
+        // style sheet.
+    *@
+    <div class="scroll-view">
+        <table cellspacing="0" style="border-collapse:collapse;" class="table table-condensed table-striped">
+            <tr>
+                <th class="name-col" style="white-space:nowrap;">Name</th>
+                <th class="value-col" style="white-space:nowrap;">Value</th>
+            </tr>
+            @foreach (var item in items)
+            {
+                <tr class="@(item.Index % 2 == 0 ? "even" : "odd")">
+                    <td class="key-col">@item.Key</td>
+                    <td class="value-col">@item.Value</td>
+                </tr>
+            }
+        </table>
+    </div>
+}
+@{
+    Exception exception = Model.Exception;
+    Exception _initialException = exception;
+    var exStack = new List<Exception>();
+    for (var ex1 = exception; ex1 != null; ex1 = ex1.InnerException)
+    {
+        exStack.Add(ex1);
+        _initialException = ex1;
+    }
+
+    var exStackIntos = GetExceptionStackTraceInfos(exStack);
+    var exceptionId = exception.GetExceptionId();
+
+    //StackFrameInfo lastExStackFrame=null;
+    //ExceptionStackTraceInfo lastExStack = null;
+    //for (int i = 0; i < exStackIntos.Length; i++)
+    //{
+    //    var st = exStackIntos[i];
+    //    var frames =st.StackFrameInfos;
+    //    if (frames == null)
+    //    {
+    //        continue;
+    //    }
+    //    for (int j = 0; j < frames.Length; j++)
+    //    {
+    //        if (frames[j].FileContent != null)
+    //        {
+    //            lastExStackFrame = frames[j];
+    //            lastExStack = st;
+    //        }
+    //    }
+    //}
+
+    string _initialExceptionFullName = _initialException.GetType().FullName;
+    string _initialExceptionMessage = _initialException.Message;
+
+    var httpContext = Model.HttpContext;
+    if (httpContext == null)
+    {
+        var wc = Model.WorkContext;
+        if (wc != null)
+        {
+            httpContext = wc.HttpContext;
+        }
+    }
+    //var displayPath = Model.VirtualPath ?? Model.PhysicalPath ?? path;
+}
+<!DOCTYPE html>
+<!--fake html body tag,to anti dianxin insert html ad script.-->
+<!--<head><title></title></head><body><div></div></body></html>-->
+<!--
+-->
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="renderer" content="webkit" />
+    <meta name="x5-page-mode" content="default" />
+    <title>
+        @if (!string.IsNullOrEmpty(_initialExceptionMessage))
+        {
+            <text>Application Error: @(_initialExceptionMessage)</text>
+        }
+        else
+        {
+            <text>Server Error in '@(Rhythm.Web.HttpApplicationEx.WebRoot)' Application.</text>
+        }
+    </title>
+    <style tabindex="@(12)">
+         body {
+        backround-color:white;
+        font-weight:normal;font-size: .7em;color:black;
+        }
+    p {font-weight:normal;color:black;margin-top: -5px}
+    b {font-weight:bold;color:black;margin-top: -5px}
+    H1 { font-weight:normal;font-size:18pt;color:red }
+    H2 { font-weight:normal;font-size:14pt;color:maroon }
+        body,H1,H2,code,p,b,span{
+        font-family:"Verdana";
+        }
+         .marker {font-weight: bold; color: black;text-decoration: none;}
+         .version {color: gray;}
+         .error {margin-bottom: 10px;}
+         .expandable { text-decoration:underline; font-weight:bold; color:navy; cursor:hand; }
+         @('@')media screen and (max-width: 639px) {
+        pre { width: 440px; overflow: auto; white-space: pre-wrap; word-wrap: break-word; }
+    }
+         @('@')media screen and (max-width: 479px) {
+        pre { width: 280px; }
+    }
+
+
+
+
+body
+{
+    font-family: Verdana;
+    font-size: 70%;
+    background-color: #fff;
+}
+
+button, input
+{
+    font-size: 100%;
+}
+
+a
+{
+    color: #0033CC;
+}
+
+a:visited
+{
+    color: Navy;
+}
+
+a:hover
+{
+    color: #FF6600;
+}
+
+img
+{
+    border: none;
+}
+
+pre, code
+{
+    font-family: "Courier New", Courier;
+}
+
+
+        .exception-summary-message{
+        display: block;
+          font-family: "Verdana";
+    font-weight: normal;
+    font-size: 18pt;
+    color: red;
+            -webkit-margin-before: 0.67em;
+    -webkit-margin-after: 0.67em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+        }
+
+        .exception-summary-type{
+             font-size: 14pt;
+            font-style: italic;
+          font-family: "Verdana";
+    font-weight: normal;
+    color: maroon;
+        }
+
+        .exception-message{
+
+        }
+
+         .exception-message-list{
+        }
+
+        .exception-message-list li{
+        margin-bottom:10px;
+        }
+        .exception-description{
+        }
+            .list-stack{
+        background-color:#ffffcc;
+
+            color: #333333;
+    background-color: #fcfcfc;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+        padding:5px 10px;
+        }
+        .b{
+        font-weight:600;
+        }
+        .err-body{
+        font-family:Arial, Helvetica, Geneva, SunSans-Regular, sans-serif;
+        }
+
+        .footer-table{
+        border:none;
+        }
+        .footer-table tr th{
+          text-align:right;
+        }
+        fieldset{
+        border:none;
+        margin:10px 0 0 0;
+        padding:0 0  0 0;
+        }
+        fieldset legend{
+        margin:10px 0 0 0;
+        padding:10px 0 10px 0;
+        font-weight:600;
+    }
+        .stack-list{
+        margin:0;
+
+        }
+           pre {
+              font-family: "Consolas","Lucida Console",Monospace;
+    font-size: 11pt;
+    margin: 0;
+    padding: 0.5em;
+    line-height: 14pt;
+
+
+        }
+      .stack-list li.stack-item
+        {
+        font-family: "Consolas","Lucida Console",Monospace;
+        font-size: 11pt;
+        margin: 0;
+        padding: 0.1em;
+        line-height: 14pt;
+    }
+
+       .stack-item .selfcode{
+        font-weight:600;
+        }
+
+        .code-line-ex{
+        font-size:9.5pt;
+        font-family:Consolas;
+
+        color:green;
+        }
+               .sourcecode-file a{
+         text-decoration:none;
+        color:#666;
+        }
+        .sourcecode-file{
+        color:#666;
+         text-decoration:underline;
+        }
+
+      .code-line{
+        line-height:1.7em;
+        }
+
+
+
+            .code-line-normal{
+         color:#999;
+        }
+
+        .code-line-key,.code-line-error{
+         color:red;
+        font-weight:600;
+        }
+          .code-line-error a:hover
+        {
+        #FF6600
+        }
+        .code-line-error  a,
+        .code-line-error  a:visited
+        {
+         color:red;
+        }
+
+
+        /*
+
+   ELMAH - Error Logging Modules and Handlers for ASP.NET
+   Copyright (c) 2004-9 Atif Aziz. All rights reserved.
+
+    Author(s):
+
+        Atif Aziz, http://www.raboof.com
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+*/
+.namevaluecollection .table
+{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.namevaluecollection td
+{
+    border: solid 1px silver;
+    padding: 0.4em;
+    vertical-align: top;
+}
+
+.namevaluecollection th
+{
+    text-align: left;
+    background-color: #0A6CCE;
+    padding: 0.4em;
+    color: White;
+    vertical-align: top;
+    border: solid 1px silver;
+}
+
+.odd-row
+{
+    background-color: #e9e9e9;
+}
+
+.type-col
+{
+    font-weight: bold;
+}
+
+.code-col, .date-col, .time-col
+{
+    text-align: right;
+}
+
+#ErrorDetail
+{
+    font-size: 110%;
+    background-color: #ffffcc;
+    padding: 1em;
+    width: 100%;
+}
+
+.st-type, .st-param-type
+{
+    color: #00008B;
+}
+
+.st-param-name
+{
+    color: #666;
+}
+
+.st-method
+{
+    color: #008B8B;
+    font-weight: bolder;
+}
+
+.st-file, .st-line
+{
+    color: #8B008B;
+}
+
+    #ErrorDetail
+    {
+        overflow: scroll;
+    }
+
+#ErrorTitle
+{
+    font-weight: bold;
+    font-size: 120%;
+}
+
+#ErrorType, #ErrorMessage
+{
+    display: block;
+}
+
+#ErrorTypeMessageSeparator
+{
+    display: none;
+}
+
+.key-col
+{
+    font-weight: bold;
+}
+
+h1
+{
+    font-family: Verdana;
+    font-weight: normal;
+    color: #0A6CCE;
+    font-size: 175%;
+}
+
+.table-caption
+{
+    background-color: navy;
+    margin: 0;
+    color: white;
+    padding: 0.4em;
+    font-weight: bold;
+}
+
+    .scroll-view
+    {
+        width: 100%;
+        overflow: scroll;
+    }
+
+#SpeedList
+{
+    margin: 0;
+    list-style-type: none;
+    text-transform: uppercase;
+    font-size: 80%;
+    padding: 0.25em 0;
+    color: #fff;
+    background-color: #aaa;
+    border-top: solid 1px #aaa;
+    border-bottom: solid 1px #aaa;
+}
+
+#SpeedList a
+{
+    text-decoration: none;
+    padding: 0.25em 1em;
+    border: solid 1px #aaa;
+    border-right: solid 1px #fff;
+    color: #fff;
+}
+
+#SpeedList a:hover
+{
+    background-color: #fff;
+    color: #444;
+    border: solid 1px #aaa;
+}
+
+#SpeedList li
+{
+    display: inline;
+}
+
+    </style>
+</head>
+<body>
+    <p class="exception-summary-message">发生类型为 '@(_initialExceptionFullName)' 的异常@(exceptionId == null ? null : "(ExceptionId:" + exceptionId + ")").</p>
+    <hr width="100%" size="1" color="silver">
+    <div style="margin:20px 0 0 0;">
+        <p class="exception-summary-type">@(_initialExceptionMessage)</p>
+        @*<p>
+                <span class="b">Root Exception Type@(CN("根异常类型")): </span><b class="exception-type">@(_initialExceptionFullName)</b>
+            </p>*@
+        @if (exStack != null && exStack.Count > 1)
+        {
+            var stackCount = exStack.Count;
+            <fieldset class="list-stack">
+                <legend>@(("异常列表")):</legend>
+                <ul class="exception-message-list">
+                    @for (int i = 0; i < exStack.Count; i++)
+                    {
+                        var ex = exStack[i];
+                        <li class="exception-message">
+                            @if (stackCount > 1)
+                            {
+                                if (i == stackCount - 1)
+                                {
+                                    <text>[@(("底层/根异常"))]</text>
+                                }
+                                else if (i == 0)
+                                {
+                                    <text>[@(("顶层异常"))]</text>
+                                }
+                                else
+                                {
+                                    <text>[@(("第 " + i.ToString() + " 层"))]</text>
+                                }
+                            }
+                            @(ex.GetType().FullName) : @(ex.Message)
+                        </li>
+                    }
+                </ul>
+            </fieldset>
+        }
+
+        @*<p>
+                <span class="b">Description: </span><span class="exception-description">@(_initialExceptionFullName)</span>
+            </p>*@
+    </div>
+
+    @if (_initialException is UnauthorizedAccessException)
+    {
+        <fieldset>
+            <legend>Unauthorized_Err_Desc1</legend>
+            <legend>Unauthorized_Err_Desc2</legend>
+        </fieldset>
+    }
+    else if (false)
+    {
+
+    }
+
+    @{{
+            var ex = (exception as ConfigurationErrorsException) ?? (_initialException as ConfigurationErrorsException);
+            if (ex != null)
+            {
+                @RenderConfigurationErrorsException(ex)
+            }
+
+        }}
+    @{ {
+            var ex = (exception as HttpCompileException) ?? (_initialException as HttpCompileException);
+            if (ex != null)
+            {
+                @RenderHttpCompileException(ex)
+            }
+        }}
+    @RenderFusion(exception)
+    <fieldset class="stack-trace list-stack tab-item">
+        <legend>堆栈跟踪:</legend>
+        <div>@(RenderExceptionStack(exStackIntos))</div>
+    </fieldset>
+    @if (httpContext != null)
+    {
+        HttpRequest request = null;
+        try
+        {
+            request = httpContext.Request;
+        }
+        catch { }
+        if (request != null)
+        {
+            <fieldset class="stack-trace list-stack tab-item">
+                <legend>请求信息:</legend>
+                <div class="namevaluecollection">@(RenderRequest(request))</div>
+            </fieldset>
+        }
+    }
+    <hr width="100%" size="1" color="silver">
+    <table class="footer-table">
+        <tr><th>Root Virtual Path:</th><td>@(Rhythm.Web.HttpApplicationEx.WebRoot)</td></tr>
+        <tr><th>App Directory:</th><td>@(AppDomainEx.CurrentDomain.BaseDirectory)</td></tr>
+        <tr><th>Rhythm Framework:</th><td>v6.0</td></tr>
+    </table>
+</body>
+</html>

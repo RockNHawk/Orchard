@@ -1,0 +1,95 @@
+﻿@using MnLab.Enterprise
+@using MnLab.Enterprise.Approval
+@using MnLab.Enterprise.Approval.Drivers
+@model ApprovalViewModel
+@{
+    var ApprovalPart = Model.ApprovalPart;
+    var content = ApprovalPart.ContentItem;
+    var contentEditor = Model.ContentEditor;
+}
+@*Parts.Approval*@
+
+@if (ApprovalPart.Status != ApprovalStatus.WaitingApproval)
+{
+    <div class="approval-notify-box">
+        <div class="approval-notify-msg">@(T("当前审批已完成，审批结果为：{0}，审批意见：{1}", T($"{nameof(ApprovalStatus)}.{ApprovalPart.Status}"), ApprovalPart.AuditOpinion))</div>
+        <div>审批完成时间：@(ApprovalPart.AuditDate)</div>
+    </div>
+}
+
+<fieldset>
+    <a target="_blank" href="@(Url.ItemEditUrl(content))">@(T("Edit"))</a>
+    @*<a href="@(Url.ItemDisplayUrl(content))">@(T("View"))</a>*@
+    <a target="_blank" href="@(Url.ItemDisplayUrl(content))">@(T("View"))</a>
+</fieldset>
+
+@Display(contentEditor)
+
+
+@if (ApprovalPart.Status == ApprovalStatus.WaitingApproval)
+{
+    <fieldset>
+        @Html.LabelFor(m => m.ApprovalPart.AuditOpinion, T("审批意见"))
+        @Html.TextBoxFor(m => m.ApprovalPart.AuditOpinion, new { @class = "text large" })
+        <span class="hint">@T("Separate multiple tags with commas")</span>
+    </fieldset>
+
+    @*<fieldset>
+            <label for="AuditOpinion">审批意见</label>
+            <input class="text large ui-autocomplete-input" id="AuditOpinion" name="AuditOpinion" type="text" value="" autocomplete="off">
+            <span class="hint">Separate multiple tags with commas</span>
+        </fieldset>*@
+}
+
+
+@using (Script.Head())
+{
+    <style>
+        fieldset.approval-button {
+            margin: 0 12px 0 0;
+            padding: 0 12px;
+            border-right: 1px solid #ccc;
+            clear: none;
+            float: left;
+        }
+    </style>
+}
+
+
+
+@using (Script.Foot())
+{
+    <script>
+        $(function () {
+            // removw the content self's button
+            //  $(".edit-item-content fieldset.save-button:first,fieldset.publish-button").remove();
+            $(".edit-item-content fieldset.save-button,.edit-item-content fieldset.publish-button").remove();
+            // $("fieldset.save-button,fieldset.publish-button").remove();
+            $("fieldset.publish-button").remove();
+        });
+    </script>
+    if (ApprovalPart.Status != ApprovalStatus.WaitingApproval)
+    {
+        Html.RenderPartial("_DisableEdit", (object)null);
+    }
+    else
+    {
+
+    }
+
+    @*<script>
+            // alert('ApprovalSupport');
+            $("button[fn-form-ajax]").on("click", function () {
+                var form = this.form || $('form')[0];
+                // debugger
+                if (form) {
+                    var btnAction = $(this).attr("fn-form-ajax");
+                    var rawAction = $(form).attr("action");
+                    $(form).attr("action", btnAction);
+                    setTimeout(function () {
+                        $(form).attr("action", rawAction);
+                    }, 10);
+                }
+            });
+        </script>*@
+}

@@ -1,0 +1,157 @@
+﻿@using System;
+@using Rhythm;
+@using Rhythm.ErrorHandling;
+@using Drahcro.Web;
+@using Rhythm.Web;
+@functions{
+    // public IErrorDisplayResult GetDisplay(System.Web.HttpApplication app, HttpContextBase context, Exception exception)
+    public IErrorDisplayResult GetDisplay(ErrorDisplayContext ee, HttpContextBase context)
+    {
+        //var workContext = context == null ? null : context.WorkContext();
+        //    var workContext = context == null ? null : new Rhythm.WorkContext(this.Context);
+        var workContext = context;
+        var exists = workContext == null ? null : (IErrorDisplayResult)workContext.Items["ErrorDisplayResult"];
+        if (exists != null)
+        {
+            return exists;
+        }
+        else
+        {
+            var errorDisplayDriver = ErrorDisplayDriver.Instance;
+            if (errorDisplayDriver == null)
+            {
+                errorDisplayDriver = new ErrorDisplayDriver(
+                    new ErrorDisplayHandler()
+                    {
+                        Process = (errorDisplay) =>
+                        {
+                            return new HttpErrorDisplayResult(this.Html.Partial("ErrorDisplay/ExceptionStack", errorDisplay).ToString())
+                            {
+                                HttpStatusCode = 500,
+                                ContentType = "text/html",
+                            };
+                        }
+                    },
+                    new ErrorDisplayHandler()
+                    {
+                        Process = (errorDisplay) =>
+                        {
+                            return new HttpErrorDisplayResult(this.Html.Partial("ErrorDisplay/ExceptionStack", errorDisplay).ToString())
+                            {
+                                ContentType = "application/json",
+                                HttpStatusCode = 200
+                            };
+                        }
+                    },
+                    new ErrorDisplayHandler()
+                    {
+                        Process = (errorDisplay) =>
+                        {
+                            return new HttpErrorDisplayResult(RenderFriendlyErrorToHtml(errorDisplay).ToString())
+                            {
+                                HttpStatusCode = 500,
+                                ContentType = "text/html",
+                            };
+                        }
+                    });
+            }
+
+            var exception = ee.Exception;
+            bool isAjaxRequest = context.IsAjaxRequest();
+            //if (isAjaxRequest && exception is ModelStateException)
+            if (isAjaxRequest && exception.GetSeverity() == ExceptionSeverity.Validation) {
+
+            }
+
+            if (errorDisplayDriver != null)
+            {
+                return errorDisplayDriver.Display(ee);
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+
+
+}
+
+
+@helper RenderFriendlyErrorToHtml(ErrorDisplayContext ee)
+{
+    <!DOCTYPE html>
+    <!--
+        An error occured, but faild to execute ErrorDisplayDriver:
+        <%=renderException.ToString()%>
+                        @(ee)
+                    -->
+    <html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>呃...</title>
+    </head>
+    <body>
+        An error occured
+        @(ee?.Exception?.Message)
+
+<pre>@(ee?.Exception)</pre>
+    </body>
+</html>
+}
+
+@helper RenderErrorFaildFallbackToHtml(Exception renderException)
+{
+    <!DOCTYPE html>
+    <!--
+        An error occured, but faild to execute ErrorDisplayDriver:
+        <%=renderException.ToString()%>
+                    -->
+    <html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>Emm...</title>
+    </head>
+    <body>
+        <div>An error occured but unable to display.</div>
+        <pre>@(renderException)</pre>
+    </body>
+</html>
+}
+
+
+@{
+    try
+    {
+        var context = this.Context;
+        Exception exception = Model.Exception ?? HttpApplicationUtility.GetException(this.ApplicationInstance, this.Context);
+
+        var ee = new ErrorDisplayContext
+        {
+            //  Configuration = ErrorDisplayConfigurationUtility.GetConfiguration(),
+            Configuration = new ErrorDisplayConfiguration {
+                DisplayMode = ErrorDisplayMode.ShowCustomErrorRemoteOnly
+            },
+            Exception = exception,
+            //  WorkContext = workContext,
+            IsLocal = context.Request.IsLocal,
+        };
+
+        var display = GetDisplay(ee, context);
+        if (display != null)
+        {
+            @*@display.ToString();
+                ErrorDisplayUtility.SetResponse(display, this.Response);*@
+        ErrorDisplayUtility.WriteResponse(display, this.Response);
+        this.Response.End();
+        }
+}
+catch (Exception renderException)
+{
+        @RenderErrorFaildFallbackToHtml(renderException);
+    }
+
+}

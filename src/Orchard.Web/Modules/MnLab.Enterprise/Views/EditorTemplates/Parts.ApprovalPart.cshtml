@@ -1,11 +1,15 @@
 ﻿@using MnLab.Enterprise
 @using MnLab.Enterprise.Approval
 @using MnLab.Enterprise.Approval.Drivers
+@using Orchard.ContentManagement;
 @model ApprovalViewModel
 @{
     var ApprovalPart = Model.ApprovalPart;
     var content = ApprovalPart.ContentItem;
     var contentEditor = Model.ContentEditor;
+
+    var referenceContent = ApprovalPart.ContentRecord;
+    var referenceContentItem = WorkContext.Resolve<IContentManager>().Get(referenceContent.Id);
 }
 @*Parts.Approval*@
 
@@ -17,13 +21,16 @@
     </div>
 }
 
-<fieldset>
-    <a target="_blank" href="@(Url.ItemEditUrl(content))">@(T("Edit"))</a>
-    @*<a href="@(Url.ItemDisplayUrl(content))">@(T("View"))</a>*@
-    <a target="_blank" href="@(Url.ItemDisplayUrl(content))">@(T("View"))</a>
-</fieldset>
+@if (referenceContentItem != null)
+{
+    <fieldset>
+        <a target="_blank" href="@(Url.ItemEditUrl(referenceContentItem))">@(T("Edit Content"))</a>
+        @*<a href="@(Url.ItemDisplayUrl(content))">@(T("View"))</a>*@
+        <a target="_blank" href="@(Url.ItemDisplayUrl(referenceContentItem))">@(T("View Content"))</a>
+    </fieldset>
 
-@Display(contentEditor)
+    @Display(contentEditor)
+}
 
 
 @if (ApprovalPart.Status == ApprovalStatus.WaitingApproval)

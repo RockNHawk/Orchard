@@ -1,0 +1,75 @@
+﻿@using Rhythm;
+@using Rhythm.ErrorHandling;
+@using Drahcro.Web;
+@using Rhythm.Web;
+@functions{
+    public static IErrorDisplayResult GetDisplay(System.Web.HttpApplication app, HttpContextBase context)
+    {
+        // var workContext = context == null ? null : context.WorkContext();
+        //    var workContext = context == null ? null : new Rhythm.WorkContext(this.Context);
+        var workContext = context;
+        var exists = workContext == null ? null : (IErrorDisplayResult)workContext.Items["ErrorDisplayResult"];
+        if (exists != null)
+        {
+            return exists;
+        }
+        else
+        {
+            var errorDisplay = ErrorDisplayDriver.Instance;
+            if (errorDisplay != null)
+            {
+                return errorDisplay.Display(new ErrorDisplayContext
+                {
+                    //  Configuration = ErrorDisplayConfigurationUtility.GetConfiguration(),
+                    //  Configuration = ErrorDisplayConfigurationUtility.GetConfiguration(),
+                    Exception = HttpApplicationUtility.GetException(app, context),
+                  //  WorkContext = workContext,
+                    IsLocal = context.Request.IsLocal,
+                });
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+
+
+
+}
+@helper RenderPage()
+{
+    <!DOCTYPE html>
+    <!--
+        An error occured, but faild to execute ErrorDisplayDriver:
+        <%=displayEx.ToString()%>
+    -->
+    <html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>呃...</title>
+    </head>
+    <body>
+        An error occured but unable to display.
+    </body>
+</html>
+}
+
+
+@{
+    try
+    {
+        var display = GetDisplay(this.ApplicationInstance, this.Context);
+        if (display != null)
+        {
+
+            @display.ToString();
+            Drahcro.ErrorHandling.ErrorDisplayUtility.SetResponse(display, this.Response);
+        }
+    }
+    catch (Exception displayEx)
+    {
+    }
+
+}
