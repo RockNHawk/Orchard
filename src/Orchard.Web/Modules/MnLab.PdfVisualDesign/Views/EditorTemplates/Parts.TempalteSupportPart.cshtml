@@ -23,8 +23,9 @@
     {
 <script>
          //   $("#LayoutPart_LayoutEditor_TemplateId").val("68")
-            var url = '@(base.WorkContext.CurrentSite.BaseUrl)/Admin/MnLab.PdfVisualDesign/GetContentValueMap/@(contentId)';
-            if (!localStorage.getItem('vsd.GetContentValueMap.disabled')) {
+    var url = '@(base.WorkContext.CurrentSite.BaseUrl)/Admin/MnLab.PdfVisualDesign/GetContentValueMap/@(contentId)';
+    var sw = localStorage.getItem('vsd.GetContentValueMap.disabled');
+            if (!sw) {
         syncContentPart(url,null,$("form[action='/Admin/Contents/Edit/@contentId']"));
             }
 </script>

@@ -179,15 +179,21 @@
             // progressDialog.hide();
         }
     };
+    // zhis method called twice
     var bl = function (isLock, context) {
         if (isLock) {
+            var $disabledButtons = $(context.form).find("button,input[type='submit']").filter("*[disabled!='disabled']");
+            context.$disabledButtons = $disabledButtons;
             setTimeout(function () {
-                context.$disabledButtons = $(context.form).find("button,input[type='submit']").filter("*[disabled!='disabled']").addClass("_ajax_disabled").attr("disabled", true);
-            }, 1);
+                //debugger
+                $disabledButtons.addClass("_ajax_disabled").attr("disabled", true);
+            }, 0);
         }
         else {
-            if (typeof (context.$disabledButtons) != "undefined" && context.$disabledButtons.length) {
-                context.$disabledButtons.removeClass("_ajax_disabled").attr("disabled", false);
+            //debugger
+            var $disabledButtons = context.$disabledButtons;
+            if ($disabledButtons && $disabledButtons.length) {
+                $disabledButtons.removeClass("_ajax_disabled").removeAttr("disabled");
             }
         }
     };
@@ -219,8 +225,8 @@
                     //  debugger
                     return ajaxLocks.all.apply(this, arguments);
                 },
-                success: function (response, context) {
-                    response = context.response;
+                success: function (data, context) {
+                    var response = context.response;
                     if (response.redirect) {
                         // 过一会儿再解锁屏幕，避免用户狂点提交按钮
                         setTimeout(function () {

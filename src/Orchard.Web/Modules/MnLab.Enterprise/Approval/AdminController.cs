@@ -119,7 +119,7 @@ namespace MnLab.Enterprise.Approval.Controllers {
             var workContext = base.ControllerContext.GetWorkContext();
             //var user = workContext.CurrentUser.As<UserPart>().Record;
             _approvalService.Approve(workContext, id, AuditOpinion);
-            return Done(T("Approved").Text);
+            return Done(T("Approved").Text).Refresh();
         }
 
 
@@ -127,7 +127,7 @@ namespace MnLab.Enterprise.Approval.Controllers {
             var workContext = base.ControllerContext.GetWorkContext();
             //  var user = workContext.CurrentUser.As<UserPart>().Record;
             _approvalService.Reject(workContext, id, AuditOpinion);
-            return Done(T("Rejected").Text);
+            return Done(T("Rejected").Text).Refresh();
         }
 
         [ActionName("Create")]
@@ -245,7 +245,7 @@ namespace MnLab.Enterprise.Approval.Controllers {
                 : T("Your {0} has been saved.", contentItem.TypeDefinition.DisplayName));
 
             //return this.RedirectLocal(returnUrl, () => RedirectToAction("Edit", new RouteValueDictionary { { "Id", contentItem.Id } }));
-            return Done(T("Commited").Text);
+            return Done(T("Commited").Text).Refresh();
         }
 
 

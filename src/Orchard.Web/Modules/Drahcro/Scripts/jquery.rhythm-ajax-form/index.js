@@ -397,14 +397,14 @@ var RhythmAjaxForm;
             form.target = target.id;
             setTimeout(function () {
                 form.target = originalTarget;
-            }, 1);
+            }, 0);
             var url = _options.url;
             if (url) {
                 var originalUrl = $form.attr('action');
                 $form.attr('action', url);
                 setTimeout(function () {
                     $form.attr('action', originalUrl);
-                }, 1);
+                }, 0);
             }
             var context = {
                 form: form,

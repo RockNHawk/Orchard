@@ -459,7 +459,7 @@ module RhythmAjaxForm {
             form.target = target.id;
             setTimeout(function () {
                 form.target = originalTarget;
-            }, 1);
+            }, 0);
 
             var url = _options.url;
             if (url) {
@@ -467,7 +467,7 @@ module RhythmAjaxForm {
                 $form.attr('action', url);
                 setTimeout(function () {
                     $form.attr('action', originalUrl);
-                }, 1);
+                }, 0);
             }
 
             var context: AjaxContext = {
