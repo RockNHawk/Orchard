@@ -85,6 +85,7 @@
   <ItemGroup>
     <Content Include="Content\Admin\images\check.gif" />
     <Content Include="Content\Admin\images\uncheck.gif" />
+    <Content Include="Scripts\bootstrap.css" />
     <Content Include="Views\Web.config" />
     <Content Include="Scripts\Web.config" />
     <Content Include="Styles\Web.config" />
