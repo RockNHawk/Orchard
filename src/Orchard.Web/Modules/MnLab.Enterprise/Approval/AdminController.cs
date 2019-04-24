@@ -38,9 +38,11 @@ using MnLab.Enterprise;
 using MnLab.Enterprise.Approval;using MnLab.Enterprise.Approval.Models;
 using Orchard.Users.Models;
 using Rhythm.Web;
+using Orchard.Themes;
 
 namespace MnLab.Enterprise.Approval.Controllers {
     //[Admin]
+    [Themed]
     [ValidateInput(false)]
     public class AdminController : RhythmControllerBase {
 

@@ -60,6 +60,10 @@
       <HintPath>..\..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Rhythm.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Rhythm\src\packages\Rhythm.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -99,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ThemeZonePreview.png" />
+    <Content Include="Views\ErrorDisplayForward.aspx" />
     <Content Include="Web.config" />
     <Content Include="Scripts\Web.config" />
     <Content Include="Styles\Web.config" />
@@ -123,7 +128,7 @@
       <Name>Drahcro</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Modules\MnLab.Enterprise\MnLab.Enterprise.csproj">
-      <Project>{54162f30-2d6c-63f9-0288-123690f26791}</Project>
+      <Project>{dbe6b463-2f1d-47a3-828c-c56262e91911}</Project>
       <Name>MnLab.Enterprise</Name>
     </ProjectReference>
   </ItemGroup>
@@ -134,11 +139,15 @@
     <Content Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdminOverride.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Iroo.VersionManager\Admin\List.cshtml" />
     <Content Include="Views\Iroo.VersionManager\Admin\ListDeleted.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ErrorPage.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -5,8 +5,10 @@ using System.Collections.Generic;
 //using Microsoft.AspNetCore.Routing;
 using System.ServiceModel.Channels;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 using Newtonsoft.Json;
+using Drahcro.ErrorHandling;
 
 namespace Rhythm.Web {
 
@@ -256,18 +258,15 @@ namespace Rhythm.Web {
             response.Write(this.GetString(context));
         }
 
-        //public void ExecuteResult(HttpResponse response)
-        //{
-        //    if (response == null)
-        //    {
-        //        throw new ArgumentNullException(nameof(response));
-        //    }
-        //    if (string.Compare(response.ContentType, "text/html", StringComparison.OrdinalIgnoreCase) != 0)
-        //    {
-        //        response.ContentType = "text/html";
-        //    }
-        //    response.WriteAsync(this.GetString(null));
-        //}
+        public void ExecuteResult(HttpResponseBase response) {
+            if (response == null) {
+                throw new ArgumentNullException(nameof(response));
+            }
+            if (string.Compare(response.ContentType, "text/html", StringComparison.OrdinalIgnoreCase) != 0) {
+                response.ContentType = "text/html";
+            }
+            response.Write(this.GetString(null));
+        }
 
         public override string ToString() {
             return GetString(null);
